@@ -1,0 +1,1092 @@
+/* ===== Django Admin Tshaleeh Theme ===== */
+/* Complete redesign to match Tshaleeh glassmorphism aesthetic */
+
+/* Import fonts */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Root Variables - Tshaleeh Colors */
+:root {
+  /* Primary colors matching Tshaleeh */
+  --primary-50: #f0fdfc;
+  --primary-100: #ccfbf1;
+  --primary-200: #99f6e4;
+  --primary-300: #5eead4;
+  --primary-400: #2dd4bf;
+  --primary-500: #14b8a6;  /* Main Tshaleeh color */
+  --primary-600: #0d9488;
+  --primary-700: #0f766e;
+  --primary-800: #115e59;
+  --primary-900: #134e4a;
+
+  /* Background and surfaces - Dark Theme */
+  --bg-primary: linear-gradient(135deg, #0b1220 0%, #0f172a 100%);
+  --bg-glass: rgba(15, 23, 42, 0.7);
+  --bg-glass-hover: rgba(15, 23, 42, 0.8);
+  --bg-surface: rgba(15, 23, 42, 0.6);
+  
+  /* Text colors - Dark Theme */
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  
+  /* Borders and effects - Dark Theme */
+  --border-glass: rgba(148, 163, 184, 0.2);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --backdrop-blur: blur(16px);
+}
+
+/* Dark mode variables */
+.dark, [data-theme="dark"] {
+  --bg-primary: linear-gradient(135deg, #0b1220 0%, #0f172a 100%);
+  --bg-glass: rgba(15, 23, 42, 0.7);
+  --bg-glass-hover: rgba(15, 23, 42, 0.8);
+  --bg-surface: rgba(15, 23, 42, 0.6);
+  --text-primary: #e2e8f0;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --border-glass: rgba(100, 116, 139, 0.2);
+}
+
+/* Base HTML and body */
+html, body {
+  font-family: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  direction: rtl !important;
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  transition: all 0.3s ease;
+}
+
+/* Glass effect utilities */
+.glass-effect {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  -webkit-backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  box-shadow: var(--shadow-glass) !important;
+}
+
+/* ===== Django Admin Overrides ===== */
+
+/* Header styling */
+#header {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 0 0 20px 20px !important;
+  box-shadow: var(--shadow-glass) !important;
+  color: var(--text-primary) !important;
+}
+
+#branding h1 {
+  color: var(--text-primary) !important;
+  font-family: 'Cairo', sans-serif !important;
+    font-weight: 700 !important;
+}
+
+#branding h1 a:link,
+#branding h1 a:visited {
+  color: var(--primary-500) !important;
+    text-decoration: none !important;
+}
+
+/* Navigation styling */
+.admin-nav-global {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  padding: 0 20px;
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 15px !important;
+  margin: 10px 0 !important;
+}
+
+.nav-items {
+    display: flex;
+  gap: 20px;
+    align-items: center;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: var(--bg-glass);
+  backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--border-glass);
+  color: var(--text-primary) !important;
+    text-decoration: none !important;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.nav-item:hover {
+  background: var(--bg-glass-hover);
+  border-color: var(--primary-400);
+  transform: translateY(-2px);
+}
+
+.nav-telegram {
+  background: linear-gradient(135deg, #0088cc, #229ed9) !important;
+  color: white !important;
+  border: none !important;
+}
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.nav-controls {
+    display: flex;
+  gap: 10px;
+    align-items: center;
+}
+
+.theme-toggle {
+  background: var(--bg-glass);
+  backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--border-glass);
+  border-radius: 10px;
+  padding: 8px 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+  background: var(--bg-glass-hover);
+  transform: scale(1.05);
+}
+
+.nav-logout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white !important;
+    text-decoration: none !important;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.nav-logout:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* Content area */
+#content {
+  background: transparent !important;
+  padding: 20px !important;
+}
+
+.content-wrapper {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--shadow-glass) !important;
+  padding: 30px !important;
+  margin: 20px 0 !important;
+}
+
+/* Module styling */
+.module {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 15px !important;
+  box-shadow: var(--shadow-glass) !important;
+  margin-bottom: 20px !important;
+}
+
+.module h2 {
+  background: var(--primary-500) !important;
+  color: white !important;
+  border-radius: 15px 15px 0 0 !important;
+  padding: 15px 20px !important;
+    margin: 0 !important;
+  font-family: 'Cairo', sans-serif !important;
+  font-weight: 600 !important;
+}
+
+.module table {
+  background: transparent !important;
+  border: none !important;
+}
+
+.module th {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-glass) !important;
+  padding: 12px !important;
+  font-family: 'Cairo', sans-serif !important;
+  font-weight: 600 !important;
+}
+
+.module td {
+  background: var(--bg-glass) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-glass) !important;
+  padding: 12px !important;
+}
+
+.module tr:hover td {
+  background: var(--bg-glass-hover) !important;
+}
+
+/* Button styling */
+.button, .btn, input[type="submit"], button {
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600)) !important;
+  color: white !important;
+    border: none !important;
+  border-radius: 10px !important;
+  padding: 10px 20px !important;
+  font-family: 'Cairo', sans-serif !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3) !important;
+}
+
+.button:hover, .btn:hover, input[type="submit"]:hover, button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.4) !important;
+}
+
+.button.default {
+  background: var(--bg-glass) !important;
+  color: var(--text-primary) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  box-shadow: var(--shadow-glass) !important;
+}
+
+/* Form styling */
+.form-row {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 10px !important;
+  padding: 15px !important;
+  margin-bottom: 15px !important;
+}
+
+.form-row input, .form-row select, .form-row textarea {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 8px !important;
+  padding: 10px !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  transition: all 0.3s ease !important;
+}
+
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+  outline: none !important;
+  border-color: var(--primary-400) !important;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1) !important;
+}
+
+.form-row label {
+  color: var(--text-primary) !important;
+  font-family: 'Cairo', sans-serif !important;
+  font-weight: 500 !important;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 10px !important;
+  padding: 10px 20px !important;
+  margin-bottom: 20px !important;
+  color: var(--text-secondary) !important;
+}
+
+.breadcrumbs a {
+  color: var(--primary-500) !important;
+  text-decoration: none !important;
+}
+
+.breadcrumbs a:hover {
+  color: var(--primary-600) !important;
+}
+
+/* Messages */
+.messagelist {
+  margin: 20px 0 !important;
+}
+
+.messagelist li {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 10px !important;
+  padding: 15px 20px !important;
+  margin-bottom: 10px !important;
+  color: var(--text-primary) !important;
+    font-family: 'Cairo', sans-serif !important;
+}
+
+.messagelist .success {
+  border-color: #10b981 !important;
+  background: rgba(16, 185, 129, 0.1) !important;
+}
+
+.messagelist .error {
+  border-color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+
+.messagelist .warning {
+  border-color: #f59e0b !important;
+  background: rgba(245, 158, 11, 0.1) !important;
+}
+
+/* Footer */
+.admin-footer {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 20px 20px 0 0 !important;
+  margin-top: 40px !important;
+  padding: 20px !important;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-secondary) !important;
+  font-size: 14px;
+}
+
+.footer-info {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.separator {
+  color: var(--text-muted) !important;
+}
+
+.footer-links {
+  display: flex;
+  gap: 20px;
+}
+
+.footer-links a {
+  color: var(--primary-500) !important;
+  text-decoration: none !important;
+  font-weight: 500 !important;
+}
+
+.footer-links a:hover {
+  color: var(--primary-600) !important;
+}
+
+/* Dashboard boxes */
+.dashboard .module h2 {
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600)) !important;
+}
+
+.dashboard .module table {
+  border-radius: 0 0 15px 15px !important;
+    overflow: hidden !important;
+}
+
+/* Object tools */
+.object-tools {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 10px !important;
+  padding: 10px !important;
+  margin-bottom: 20px !important;
+}
+
+.object-tools a {
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600)) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  padding: 8px 16px !important;
+  text-decoration: none !important;
+  font-family: 'Cairo', sans-serif !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+.object-tools a:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3) !important;
+}
+
+/* Paginator */
+.paginator {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 10px !important;
+  padding: 15px !important;
+  margin: 20px 0 !important;
+  text-align: center !important;
+}
+
+.paginator a, .paginator .this-page {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 6px !important;
+  padding: 6px 12px !important;
+  margin: 0 3px !important;
+  text-decoration: none !important;
+  transition: all 0.3s ease !important;
+}
+
+.paginator a:hover {
+  background: var(--primary-500) !important;
+  color: white !important;
+  transform: translateY(-1px) !important;
+}
+
+.paginator .this-page {
+  background: var(--primary-500) !important;
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+/* Search form */
+#toolbar {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 10px !important;
+  padding: 15px !important;
+  margin-bottom: 20px !important;
+}
+
+#searchbar {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 8px !important;
+  padding: 10px !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+}
+
+/* Action dropdown */
+.actions {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 10px !important;
+  padding: 15px !important;
+  margin-bottom: 20px !important;
+}
+
+.actions select {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 8px !important;
+  padding: 8px !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .admin-nav-global {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+  }
+  
+  .nav-items {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .footer-content {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .footer-links {
+    justify-content: center;
+  }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.module, .content-wrapper, .form-row {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-glass);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-500);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-600);
+}
+
+/* Dark mode toggle animation */
+.theme-toggle i {
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover i {
+  transform: rotate(15deg);
+}
+
+/* Focus states for accessibility */
+*:focus {
+  outline: 2px solid var(--primary-400) !important;
+  outline-offset: 2px !important;
+}
+
+/* Enhanced branding */
+.admin-branding {
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 !important;
+}
+
+.admin-logo-link {
+  display: flex !important;
+  align-items: center !important;
+    text-decoration: none !important;
+  color: white !important;
+  padding: 10px 0 !important;
+}
+
+.admin-logo {
+  width: 50px !important;
+  height: 50px !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-left: 15px !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.admin-logo i {
+  font-size: 24px !important;
+  color: white !important;
+}
+
+.admin-title h1 {
+  font-size: 28px !important;
+  font-weight: 700 !important;
+    margin: 0 !important;
+  font-family: 'Cairo', sans-serif !important;
+}
+
+.admin-title span {
+  font-size: 14px !important;
+  opacity: 0.9 !important;
+  font-weight: 400 !important;
+}
+
+/* Navigation container */
+.nav-container {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 0 30px !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+}
+
+/* Index page modules */
+.dashboard .module {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--shadow-glass) !important;
+  margin-bottom: 25px !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+}
+
+.dashboard .module:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 12px 40px rgba(20, 184, 166, 0.15) !important;
+}
+
+.dashboard .module h2 {
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600)) !important;
+  color: white !important;
+  padding: 20px 25px !important;
+  margin: 0 !important;
+  font-family: 'Cairo', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 18px !important;
+  border: none !important;
+}
+
+.dashboard .module h2 a {
+  color: white !important;
+  text-decoration: none !important;
+}
+
+/* Index page table styling */
+.dashboard .module table {
+  background: transparent !important;
+  width: 100% !important;
+  border-collapse: collapse !important;
+}
+
+.dashboard .module th {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border: none !important;
+  border-bottom: 1px solid var(--border-glass) !important;
+  padding: 15px 20px !important;
+  font-family: 'Cairo', sans-serif !important;
+  font-weight: 600 !important;
+  text-align: right !important;
+}
+
+.dashboard .module td {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  border: none !important;
+  border-bottom: 1px solid var(--border-glass) !important;
+  padding: 15px 20px !important;
+  text-align: right !important;
+}
+
+.dashboard .module tbody tr:hover td {
+  background: var(--bg-glass-hover) !important;
+}
+
+.dashboard .module tbody tr:hover {
+  background: var(--bg-glass-hover) !important;
+}
+
+/* Change list pages */
+#changelist {
+  background: transparent !important;
+}
+
+#changelist .results {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--shadow-glass) !important;
+  overflow: hidden !important;
+  margin-top: 20px !important;
+}
+
+#changelist .results table {
+  background: transparent !important;
+  border: none !important;
+}
+
+#changelist .results th {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border: none !important;
+  border-bottom: 1px solid var(--border-glass) !important;
+  padding: 15px 20px !important;
+  font-family: 'Cairo', sans-serif !important;
+    font-weight: 600 !important;
+}
+
+#changelist .results td {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  border: none !important;
+  border-bottom: 1px solid var(--border-glass) !important;
+  padding: 15px 20px !important;
+}
+
+#changelist .results tbody tr:hover {
+  background: var(--bg-glass-hover) !important;
+}
+
+/* Action bar */
+.actions {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 15px !important;
+  padding: 20px !important;
+  margin-bottom: 20px !important;
+  box-shadow: var(--shadow-glass) !important;
+}
+
+.actions label {
+  color: var(--text-primary) !important;
+  font-family: 'Cairo', sans-serif !important;
+  font-weight: 600 !important;
+}
+
+.actions select {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 10px !important;
+  padding: 10px 15px !important;
+  font-family: 'Cairo', sans-serif !important;
+  margin: 0 10px !important;
+}
+
+/* Content main wrapper */
+#content-main {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+/* Change form styling */
+.change-form .form-row {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 15px !important;
+  padding: 20px !important;
+  margin-bottom: 20px !important;
+  box-shadow: var(--shadow-glass) !important;
+}
+
+.change-form .form-row .field-box {
+  background: transparent !important;
+}
+
+.change-form label {
+  color: var(--text-primary) !important;
+  font-family: 'Cairo', sans-serif !important;
+  font-weight: 600 !important;
+  display: block !important;
+  margin-bottom: 8px !important;
+}
+
+.change-form input[type="text"],
+.change-form input[type="email"],
+.change-form input[type="password"],
+.change-form input[type="number"],
+.change-form select,
+.change-form textarea {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 10px !important;
+  padding: 12px 15px !important;
+    font-family: 'Cairo', sans-serif !important;
+  width: 100% !important;
+  transition: all 0.3s ease !important;
+}
+
+.change-form input:focus,
+.change-form select:focus,
+.change-form textarea:focus {
+    outline: none !important;
+  border-color: var(--primary-400) !important;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1) !important;
+}
+
+/* Fieldsets */
+.fieldset {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 20px !important;
+  padding: 0 !important;
+  margin-bottom: 25px !important;
+  box-shadow: var(--shadow-glass) !important;
+    overflow: hidden !important;
+}
+
+.fieldset h2 {
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600)) !important;
+  color: white !important;
+  padding: 20px 25px !important;
+  margin: 0 !important;
+  font-family: 'Cairo', sans-serif !important;
+  font-weight: 600 !important;
+    border: none !important;
+}
+
+.fieldset .fieldBox {
+  padding: 25px !important;
+}
+
+/* Inline forms */
+.inline-group {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 20px !important;
+  padding: 0 !important;
+  margin-bottom: 25px !important;
+  box-shadow: var(--shadow-glass) !important;
+  overflow: hidden !important;
+}
+
+.inline-group .module h2 {
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600)) !important;
+  color: white !important;
+  padding: 20px 25px !important;
+    margin: 0 !important;
+  font-family: 'Cairo', sans-serif !important;
+  font-weight: 600 !important;
+}
+
+.inline-group table {
+  background: transparent !important;
+  margin: 20px !important;
+  border-radius: 15px !important;
+  overflow: hidden !important;
+}
+
+/* Submit row */
+.submit-row {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 15px !important;
+  padding: 20px !important;
+  margin-top: 25px !important;
+  box-shadow: var(--shadow-glass) !important;
+  text-align: center !important;
+}
+
+/* Help text */
+.help, .grp-help {
+  color: var(--text-muted) !important;
+  font-size: 13px !important;
+  margin-top: 5px !important;
+  font-family: 'Cairo', sans-serif !important;
+}
+
+/* Error styling */
+.errorlist {
+  background: var(--message-error-bg) !important;
+  border: 1px solid #dc2626 !important;
+  border-radius: 10px !important;
+  padding: 10px 15px !important;
+  margin: 10px 0 !important;
+  color: #dc2626 !important;
+  font-family: 'Cairo', sans-serif !important;
+}
+
+.errorlist li {
+  list-style: none !important;
+    margin: 0 !important;
+}
+
+.errorlist li:before {
+  content: "\f071" !important;
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 900 !important;
+  margin-left: 8px !important;
+}
+
+/* Success messages */
+.success {
+  background: var(--message-success-bg) !important;
+  border: 1px solid #10b981 !important;
+  border-radius: 10px !important;
+  padding: 15px 20px !important;
+  margin: 15px 0 !important;
+  color: #065f46 !important;
+  font-family: 'Cairo', sans-serif !important;
+}
+
+/* Filter sidebar */
+#changelist-filter {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 20px !important;
+  padding: 25px !important;
+  box-shadow: var(--shadow-glass) !important;
+}
+
+#changelist-filter h2 {
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600)) !important;
+  color: white !important;
+  padding: 15px 20px !important;
+  margin: -25px -25px 20px -25px !important;
+  font-family: 'Cairo', sans-serif !important;
+  font-weight: 600 !important;
+  border-radius: 20px 20px 0 0 !important;
+}
+
+#changelist-filter h3 {
+  color: var(--text-primary) !important;
+  font-family: 'Cairo', sans-serif !important;
+  font-weight: 600 !important;
+  margin: 20px 0 10px 0 !important;
+  font-size: 14px !important;
+}
+
+#changelist-filter a {
+  color: var(--text-primary) !important;
+    text-decoration: none !important;
+  padding: 8px 12px !important;
+    display: block !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+  font-family: 'Cairo', sans-serif !important;
+}
+
+#changelist-filter a:hover {
+  background: var(--bg-glass-hover) !important;
+  color: var(--primary-500) !important;
+}
+
+#changelist-filter a.selected {
+  background: var(--primary-500) !important;
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+#changelist-filter ul {
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+#changelist-filter li {
+  margin: 2px 0 !important;
+}
+
+/* Search bar enhancements */
+#toolbar {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 15px !important;
+  padding: 20px !important;
+  margin-bottom: 20px !important;
+  box-shadow: var(--shadow-glass) !important;
+}
+
+#searchbar {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 10px !important;
+  padding: 12px 15px !important;
+  font-family: 'Cairo', sans-serif !important;
+  width: 300px !important;
+  margin-left: 10px !important;
+}
+
+#searchbar:focus {
+  outline: none !important;
+  border-color: var(--primary-400) !important;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1) !important;
+}
+
+/* Date hierarchy */
+.xfull {
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: 15px !important;
+  padding: 15px 20px !important;
+  margin-bottom: 20px !important;
+  box-shadow: var(--shadow-glass) !important;
+}
+
+.xfull a {
+  color: var(--primary-500) !important;
+  text-decoration: none !important;
+  font-family: 'Cairo', sans-serif !important;
+  font-weight: 500 !important;
+  padding: 5px 10px !important;
+  border-radius: 6px !important;
+  transition: all 0.3s ease !important;
+}
+
+.xfull a:hover {
+  background: var(--bg-glass-hover) !important;
+  color: var(--primary-600) !important;
+}
+
+/* Print styles */
+@media print {
+  .admin-nav-global,
+  .theme-toggle,
+  .nav-logout,
+  .admin-footer {
+        display: none !important;
+    }
+    
+  .module,
+  .content-wrapper {
+        background: white !important;
+        border: 1px solid #ccc !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 768px) {
+  .nav-container {
+    padding: 0 15px !important;
+  }
+  
+  .admin-title h1 {
+    font-size: 20px !important;
+  }
+  
+  .admin-title span {
+    font-size: 12px !important;
+  }
+  
+  #changelist-filter {
+    margin-top: 20px !important;
+  }
+  
+  .dashboard .module {
+    margin-bottom: 15px !important;
+  }
+  
+  .dashboard .module h2 {
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    }
+} 

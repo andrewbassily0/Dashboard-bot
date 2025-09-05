@@ -1,0 +1,265 @@
+{
+  "name": "New Auto Parts Request - Fixed",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-request",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "c5d1c0e0-4b8a-4f8c-9a0e-1b2c3d4e5f6g",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.request_type }}",
+              "operation": "equal",
+              "value2": "client"
+            }
+          ]
+        }
+      },
+      "id": "f6e5d4c3-b2a1-9c8d-7e6f-5a4b3c2d1e0f",
+      "name": "Check Request Type",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://django_app:8000/bot/api/requests/",
+        "authentication": "none",
+        "requestFormat": "json",
+        "jsonParameters": "specify",
+        "specifyJsonParameters": [
+          {
+            "name": "user_id",
+            "value": "={{ $json.user_id }}"
+          },
+          {
+            "name": "city_id", 
+            "value": "={{ $json.city_id }}"
+          },
+          {
+            "name": "brand_id",
+            "value": "={{ $json.brand_id }}"
+          },
+          {
+            "name": "model_id",
+            "value": "={{ $json.model_id }}"
+          },
+          {
+            "name": "year",
+            "value": "={{ $json.year }}"
+          },
+          {
+            "name": "parts",
+            "value": "={{ $json.parts }}"
+          },
+          {
+            "name": "media_files",
+            "value": "={{ $json.media_files || [] }}"
+          }
+        ],
+        "options": {}
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Create Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        680,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://django_app:8000/bot/api/junkyards/",
+        "qs": {
+          "city_id": "={{ $json.city_id }}",
+          "active": "true"
+        },
+        "options": {}
+      },
+      "id": "b2c3d4e5-f6g7-8901-bcde-f23456789012",
+      "name": "Get Junkyards",
+      "type": "n8n-nodes-base.httpRequest", 
+      "typeVersion": 4.1,
+      "position": [
+        900,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot{{ $env.TELEGRAM_BOT_TOKEN }}/sendMessage",
+        "authentication": "none",
+        "requestFormat": "json",
+        "jsonParameters": "specify",
+        "specifyJsonParameters": [
+          {
+            "name": "chat_id",
+            "value": "={{ $json.telegram_id }}"
+          },
+          {
+            "name": "text",
+            "value": "🆕 طلب جديد في منطقتك!\n\n🆔 الطلب: {{ $('Create Request').first().json.order_id }}\n🚗 السيارة: {{ $json.brand_name }} {{ $json.model_name }}\n🔧 القطع: {{ $json.parts }}\n\nاضغط الزر لإضافة عرضك:"
+          },
+          {
+            "name": "reply_markup",
+            "value": "{\"inline_keyboard\":[[{\"text\":\"💰 إضافة عرض\",\"callback_data\":\"offer_add_{{ $('Create Request').first().json.id }}\"}]]}"
+          }
+        ],
+        "options": {}
+      },
+      "id": "c3d4e5f6-g7h8-9012-cdef-345678901234",
+      "name": "Notify Junkyard",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1120,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot{{ $env.TELEGRAM_BOT_TOKEN }}/sendMessage",
+        "authentication": "none", 
+        "requestFormat": "json",
+        "jsonParameters": "specify",
+        "specifyJsonParameters": [
+          {
+            "name": "chat_id",
+            "value": "={{ $('Webhook').first().json.user_telegram_id }}"
+          },
+          {
+            "name": "text",
+            "value": "✅ تم إنشاء طلبك بنجاح!\n\n🆔 رقم الطلب: {{ $('Create Request').first().json.order_id }}\n🚗 السيارة: {{ $('Create Request').first().json.brand_name }} {{ $('Create Request').first().json.model_name }}\n🔧 القطع: {{ $('Create Request').first().json.parts }}\n\nسيتم إرسال طلبك للمخازن في منطقتك!"
+          }
+        ],
+        "options": {}
+      },
+      "id": "d4e5f6g7-h8i9-0123-defg-456789012345",
+      "name": "Confirm to User",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        680,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"status\": \"success\", \"message\": \"Request processed\", \"order_id\": \"{{ $('Create Request').first().json.order_id }}\"}"
+      },
+      "id": "e5f6g7h8-i9j0-1234-efgh-567890123456",
+      "name": "Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Request Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Request Type": {
+      "main": [
+        [
+          {
+            "node": "Create Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Request": {
+      "main": [
+        [
+          {
+            "node": "Get Junkyards",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Confirm to User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Junkyards": {
+      "main": [
+        [
+          {
+            "node": "Notify Junkyard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Junkyard": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirm to User": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main", 
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-28T12:00:00.000Z",
+  "versionId": "1"
+} 

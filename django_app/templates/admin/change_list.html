@@ -1,0 +1,690 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ media }}
+    <style>
+        /* FORCE COMPLETE CHANGELIST REDESIGN */
+        body {
+            background: linear-gradient(135deg, #0b1220 0%, #0f172a 100%) !important;
+            font-family: 'Cairo', sans-serif !important;
+            color: #e2e8f0 !important;
+        }
+        
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, #0b1220 0%, #0f172a 100%) !important;
+        }
+        
+        #changelist {
+            direction: rtl !important;
+            background: transparent !important;
+        }
+        
+        #content-main {
+            background: transparent !important;
+            padding: 0 !important;
+        }
+        
+        /* FORCE SIDEBAR REDESIGN */
+        #changelist-filter {
+            background: rgba(255, 255, 255, 0.25) !important;
+            backdrop-filter: blur(16px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+            border-radius: 20px !important;
+            padding: 0 !important;
+            margin: 0 0 0 20px !important;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37) !important;
+            width: 280px !important;
+            min-height: 600px !important;
+            position: sticky !important;
+            top: 20px !important;
+            overflow: hidden !important;
+        }
+        
+        #changelist-filter h2 {
+            background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%) !important;
+            color: white !important;
+            padding: 20px 25px !important;
+            margin: 0 !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            border-radius: 0 !important;
+            border: none !important;
+            font-size: 18px !important;
+        }
+        
+        #changelist-filter h3 {
+            color: #0f172a !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            margin: 20px 20px 10px 20px !important;
+            font-size: 15px !important;
+            border-bottom: 2px solid #14b8a6 !important;
+            padding-bottom: 8px !important;
+        }
+        
+        #changelist-filter ul {
+            margin: 0 !important;
+            padding: 0 20px !important;
+            list-style: none !important;
+        }
+        
+        #changelist-filter li {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        #changelist-filter a {
+            color: #0f172a !important;
+            text-decoration: none !important;
+            padding: 12px 15px !important;
+            display: block !important;
+            border-radius: 10px !important;
+            transition: all 0.3s ease !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 500 !important;
+            margin: 2px 0 !important;
+            border: 1px solid transparent !important;
+        }
+        
+        #changelist-filter a:hover {
+            background: rgba(20, 184, 166, 0.1) !important;
+            color: #14b8a6 !important;
+            border: 1px solid rgba(20, 184, 166, 0.3) !important;
+            transform: translateX(-3px) !important;
+        }
+        
+        #changelist-filter a.selected {
+            background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%) !important;
+            color: white !important;
+            font-weight: 600 !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3) !important;
+        }
+        
+        /* DARK MODE SIDEBAR */
+        [data-theme="dark"] #changelist-filter {
+            background: rgba(15, 23, 42, 0.7) !important;
+            border: 1px solid rgba(100, 116, 139, 0.2) !important;
+        }
+        
+        [data-theme="dark"] #changelist-filter h3 {
+            color: #e2e8f0 !important;
+            border-bottom: 2px solid #14b8a6 !important;
+        }
+        
+        [data-theme="dark"] #changelist-filter a {
+            color: #e2e8f0 !important;
+        }
+        
+        [data-theme="dark"] #changelist-filter a:hover {
+            background: rgba(20, 184, 166, 0.2) !important;
+            color: #14b8a6 !important;
+        }
+        
+        /* SEARCH BAR REDESIGN */
+        #toolbar {
+            background: rgba(255, 255, 255, 0.25) !important;
+            backdrop-filter: blur(16px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+            border-radius: 15px !important;
+            padding: 20px !important;
+            margin-bottom: 20px !important;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37) !important;
+        }
+        
+        #searchbar {
+            background: rgba(255, 255, 255, 0.8) !important;
+            color: #0f172a !important;
+            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+            border-radius: 10px !important;
+            padding: 12px 15px !important;
+            font-family: 'Cairo', sans-serif !important;
+            width: 350px !important;
+            margin-left: 15px !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        #searchbar:focus {
+            outline: none !important;
+            border-color: #14b8a6 !important;
+            background: white !important;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1) !important;
+            transform: translateY(-2px) !important;
+        }
+        
+        /* DROPDOWN MENUS FIX */
+        select {
+            background: rgba(255, 255, 255, 0.8) !important;
+            color: #0f172a !important;
+            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+            border-radius: 10px !important;
+            padding: 10px 15px !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 500 !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            min-width: 150px !important;
+            appearance: none !important;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%2314b8a6' d='M8 12L3 7h10l-5 5z'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: left 12px center !important;
+            background-size: 16px !important;
+            padding-left: 40px !important;
+        }
+        
+        select:focus {
+            outline: none !important;
+            border-color: #14b8a6 !important;
+            background-color: white !important;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1) !important;
+        }
+        
+        select option {
+            background: white !important;
+            color: #0f172a !important;
+            font-family: 'Cairo', sans-serif !important;
+            padding: 10px !important;
+        }
+        
+        /* DARK MODE DROPDOWNS */
+        [data-theme="dark"] select {
+            background: rgba(15, 23, 42, 0.6) !important;
+            color: #e2e8f0 !important;
+            border: 1px solid rgba(100, 116, 139, 0.3) !important;
+        }
+        
+        [data-theme="dark"] select:focus {
+            background: rgba(15, 23, 42, 0.8) !important;
+        }
+        
+        [data-theme="dark"] select option {
+            background: #0f172a !important;
+            color: #e2e8f0 !important;
+        }
+        
+        [data-theme="dark"] #toolbar {
+            background: rgba(15, 23, 42, 0.7) !important;
+            border: 1px solid rgba(100, 116, 139, 0.2) !important;
+        }
+        
+        [data-theme="dark"] #searchbar {
+            background: rgba(15, 23, 42, 0.6) !important;
+            color: #e2e8f0 !important;
+            border: 1px solid rgba(100, 116, 139, 0.3) !important;
+        }
+        
+        [data-theme="dark"] #searchbar:focus {
+            background: rgba(15, 23, 42, 0.8) !important;
+        }
+        
+        .changelist-header {
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 20px !important;
+            padding: 25px 30px !important;
+            margin-bottom: 25px !important;
+            box-shadow: var(--shadow-glass) !important;
+        }
+        
+        .changelist-title {
+            font-size: 2rem !important;
+            font-weight: 700 !important;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600)) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+            margin: 0 !important;
+            font-family: 'Cairo', sans-serif !important;
+        }
+        
+        .changelist-subtitle {
+            color: var(--text-secondary) !important;
+            font-size: 1rem !important;
+            margin-top: 5px !important;
+            font-family: 'Cairo', sans-serif !important;
+        }
+        
+        .changelist-controls {
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 15px !important;
+            padding: 20px !important;
+            margin-bottom: 20px !important;
+            box-shadow: var(--shadow-glass) !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            flex-wrap: wrap !important;
+            gap: 15px !important;
+        }
+        
+        .search-controls {
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+        }
+        
+        .action-controls {
+            display: flex !important;
+            align-items: center !important;
+            gap: 15px !important;
+        }
+        
+        .results-summary {
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 10px !important;
+            padding: 15px 20px !important;
+            margin-bottom: 20px !important;
+            text-align: center !important;
+            color: var(--text-primary) !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 500 !important;
+        }
+        
+        /* Enhanced table styling */
+        #result_list {
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 20px !important;
+            overflow: hidden !important;
+            box-shadow: var(--shadow-glass) !important;
+        }
+        
+        #result_list thead th {
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600)) !important;
+            color: white !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            padding: 15px 20px !important;
+            border: none !important;
+            text-align: right !important;
+        }
+        
+        #result_list tbody td {
+            padding: 15px 20px !important;
+            border-bottom: 1px solid var(--border-glass) !important;
+            color: var(--text-primary) !important;
+            font-family: 'Cairo', sans-serif !important;
+            text-align: right !important;
+        }
+        
+        #result_list tbody tr {
+            transition: all 0.3s ease !important;
+        }
+        
+        #result_list tbody tr:hover {
+            background: var(--bg-glass-hover) !important;
+            transform: translateY(-1px) !important;
+        }
+        
+        #result_list tbody tr:last-child td {
+            border-bottom: none !important;
+        }
+        
+        /* Action checkboxes */
+        .action-checkbox {
+            transform: scale(1.2) !important;
+            accent-color: var(--primary-500) !important;
+        }
+        
+        /* Pagination styling */
+        .paginator {
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 15px !important;
+            padding: 20px !important;
+            margin-top: 25px !important;
+            box-shadow: var(--shadow-glass) !important;
+            text-align: center !important;
+        }
+        
+        .paginator a,
+        .paginator .this-page {
+            background: var(--bg-surface) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 8px !important;
+            padding: 8px 15px !important;
+            margin: 0 5px !important;
+            text-decoration: none !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 500 !important;
+            transition: all 0.3s ease !important;
+            display: inline-block !important;
+        }
+        
+        .paginator a:hover {
+            background: var(--primary-500) !important;
+            color: white !important;
+            transform: translateY(-2px) !important;
+        }
+        
+        .paginator .this-page {
+            background: var(--primary-500) !important;
+            color: white !important;
+            font-weight: 600 !important;
+        }
+        
+        /* Filter improvements */
+        #changelist-filter {
+            margin-top: 0 !important;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .changelist-controls {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+            
+            .search-controls,
+            .action-controls {
+                justify-content: center !important;
+            }
+            
+            .changelist-title {
+                font-size: 1.5rem !important;
+            }
+            
+            #result_list {
+                font-size: 14px !important;
+            }
+            
+            #result_list thead th,
+            #result_list tbody td {
+                padding: 10px 15px !important;
+            }
+        }
+        
+        /* ADDITIONAL FORCE DARK FORM ELEMENTS IN CHANGE LIST */
+        
+        /* Search inputs and filters */
+        #changelist-search input[type="text"],
+        .form-row input, .form-row select, .form-row textarea,
+        .actions select, .action-btn {
+            background-color: rgba(15, 23, 42, 0.8) !important;
+            background: rgba(15, 23, 42, 0.8) !important;
+            color: #e2e8f0 !important;
+            border: 1px solid rgba(148, 163, 184, 0.3) !important;
+            border-radius: 8px !important;
+            padding: 8px 12px !important;
+            font-family: 'Cairo', sans-serif !important;
+        }
+        
+        /* Focus states for search and filters */
+        #changelist-search input[type="text"]:focus,
+        .form-row input:focus, .form-row select:focus, .form-row textarea:focus,
+        .actions select:focus {
+            background-color: rgba(15, 23, 42, 0.9) !important;
+            background: rgba(15, 23, 42, 0.9) !important;
+            color: #e2e8f0 !important;
+            border-color: #14b8a6 !important;
+            outline: none !important;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2) !important;
+        }
+        
+        /* Force dark on all Django admin form classes */
+        .vTextField, .vIntegerField, .vCharField, .vEmailField, .vURLField,
+        .vDateField, .vTimeField, .vDateTimeField, .vLargeTextField,
+        .vSelectField, .vSelectMultipleField {
+            background-color: rgba(15, 23, 42, 0.8) !important;
+            background: rgba(15, 23, 42, 0.8) !important;
+            color: #e2e8f0 !important;
+            border: 1px solid rgba(148, 163, 184, 0.3) !important;
+        }
+        
+        /* Override webkit autofill */
+        input:-webkit-autofill, input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px rgba(15, 23, 42, 0.8) inset !important;
+            -webkit-text-fill-color: #e2e8f0 !important;
+            background-color: rgba(15, 23, 42, 0.8) !important;
+        }
+        
+        /* Force override white backgrounds */
+        *[style*="background-color: white"], *[style*="background: white"],
+        *[style*="background-color: #fff"], *[style*="background: #fff"] {
+            background-color: rgba(15, 23, 42, 0.8) !important;
+            background: rgba(15, 23, 42, 0.8) !important;
+            color: #e2e8f0 !important;
+        }
+    </style>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-list{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; {{ opts.verbose_name_plural|capfirst }}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block content %}
+<div id="changelist" class="{{ opts.app_label }}-{{ opts.model_name }}-changelist">
+    <!-- Header -->
+    <div class="changelist-header">
+        <h1 class="changelist-title">{{ opts.verbose_name_plural|capfirst }}</h1>
+        <p class="changelist-subtitle">إدارة {{ opts.verbose_name_plural }}</p>
+    </div>
+
+    {% if cl.formset and cl.formset.errors %}
+        <p class="errornote">
+        {% if cl.formset.total_error_count == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
+        </p>
+        {{ cl.formset.non_form_errors }}
+    {% endif %}
+
+    <div class="module filtered" id="changelist-search">
+        {% block search %}{% search_form cl %}{% endblock %}
+        
+        {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
+
+        {% block filters %}
+            {% if cl.has_filters %}
+                <div id="changelist-filter">
+                    <h2>{% trans 'Filter' %}</h2>
+                    {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
+                </div>
+            {% endif %}
+        {% endblock %}
+
+        <form id="changelist-form" method="post" novalidate>{% csrf_token %}
+        {% if cl.formset %}
+            <div id="changelist-form-container">
+                <div id="toolbar"><label for="action-toggle">{% trans "Action:" %}</label>
+                <select name="action" required>
+                <option value="" selected>---------</option>
+                {% for choice in action_choices %}
+                    <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                {% endfor %}
+                </select>
+                <button type="submit" class="button" title="{% trans "Run the selected action" %}" name="index" value="{{ action_index|default:0 }}">{% trans "Go" %}</button>
+                </div>
+        {% endif %}
+
+        <!-- Results Summary -->
+        {% if cl.result_count %}
+        <div class="results-summary">
+            <i class="fas fa-list"></i>
+            {{ cl.result_count }} {{ cl.result_count|pluralize:"نتيجة,نتائج" }}
+            {% if cl.full_result_count != cl.result_count %}
+                ({{ cl.full_result_count }} إجمالي)
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% block result_list %}
+            {% if action_form and actions_on_top and cl.show_admin_actions %}
+                <div class="actions top">
+                    {% admin_actions %}
+                </div>
+            {% endif %}
+            
+            {% result_list cl %}
+            
+            {% if action_form and actions_on_bottom and cl.show_admin_actions %}
+                <div class="actions bottom">
+                    {% admin_actions %}
+                </div>
+            {% endif %}
+        {% endblock %}
+        
+        {% block pagination %}{% pagination cl %}{% endblock %}
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Enhanced table interactions
+    const tableRows = document.querySelectorAll('#result_list tbody tr');
+    tableRows.forEach(row => {
+        // Add click handler for row selection
+        row.addEventListener('click', function(e) {
+            if (e.target.type !== 'checkbox' && e.target.tagName !== 'A') {
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                if (checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    this.classList.toggle('selected', checkbox.checked);
+                }
+            }
+        });
+
+        // Add selected class for checked rows
+        const checkbox = row.querySelector('input[type="checkbox"]');
+        if (checkbox && checkbox.checked) {
+            row.classList.add('selected');
+        }
+    });
+
+    // Enhanced search functionality
+    const searchInput = document.querySelector('#searchbar');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            // Add live search indicator
+            if (this.value.length > 0) {
+                this.style.borderColor = 'var(--primary-500)';
+            } else {
+                this.style.borderColor = 'var(--border-glass)';
+            }
+        });
+    }
+
+    // Add loading state to action buttons
+    const actionButtons = document.querySelectorAll('button[type="submit"]');
+    actionButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            if (this.name === 'index') {
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التنفيذ...';
+                this.disabled = true;
+            }
+        });
+    });
+
+    // Auto-refresh functionality (optional)
+    if (window.location.pathname.includes('/admin/')) {
+        // Refresh every 2 minutes for active data
+        setTimeout(() => {
+            if (document.hasFocus()) {
+                window.location.reload();
+            }
+        }, 120000);
+    }
+});
+
+// ULTRA FORCE - Dark theme for change list with maximum priority
+function forceUltraDarkChangeListElements() {
+    const allFormElements = document.querySelectorAll(
+        'input, textarea, select, ' +
+        'input[type], input[type="text"], input[type="search"], ' +
+        '#changelist-search input, #changelist-search input[type="text"], ' +
+        '.form-row input, .form-row select, .form-row textarea, ' +
+        '.actions select, .vTextField, .vIntegerField, .vCharField, ' +
+        '.vEmailField, .vURLField, .vDateField, .vTimeField, ' +
+        '.vDateTimeField, .vLargeTextField, .vSelectField, .vSelectMultipleField, ' +
+        'form input, form textarea, form select, ' +
+        '.field input, .field textarea, .field select, ' +
+        '#content input, #content textarea, #content select'
+    );
+    
+    allFormElements.forEach(element => {
+        // ULTRA FORCE - Maximum priority styling
+        element.style.setProperty('background-color', 'rgba(15, 23, 42, 0.8)', 'important');
+        element.style.setProperty('background', 'rgba(15, 23, 42, 0.8)', 'important');
+        element.style.setProperty('color', '#e2e8f0', 'important');
+        element.style.setProperty('border', '1px solid rgba(148, 163, 184, 0.3)', 'important');
+        element.style.setProperty('border-radius', '8px', 'important');
+        element.style.setProperty('padding', '8px 12px', 'important');
+        
+        // Check computed styles and force override
+        const computedBg = getComputedStyle(element).backgroundColor;
+        if (computedBg.includes('255, 255, 255') || computedBg.includes('white') ||
+            element.style.backgroundColor.includes('white') ||
+            element.style.backgroundColor.includes('#fff')) {
+            element.style.setProperty('background-color', 'rgba(15, 23, 42, 0.8)', 'important');
+            element.style.setProperty('background', 'rgba(15, 23, 42, 0.8)', 'important');
+        }
+        
+        // Add ultra-priority event listeners
+        if (!element.hasAttribute('data-ultra-dark-list')) {
+            element.setAttribute('data-ultra-dark-list', 'true');
+            
+            ['focus', 'click', 'mousedown', 'keydown', 'input'].forEach(eventType => {
+                element.addEventListener(eventType, function() {
+                    this.style.setProperty('background-color', 'rgba(15, 23, 42, 0.9)', 'important');
+                    this.style.setProperty('background', 'rgba(15, 23, 42, 0.9)', 'important');
+                    this.style.setProperty('color', '#e2e8f0', 'important');
+                    this.style.setProperty('border-color', '#14b8a6', 'important');
+                    this.style.setProperty('outline', 'none', 'important');
+                    this.style.setProperty('box-shadow', '0 0 0 3px rgba(20, 184, 166, 0.2)', 'important');
+                }, true);
+            });
+            
+            element.addEventListener('blur', function() {
+                this.style.setProperty('background-color', 'rgba(15, 23, 42, 0.8)', 'important');
+                this.style.setProperty('background', 'rgba(15, 23, 42, 0.8)', 'important');
+                this.style.setProperty('color', '#e2e8f0', 'important');
+                this.style.setProperty('border-color', 'rgba(148, 163, 184, 0.3)', 'important');
+                this.style.setProperty('box-shadow', '0 2px 8px rgba(0, 0, 0, 0.1)', 'important');
+            }, true);
+            
+            // Handle select elements
+            if (element.tagName.toLowerCase() === 'select') {
+                Array.from(element.options).forEach(option => {
+                    option.style.setProperty('background-color', '#1e293b', 'important');
+                    option.style.setProperty('background', '#1e293b', 'important');
+                    option.style.setProperty('color', '#e2e8f0', 'important');
+                });
+                
+                element.addEventListener('change', function() {
+                    setTimeout(() => {
+                        Array.from(this.options).forEach(option => {
+                            option.style.setProperty('background-color', '#1e293b', 'important');
+                            option.style.setProperty('color', '#e2e8f0', 'important');
+                        });
+                    }, 10);
+                });
+            }
+        }
+    });
+}
+
+// Execute multiple times to ensure complete application
+document.addEventListener('DOMContentLoaded', forceUltraDarkChangeListElements);
+setTimeout(forceUltraDarkChangeListElements, 50);
+setTimeout(forceUltraDarkChangeListElements, 200);
+setTimeout(forceUltraDarkChangeListElements, 500);
+</script>
+{% endblock %}

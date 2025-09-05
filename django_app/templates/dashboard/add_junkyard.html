@@ -1,0 +1,302 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}إضافة تشليح جديد - لوحة التحكم{% endblock %}
+
+{% block page_title %}إضافة تشليح جديد{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="glass-card p-6 rounded-xl animate-fade-up">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                    إضافة تشليح جديد
+                </h1>
+                <p class="text-slate-600 dark:text-slate-400">
+                    إضافة مخزن قطع غيار جديد إلى النظام
+                </p>
+            </div>
+            <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                <a href="{% url 'dashboard:junkyards_list' %}" class="btn-secondary">
+                    <i class="fas fa-arrow-right mr-2"></i>
+                    العودة لقائمة التشاليح
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="space-y-4 animate-fade-up" style="animation-delay: 0.05s">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} p-4 rounded-xl border backdrop-blur-sm
+            {% if message.tags == 'error' %}
+                bg-red-900/20 border-red-500/30 text-red-100
+            {% elif message.tags == 'success' %}
+                bg-green-900/20 border-green-500/30 text-green-100
+            {% elif message.tags == 'warning' %}
+                bg-yellow-900/20 border-yellow-500/30 text-yellow-100
+            {% else %}
+                bg-blue-900/20 border-blue-500/30 text-blue-100
+            {% endif %}">
+            <div class="flex items-center">
+                {% if message.tags == 'error' %}
+                    <i class="fas fa-exclamation-circle mr-3"></i>
+                {% elif message.tags == 'success' %}
+                    <i class="fas fa-check-circle mr-3"></i>
+                {% elif message.tags == 'warning' %}
+                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                {% else %}
+                    <i class="fas fa-info-circle mr-3"></i>
+                {% endif %}
+                <span>{{ message }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Add Junkyard Form -->
+    <div class="glass-card p-6 rounded-xl animate-fade-up" style="animation-delay: 0.1s">
+        <div class="max-w-2xl mx-auto">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Basic Information -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-700 pb-2">
+                        المعلومات الأساسية
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- First Name -->
+                        <div>
+                            <label for="first_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                اسم المخزن *
+                            </label>
+                            <input 
+                                type="text" 
+                                id="first_name" 
+                                name="first_name" 
+                                required
+                                class="form-input"
+                                placeholder="أدخل اسم المخزن"
+                            >
+                        </div>
+                        
+                        <!-- Last Name -->
+                        <div>
+                            <label for="last_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                الاسم الثاني (اختياري)
+                            </label>
+                            <input 
+                                type="text" 
+                                id="last_name" 
+                                name="last_name"
+                                class="form-input"
+                                placeholder="أدخل الاسم الثاني"
+                            >
+                        </div>
+                    </div>
+                    
+                    <!-- Username -->
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            اسم المستخدم *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            required
+                            class="form-input"
+                            placeholder="أدخل اسم مستخدم فريد"
+                        >
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            سيتم استخدام هذا الاسم لتسجيل الدخول
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-700 pb-2">
+                        معلومات الاتصال
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Phone -->
+                        <div>
+                            <label for="phone" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                رقم الهاتف *
+                            </label>
+                            <input 
+                                type="tel" 
+                                id="phone" 
+                                name="phone" 
+                                required
+                                class="form-input"
+                                placeholder="05xxxxxxxx"
+                                pattern="[0-9+\-\s]+"
+                            >
+                        </div>
+                        
+                        <!-- City -->
+                        <div>
+                            <label for="city" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                المدينة *
+                            </label>
+                            <select id="city" name="city" required class="form-input">
+                                <option value="">اختر المدينة</option>
+                                {% for city in cities %}
+                                <option value="{{ city.id }}">{{ city.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Telegram ID -->
+                    <div>
+                        <label for="telegram_id" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            معرف التليجرام (Telegram ID) *
+                        </label>
+                        <input 
+                            type="number" 
+                            id="telegram_id" 
+                            name="telegram_id" 
+                            required
+                            class="form-input"
+                            placeholder="123456789"
+                            min="1"
+                        >
+                        <div class="mt-2 p-3 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+                            <p class="text-xs text-blue-200 mb-2">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                <strong>كيفية الحصول على معرف التليجرام:</strong>
+                            </p>
+                            <ol class="text-xs text-blue-300 space-y-1 list-decimal list-inside mr-4">
+                                <li>افتح تطبيق التليجرام</li>
+                                <li>ابحث عن البوت: <span class="font-mono bg-blue-800/50 px-1 rounded">@userinfobot</span></li>
+                                <li>ابدأ محادثة مع البوت بإرسال <span class="font-mono bg-blue-800/50 px-1 rounded">/start</span></li>
+                                <li>سيرسل لك البوت معرفك الرقمي (Telegram ID)</li>
+                                <li>انسخ الرقم وألصقه هنا</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location Information -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-700 pb-2">
+                        معلومات الموقع
+                    </h3>
+                    
+                    <!-- Location -->
+                    <div>
+                        <label for="location" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            عنوان المخزن *
+                        </label>
+                        <textarea 
+                            id="location" 
+                            name="location" 
+                            required
+                            rows="3"
+                            class="form-input"
+                            placeholder="أدخل عنوان مفصل للمخزن أو رابط الموقع"
+                        ></textarea>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            يمكن إدخال عنوان نصي مفصل أو رابط Google Maps
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="flex items-center justify-end space-x-4 rtl:space-x-reverse pt-6 border-t border-slate-200 dark:border-slate-700">
+                    <a href="{% url 'dashboard:junkyards_list' %}" class="btn-secondary">
+                        إلغاء
+                    </a>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-plus mr-2"></i>
+                        إضافة التشليح
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Form Validation Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const usernameInput = document.getElementById('username');
+    const phoneInput = document.getElementById('phone');
+    
+    // Username validation
+    usernameInput.addEventListener('input', function() {
+        let value = this.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+        this.value = value;
+    });
+    
+    // Phone validation
+    phoneInput.addEventListener('input', function() {
+        let value = this.value.replace(/[^0-9+\-\s]/g, '');
+        this.value = value;
+    });
+    
+    // Telegram ID validation
+    const telegramIdInput = document.getElementById('telegram_id');
+    telegramIdInput.addEventListener('input', function() {
+        let value = this.value.replace(/[^0-9]/g, '');
+        this.value = value;
+        
+        // Basic validation - must be positive number with at least 8 digits
+        if (value.length >= 8 && parseInt(value) > 0) {
+            this.classList.remove('border-red-500');
+            this.classList.add('border-green-500');
+        } else {
+            this.classList.remove('border-green-500');
+            this.classList.add('border-red-500');
+        }
+    });
+    
+    // Form submission validation
+    form.addEventListener('submit', function(e) {
+        console.log('Form submission started with telegram_id validation');
+        
+        const requiredFields = ['first_name', 'username', 'phone', 'city', 'location', 'telegram_id'];
+        let isValid = true;
+        
+        requiredFields.forEach(field => {
+            const input = document.getElementById(field);
+            console.log(`Field ${field}: value="${input.value.trim()}"`);
+            if (!input.value.trim()) {
+                input.classList.add('border-red-500');
+                isValid = false;
+            } else {
+                input.classList.remove('border-red-500');
+            }
+        });
+        
+        // Special validation for telegram_id
+        const telegramId = telegramIdInput.value.trim();
+        if (telegramId.length < 8 || parseInt(telegramId) <= 0) {
+            telegramIdInput.classList.add('border-red-500');
+            isValid = false;
+            console.log('Telegram ID validation failed');
+        }
+        
+        console.log(`Validation result: isValid=${isValid}`);
+        
+        if (!isValid) {
+            console.log('Validation failed - preventing form submission');
+            e.preventDefault();
+            alert('يرجى ملء جميع الحقول المطلوبة بشكل صحيح\nمعرف التليجرام يجب أن يكون رقماً صحيحاً مكوناً من 8 أرقام على الأقل');
+        } else {
+            console.log('Validation passed - allowing form submission');
+        }
+    });
+});
+</script>
+{% endblock %}

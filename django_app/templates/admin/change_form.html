@@ -1,0 +1,817 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ media }}
+    <style>
+        .change-form-container {
+            direction: rtl !important;
+        }
+        
+        .form-header {
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 20px !important;
+            padding: 25px 30px !important;
+            margin-bottom: 25px !important;
+            box-shadow: var(--shadow-glass) !important;
+            text-align: center !important;
+        }
+        
+        .form-title {
+            font-size: 2rem !important;
+            font-weight: 700 !important;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600)) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+            margin: 0 0 10px 0 !important;
+            font-family: 'Cairo', sans-serif !important;
+        }
+        
+        .form-subtitle {
+            color: var(--text-secondary) !important;
+            font-size: 1rem !important;
+            font-family: 'Cairo', sans-serif !important;
+        }
+        
+        /* Enhanced form styling */
+        .module.aligned {
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 20px !important;
+            padding: 0 !important;
+            margin-bottom: 25px !important;
+            box-shadow: var(--shadow-glass) !important;
+            overflow: hidden !important;
+        }
+        
+        .module.aligned h2 {
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600)) !important;
+            color: white !important;
+            padding: 20px 25px !important;
+            margin: 0 !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            border: none !important;
+            font-size: 18px !important;
+        }
+        
+        .module.aligned .form-row {
+            background: transparent !important;
+            border: none !important;
+            padding: 20px 25px !important;
+            border-bottom: 1px solid var(--border-glass) !important;
+        }
+        
+        .module.aligned .form-row:last-child {
+            border-bottom: none !important;
+        }
+        
+        .module.aligned .form-row .field-box {
+            background: transparent !important;
+        }
+        
+        /* Form field styling */
+        .form-row label {
+            color: var(--text-primary) !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            margin-bottom: 8px !important;
+            display: block !important;
+        }
+        
+        .form-row input[type="text"],
+        .form-row input[type="email"],
+        .form-row input[type="password"],
+        .form-row input[type="number"],
+        .form-row input[type="url"],
+        .form-row input[type="tel"],
+        .form-row input[type="date"],
+        .form-row input[type="time"],
+        .form-row input[type="datetime-local"],
+        .form-row select,
+        .form-row textarea {
+            background: var(--bg-surface) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 10px !important;
+            padding: 12px 15px !important;
+            font-family: 'Cairo', sans-serif !important;
+            width: 100% !important;
+            transition: all 0.3s ease !important;
+            font-size: 14px !important;
+        }
+        
+        .form-row input:focus,
+        .form-row select:focus,
+        .form-row textarea:focus {
+            outline: none !important;
+            border-color: var(--primary-500) !important;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1) !important;
+            background: white !important;
+        }
+        
+        /* Help text styling */
+        .help {
+            color: var(--text-muted) !important;
+            font-size: 12px !important;
+            margin-top: 5px !important;
+            font-family: 'Cairo', sans-serif !important;
+            line-height: 1.4 !important;
+        }
+        
+        /* Error styling */
+        .errorlist {
+            background: rgba(220, 38, 38, 0.1) !important;
+            border: 1px solid #dc2626 !important;
+            border-radius: 8px !important;
+            padding: 10px 15px !important;
+            margin: 8px 0 !important;
+            color: #dc2626 !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-size: 13px !important;
+        }
+        
+        .errorlist li {
+            list-style: none !important;
+            margin: 0 !important;
+        }
+        
+        .errorlist li:before {
+            content: "\f071" !important;
+            font-family: "Font Awesome 6 Free" !important;
+            font-weight: 900 !important;
+            margin-left: 8px !important;
+        }
+        
+        /* Submit row styling */
+        .submit-row {
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 15px !important;
+            padding: 25px !important;
+            margin-top: 30px !important;
+            box-shadow: var(--shadow-glass) !important;
+            text-align: center !important;
+        }
+        
+        .submit-row input[type="submit"] {
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600)) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 10px !important;
+            padding: 12px 30px !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            font-size: 16px !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            margin: 0 10px !important;
+        }
+        
+        .submit-row input[type="submit"]:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 25px rgba(20, 184, 166, 0.3) !important;
+        }
+        
+        .submit-row .deletelink {
+            background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 10px !important;
+            padding: 12px 30px !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            text-decoration: none !important;
+            display: inline-block !important;
+            transition: all 0.3s ease !important;
+            margin: 0 10px !important;
+        }
+        
+        .submit-row .deletelink:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3) !important;
+        }
+        
+        /* Inline formsets */
+        .inline-group {
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 20px !important;
+            padding: 0 !important;
+            margin-bottom: 25px !important;
+            box-shadow: var(--shadow-glass) !important;
+            overflow: hidden !important;
+        }
+        
+        .inline-group .module h2 {
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600)) !important;
+            color: white !important;
+            padding: 20px 25px !important;
+            margin: 0 !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+        }
+        
+        .inline-group table {
+            background: transparent !important;
+            margin: 20px !important;
+            border-radius: 15px !important;
+            overflow: hidden !important;
+            width: calc(100% - 40px) !important;
+        }
+        
+        .inline-group table th {
+            background: var(--bg-surface) !important;
+            color: var(--text-primary) !important;
+            padding: 12px 15px !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            border: 1px solid var(--border-glass) !important;
+            text-align: right !important;
+        }
+        
+        .inline-group table td {
+            padding: 12px 15px !important;
+            border: 1px solid var(--border-glass) !important;
+            background: transparent !important;
+        }
+        
+        /* File uploads */
+        .file-upload {
+            background: var(--bg-surface) !important;
+            border: 2px dashed var(--border-glass) !important;
+            border-radius: 10px !important;
+            padding: 20px !important;
+            text-align: center !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .file-upload:hover {
+            border-color: var(--primary-500) !important;
+            background: var(--bg-glass-hover) !important;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .form-title {
+                font-size: 1.5rem !important;
+            }
+            
+            .module.aligned .form-row {
+                padding: 15px 20px !important;
+            }
+            
+            .submit-row {
+                padding: 20px !important;
+            }
+            
+            .submit-row input[type="submit"],
+            .submit-row .deletelink {
+                display: block !important;
+                width: 100% !important;
+                margin: 5px 0 !important;
+            }
+        }
+        
+        /* FORCE DARK THEME ON ALL FORM ELEMENTS IN CHANGE FORM */
+        
+        /* All input types - force dark background */
+        input, input[type="text"], input[type="email"], input[type="password"], 
+        input[type="number"], input[type="tel"], input[type="url"], input[type="search"],
+        input[type="date"], input[type="time"], input[type="datetime-local"],
+        textarea, select, .vTextField, .vIntegerField, .vCharField, .vEmailField,
+        .vURLField, .vDateField, .vTimeField, .vDateTimeField, .vLargeTextField,
+        .vSelectField, .vSelectMultipleField {
+            background-color: rgba(15, 23, 42, 0.8) !important;
+            background: rgba(15, 23, 42, 0.8) !important;
+            color: #e2e8f0 !important;
+            border: 1px solid rgba(148, 163, 184, 0.3) !important;
+            border-radius: 8px !important;
+            padding: 10px 12px !important;
+            font-family: 'Cairo', sans-serif !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        /* Focus states */
+        input:focus, textarea:focus, select:focus,
+        .vTextField:focus, .vIntegerField:focus, .vCharField:focus,
+        .vEmailField:focus, .vURLField:focus, .vDateField:focus,
+        .vTimeField:focus, .vDateTimeField:focus, .vLargeTextField:focus,
+        .vSelectField:focus, .vSelectMultipleField:focus {
+            background-color: rgba(15, 23, 42, 0.9) !important;
+            background: rgba(15, 23, 42, 0.9) !important;
+            color: #e2e8f0 !important;
+            border-color: #14b8a6 !important;
+            outline: none !important;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2), 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+        }
+        
+        /* Form row specific styling */
+        .form-row input, .form-row textarea, .form-row select,
+        .field-box input, .field-box textarea, .field-box select {
+            background-color: rgba(15, 23, 42, 0.8) !important;
+            background: rgba(15, 23, 42, 0.8) !important;
+            color: #e2e8f0 !important;
+        }
+        
+        /* Select options */
+        select option {
+            background: #1e293b !important;
+            color: #e2e8f0 !important;
+            padding: 8px 12px !important;
+        }
+        
+        select option:hover, select option:selected {
+            background: #14b8a6 !important;
+            color: white !important;
+        }
+        
+        /* Error states */
+        input.error, textarea.error, select.error,
+        .errorlist + input, .errorlist + textarea, .errorlist + select {
+            background-color: rgba(15, 23, 42, 0.8) !important;
+            background: rgba(15, 23, 42, 0.8) !important;
+            color: #e2e8f0 !important;
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+        }
+        
+        /* Webkit autofill override */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px rgba(15, 23, 42, 0.8) inset !important;
+            -webkit-text-fill-color: #e2e8f0 !important;
+            background-color: rgba(15, 23, 42, 0.8) !important;
+            color: #e2e8f0 !important;
+        }
+        
+        /* Force override any white backgrounds */
+        *[style*="background-color: white"], *[style*="background: white"],
+        *[style*="background-color: #fff"], *[style*="background: #fff"] {
+            background-color: rgba(15, 23, 42, 0.8) !important;
+            background: rgba(15, 23, 42, 0.8) !important;
+            color: #e2e8f0 !important;
+        }
+        
+        /* Labels styling */
+        label, .form-row label {
+            color: #e2e8f0 !important;
+            font-weight: 500 !important;
+            margin-bottom: 6px !important;
+        }
+        
+        /* Help text */
+        .help, .help-text {
+            color: #94a3b8 !important;
+            font-size: 12px !important;
+        }
+    </style>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-form{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; {% if has_view_permission %}<a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}
+&rsaquo; {% if add %}{% blocktrans with name=opts.verbose_name %}Add {{ name }}{% endblocktrans %}{% else %}{{ original|truncatewords:"18" }}{% endif %}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block content %}
+<div class="change-form-container">
+    <!-- Form Header -->
+    <div class="form-header">
+        <h1 class="form-title">
+            {% if add %}
+                <i class="fas fa-plus"></i>
+                إضافة {{ opts.verbose_name }}
+            {% else %}
+                <i class="fas fa-edit"></i>
+                تحرير {{ opts.verbose_name }}
+            {% endif %}
+        </h1>
+        <p class="form-subtitle">
+            {% if add %}
+                إنشاء {{ opts.verbose_name }} جديد
+            {% else %}
+                تحديث بيانات {{ opts.verbose_name }}
+            {% endif %}
+        </p>
+    </div>
+
+    <div id="content-main">
+        {% block object-tools %}
+        {% if change %}{% if not is_popup %}
+          <ul class="object-tools">
+            {% block object-tools-items %}
+            {% change_form_object_tools %}
+            {% endblock %}
+          </ul>
+        {% endif %}{% endif %}
+        {% endblock %}
+        
+        <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
+        
+        <div>
+        {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+        {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
+        {% if save_on_top %}{% block submit_buttons_top %}{% submit_row %}{% endblock %}{% endif %}
+        {% if errors %}
+            <p class="errornote">
+            {% if errors|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
+            </p>
+            {{ adminform.form.non_field_errors }}
+        {% endif %}
+
+        {% block field_sets %}
+        {% for fieldset in adminform %}
+          {% include "admin/includes/fieldset.html" %}
+        {% endfor %}
+        {% endblock %}
+
+        {% block after_field_sets %}{% endblock %}
+
+        {% block inline_field_sets %}
+        {% for inline_admin_formset in inline_admin_formsets %}
+            {% include inline_admin_formset.opts.template %}
+        {% endfor %}
+        {% endblock %}
+
+        {% block after_related_objects %}{% endblock %}
+
+        {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
+
+        {% block admin_change_form_document_ready %}
+            <script id="django-admin-form-add-constants"
+                    src="{% static "admin/js/change_form.js" %}"
+                    {% if adminform and add %}
+                        data-model-name="{{ opts.model_name }}"
+                    {% endif %}
+                    async>
+            </script>
+        {% endblock %}
+
+        {# JavaScript for prepopulated fields #}
+        {% prepopulated_fields_js %}
+
+        </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // FORCE BUTTON STYLING WITH JAVASCRIPT
+    function forceButtonStyling() {
+        // Find all submit buttons in submit-row
+        const saveButton = document.querySelector('.submit-row input[name="_save"], .submit-row input.default');
+        const addAnotherButton = document.querySelector('.submit-row input[name="_addanother"]');
+        const continueButton = document.querySelector('.submit-row input[name="_continue"]');
+        
+        if (saveButton) {
+            saveButton.style.background = 'linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%)';
+            saveButton.style.border = '3px solid #1e40af';
+            saveButton.style.color = 'white';
+            saveButton.style.padding = '20px 40px';
+            saveButton.style.fontSize = '18px';
+            saveButton.style.fontWeight = '900';
+            saveButton.style.borderRadius = '15px';
+            saveButton.style.minWidth = '200px';
+            saveButton.style.minHeight = '55px';
+            saveButton.style.fontFamily = 'Cairo, sans-serif';
+            saveButton.style.boxShadow = '0 10px 30px rgba(30, 64, 175, 0.6)';
+            saveButton.style.margin = '8px';
+            saveButton.style.cursor = 'pointer';
+            saveButton.style.transition = 'all 0.3s ease';
+        }
+        
+        if (addAnotherButton) {
+            addAnotherButton.style.background = 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)';
+            addAnotherButton.style.border = '3px solid #16a34a';
+            addAnotherButton.style.color = 'white';
+            addAnotherButton.style.padding = '20px 40px';
+            addAnotherButton.style.fontSize = '18px';
+            addAnotherButton.style.fontWeight = '900';
+            addAnotherButton.style.borderRadius = '15px';
+            addAnotherButton.style.minWidth = '200px';
+            addAnotherButton.style.minHeight = '55px';
+            addAnotherButton.style.fontFamily = 'Cairo, sans-serif';
+            addAnotherButton.style.boxShadow = '0 10px 30px rgba(22, 163, 74, 0.6)';
+            addAnotherButton.style.margin = '8px';
+            addAnotherButton.style.cursor = 'pointer';
+            addAnotherButton.style.transition = 'all 0.3s ease';
+        }
+        
+        if (continueButton) {
+            continueButton.style.background = 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)';
+            continueButton.style.border = '3px solid #9333ea';
+            continueButton.style.color = 'white';
+            continueButton.style.padding = '20px 40px';
+            continueButton.style.fontSize = '18px';
+            continueButton.style.fontWeight = '900';
+            continueButton.style.borderRadius = '15px';
+            continueButton.style.minWidth = '200px';
+            continueButton.style.minHeight = '55px';
+            continueButton.style.fontFamily = 'Cairo, sans-serif';
+            continueButton.style.boxShadow = '0 10px 30px rgba(147, 51, 234, 0.6)';
+            continueButton.style.margin = '8px';
+            continueButton.style.cursor = 'pointer';
+            continueButton.style.transition = 'all 0.3s ease';
+        }
+        
+        // Style the submit-row container
+        const submitRow = document.querySelector('.submit-row');
+        if (submitRow) {
+            submitRow.style.background = 'rgba(255, 255, 255, 0.98)';
+            submitRow.style.border = '3px solid #1e40af';
+            submitRow.style.borderRadius = '20px';
+            submitRow.style.padding = '45px';
+            submitRow.style.margin = '40px auto';
+            submitRow.style.textAlign = 'center';
+            submitRow.style.maxWidth = '900px';
+            submitRow.style.boxShadow = '0 15px 40px rgba(30, 64, 175, 0.3)';
+        }
+    }
+    
+    // Apply styling immediately
+    forceButtonStyling();
+    
+    // Apply again after a short delay to override any late-loading styles
+    setTimeout(forceButtonStyling, 100);
+    setTimeout(forceButtonStyling, 500);
+    setTimeout(forceButtonStyling, 1000);
+    
+    // Add hover effects with JavaScript
+    function addHoverEffects() {
+        const saveButton = document.querySelector('.submit-row input[name="_save"], .submit-row input.default');
+        const addAnotherButton = document.querySelector('.submit-row input[name="_addanother"]');
+        const continueButton = document.querySelector('.submit-row input[name="_continue"]');
+        
+        if (saveButton) {
+            saveButton.addEventListener('mouseenter', function() {
+                this.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
+                this.style.border = '3px solid #3b82f6';
+                this.style.color = 'white';
+                this.style.transform = 'translateY(-3px) scale(1.05)';
+                this.style.boxShadow = '0 15px 40px rgba(59, 130, 246, 0.8)';
+            });
+            saveButton.addEventListener('mouseleave', function() {
+                this.style.background = 'linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%)';
+                this.style.border = '3px solid #1e40af';
+                this.style.color = 'white';
+                this.style.transform = 'translateY(0) scale(1)';
+                this.style.boxShadow = '0 10px 30px rgba(30, 64, 175, 0.6)';
+            });
+        }
+        
+        if (addAnotherButton) {
+            addAnotherButton.addEventListener('mouseenter', function() {
+                this.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+                this.style.border = '3px solid #22c55e';
+                this.style.color = 'white';
+                this.style.transform = 'translateY(-3px) scale(1.05)';
+                this.style.boxShadow = '0 15px 40px rgba(34, 197, 94, 0.8)';
+            });
+            addAnotherButton.addEventListener('mouseleave', function() {
+                this.style.background = 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)';
+                this.style.border = '3px solid #16a34a';
+                this.style.color = 'white';
+                this.style.transform = 'translateY(0) scale(1)';
+                this.style.boxShadow = '0 10px 30px rgba(22, 163, 74, 0.6)';
+            });
+        }
+        
+        if (continueButton) {
+            continueButton.addEventListener('mouseenter', function() {
+                this.style.background = 'linear-gradient(135deg, #a855f7 0%, #9333ea 100%)';
+                this.style.border = '3px solid #a855f7';
+                this.style.color = 'white';
+                this.style.transform = 'translateY(-3px) scale(1.05)';
+                this.style.boxShadow = '0 15px 40px rgba(168, 85, 247, 0.8)';
+            });
+            continueButton.addEventListener('mouseleave', function() {
+                this.style.background = 'linear-gradient(135deg, #9333ea 0%, #7c3aed 100%)';
+                this.style.border = '3px solid #9333ea';
+                this.style.color = 'white';
+                this.style.transform = 'translateY(0) scale(1)';
+                this.style.boxShadow = '0 10px 30px rgba(147, 51, 234, 0.6)';
+            });
+        }
+    }
+    
+    // Add hover effects after styling
+    setTimeout(addHoverEffects, 200);
+    setTimeout(addHoverEffects, 600);
+    setTimeout(addHoverEffects, 1100);
+    
+    // Enhanced form interactions
+    const form = document.getElementById('{{ opts.model_name }}_form');
+    
+    // Add loading state to submit buttons
+    const submitButtons = form.querySelectorAll('input[type="submit"]');
+    submitButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const originalValue = this.value;
+            this.value = 'جاري الحفظ...';
+            this.disabled = true;
+            
+            // Re-enable after 3 seconds in case of validation errors
+            setTimeout(() => {
+                this.value = originalValue;
+                this.disabled = false;
+            }, 3000);
+        });
+    });
+    
+    // Enhanced field validation
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.hasAttribute('required') && !this.value.trim()) {
+                this.style.borderColor = '#dc2626';
+            } else if (this.checkValidity()) {
+                this.style.borderColor = 'var(--primary-500)';
+            }
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.style.borderColor === 'rgb(220, 38, 38)') {
+                this.style.borderColor = 'var(--border-glass)';
+            }
+        });
+    });
+    
+    // Auto-save functionality (optional)
+    let autoSaveTimer;
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                // Save to localStorage
+                const formData = new FormData(form);
+                const data = {};
+                for (let [key, value] of formData.entries()) {
+                    data[key] = value;
+                }
+                localStorage.setItem('admin_form_autosave_{{ opts.model_name }}', JSON.stringify(data));
+            }, 1000);
+        });
+    });
+    
+    // Load auto-saved data
+    const savedData = localStorage.getItem('admin_form_autosave_{{ opts.model_name }}');
+    if (savedData && !form.querySelector('[name*="id"]').value) {
+        try {
+            const data = JSON.parse(savedData);
+            Object.keys(data).forEach(key => {
+                const field = form.querySelector(`[name="${key}"]`);
+                if (field && !field.value) {
+                    field.value = data[key];
+                }
+            });
+        } catch (e) {
+            console.warn('Could not restore auto-saved data');
+        }
+    }
+    
+    // Clear auto-saved data on successful submit
+    form.addEventListener('submit', function() {
+        localStorage.removeItem('admin_form_autosave_{{ opts.model_name }}');
+    });
+    
+    // File upload enhancements
+    const fileInputs = form.querySelectorAll('input[type="file"]');
+    fileInputs.forEach(input => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'file-upload';
+        wrapper.innerHTML = `
+            <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--primary-500); margin-bottom: 10px;"></i>
+            <p style="margin: 0; color: var(--text-secondary); font-family: 'Cairo', sans-serif;">
+                اضغط هنا أو اسحب الملف لرفعه
+            </p>
+        `;
+        
+        input.parentNode.insertBefore(wrapper, input);
+        wrapper.appendChild(input);
+        input.style.opacity = '0';
+        input.style.position = 'absolute';
+        input.style.width = '100%';
+        input.style.height = '100%';
+        input.style.cursor = 'pointer';
+        
+        input.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                wrapper.innerHTML = `
+                    <i class="fas fa-check" style="font-size: 2rem; color: #10b981; margin-bottom: 10px;"></i>
+                    <p style="margin: 0; color: var(--text-primary); font-family: 'Cairo', sans-serif; font-weight: 600;">
+                        ${this.files[0].name}
+                    </p>
+                `;
+                wrapper.appendChild(this);
+            }
+        });
+                });
+        });
+        
+        // ULTRA FORCE - Apply dark theme on ALL form elements with maximum priority
+        function forceUltraDarkFormElements() {
+            const allFormElements = document.querySelectorAll(
+                'input, textarea, select, ' +
+                'input[type], input[type="text"], input[type="email"], input[type="password"], ' +
+                'input[type="number"], input[type="tel"], input[type="url"], input[type="search"], ' +
+                'input[type="date"], input[type="time"], input[type="datetime-local"], ' +
+                '.vTextField, .vIntegerField, .vCharField, .vEmailField, ' +
+                '.vURLField, .vDateField, .vTimeField, .vDateTimeField, ' +
+                '.vLargeTextField, .vSelectField, .vSelectMultipleField, ' +
+                'form input, form textarea, form select, ' +
+                '.form-row input, .form-row textarea, .form-row select, ' +
+                '.field input, .field textarea, .field select, ' +
+                '.field-box input, .field-box textarea, .field-box select, ' +
+                '#content input, #content textarea, #content select'
+            );
+            
+            allFormElements.forEach(element => {
+                // ULTRA FORCE - Use setProperty with important flag
+                element.style.setProperty('background-color', 'rgba(15, 23, 42, 0.8)', 'important');
+                element.style.setProperty('background', 'rgba(15, 23, 42, 0.8)', 'important');
+                element.style.setProperty('color', '#e2e8f0', 'important');
+                element.style.setProperty('border', '1px solid rgba(148, 163, 184, 0.3)', 'important');
+                element.style.setProperty('border-radius', '8px', 'important');
+                element.style.setProperty('padding', '10px 12px', 'important');
+                element.style.setProperty('font-family', "'Cairo', sans-serif", 'important');
+                
+                // Force override any white backgrounds with maximum priority
+                const bgColor = getComputedStyle(element).backgroundColor;
+                if (bgColor.includes('255, 255, 255') || bgColor.includes('white') || 
+                    element.style.backgroundColor.includes('white') ||
+                    element.style.backgroundColor.includes('#fff')) {
+                    element.style.setProperty('background-color', 'rgba(15, 23, 42, 0.8)', 'important');
+                    element.style.setProperty('background', 'rgba(15, 23, 42, 0.8)', 'important');
+                }
+                
+                // Add ultra-priority event listeners
+                if (!element.hasAttribute('data-ultra-dark')) {
+                    element.setAttribute('data-ultra-dark', 'true');
+                    
+                    ['focus', 'click', 'mousedown', 'keydown', 'input'].forEach(eventType => {
+                        element.addEventListener(eventType, function(e) {
+                            this.style.setProperty('background-color', 'rgba(15, 23, 42, 0.9)', 'important');
+                            this.style.setProperty('background', 'rgba(15, 23, 42, 0.9)', 'important');
+                            this.style.setProperty('color', '#e2e8f0', 'important');
+                            this.style.setProperty('border-color', '#14b8a6', 'important');
+                            this.style.setProperty('outline', 'none', 'important');
+                            this.style.setProperty('box-shadow', '0 0 0 3px rgba(20, 184, 166, 0.2), 0 4px 12px rgba(0, 0, 0, 0.2)', 'important');
+                        }, true); // Use capture phase for highest priority
+                    });
+                    
+                    element.addEventListener('blur', function() {
+                        this.style.setProperty('background-color', 'rgba(15, 23, 42, 0.8)', 'important');
+                        this.style.setProperty('background', 'rgba(15, 23, 42, 0.8)', 'important');
+                        this.style.setProperty('color', '#e2e8f0', 'important');
+                        this.style.setProperty('border-color', 'rgba(148, 163, 184, 0.3)', 'important');
+                        this.style.setProperty('box-shadow', '0 2px 8px rgba(0, 0, 0, 0.1)', 'important');
+                    }, true);
+                    
+                    // Handle select options with maximum priority
+                    if (element.tagName.toLowerCase() === 'select') {
+                        Array.from(element.options).forEach(option => {
+                            option.style.setProperty('background-color', '#1e293b', 'important');
+                            option.style.setProperty('background', '#1e293b', 'important');
+                            option.style.setProperty('color', '#e2e8f0', 'important');
+                        });
+                        
+                        element.addEventListener('change', function() {
+                            setTimeout(() => {
+                                Array.from(this.options).forEach(option => {
+                                    option.style.setProperty('background-color', '#1e293b', 'important');
+                                    option.style.setProperty('color', '#e2e8f0', 'important');
+                                });
+                            }, 10);
+                        });
+                    }
+                }
+            });
+        }
+        
+        // Execute multiple times to ensure application
+        document.addEventListener('DOMContentLoaded', forceUltraDarkFormElements);
+        setTimeout(forceUltraDarkFormElements, 50);
+        setTimeout(forceUltraDarkFormElements, 200);
+        setTimeout(forceUltraDarkFormElements, 500);
+    </script>
+{% endblock %}

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="h-full dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}تشاليح - لوحة التحكم{% endblock %}</title>
+    
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdfa', 100: '#ccfbf1', 200: '#99f6e4',
+                            300: '#5eead4', 400: '#2dd4bf', 500: '#14b8a6',
+                            600: '#0d9488', 700: '#0f766e', 800: '#115e59', 900: '#134e4a'
+                        }
+                    },
+                    fontFamily: {
+                        'cairo': ['Cairo', 'system-ui', 'sans-serif'],
+                        'inter': ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'dashboard/css/tshaleeh-theme.css' %}">
+    
+    <!-- Force Dark Mode -->
+    <script>
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.colorScheme = 'dark';
+    </script>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="h-full gradient-bg dark:gradient-bg-dark noise-overlay relative font-cairo" 
+      x-data="dashboardController()" x-init="init()" x-cloak
+    
+    <!-- Mobile Overlay -->
+    <div x-show="sidebarOpen" @click="sidebarOpen = false" 
+         class="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
+         x-transition:enter="transition-opacity ease-linear duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-linear duration-300"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"></div>
+
+    <!-- Glass Navigation Sidebar -->
+    <nav class="glass-panel fixed inset-y-0 right-0 z-50 w-64 transform transition-transform duration-300 lg:translate-x-0"
+         :class="sidebarOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'">
+        <div class="flex flex-col h-full p-6">
+            <!-- Logo -->
+            <div class="flex items-center justify-center mb-8">
+                <h1 class="text-2xl font-bold text-gradient">تشاليح</h1>
+            </div>
+            
+            <!-- Navigation Links -->
+            <nav class="flex-1 space-y-2">
+                <a href="{% url 'dashboard:home' %}" 
+                   class="glass-card-hover flex items-center px-4 py-3 rounded-lg text-slate-700 dark:text-slate-300 transition-all duration-200 {% if 'home' in request.resolver_match.url_name %}bg-primary-500/20 text-primary-600 dark:text-primary-400{% endif %}">
+                    <svg class="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
+                    </svg>
+                    لوحة التحكم
+                </a>
+                
+                <a href="{% url 'dashboard:requests_list' %}" 
+                   class="glass-card-hover flex items-center px-4 py-3 rounded-lg text-slate-700 dark:text-slate-300 transition-all duration-200 {% if 'requests' in request.resolver_match.url_name %}bg-primary-500/20 text-primary-600 dark:text-primary-400{% endif %}">
+                    <svg class="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    الطلبات
+                </a>
+                
+                <a href="{% url 'dashboard:junkyards_list' %}" 
+                   class="glass-card-hover flex items-center px-4 py-3 rounded-lg text-slate-700 dark:text-slate-300 transition-all duration-200 {% if 'junkyards' in request.resolver_match.url_name %}bg-primary-500/20 text-primary-600 dark:text-primary-400{% endif %}">
+                    <svg class="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                    المخازن
+                </a>
+                
+                <a href="{% url 'dashboard:users_list' %}" 
+                   class="glass-card-hover flex items-center px-4 py-3 rounded-lg text-slate-700 dark:text-slate-300 transition-all duration-200 {% if 'users' in request.resolver_match.url_name %}bg-primary-500/20 text-primary-600 dark:text-primary-400{% endif %}">
+                    <svg class="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                    </svg>
+                    المستخدمين
+                </a>
+                
+                <a href="{% url 'dashboard:analytics' %}" 
+                   class="glass-card-hover flex items-center px-4 py-3 rounded-lg text-slate-700 dark:text-slate-300 transition-all duration-200 {% if 'analytics' in request.resolver_match.url_name %}bg-primary-500/20 text-primary-600 dark:text-primary-400{% endif %}">
+                    <svg class="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    التحليلات
+                </a>
+                
+                <a href="{% url 'dashboard:settings' %}" 
+                   class="glass-card-hover flex items-center px-4 py-3 rounded-lg text-slate-700 dark:text-slate-300 transition-all duration-200 {% if 'settings' in request.resolver_match.url_name %}bg-primary-500/20 text-primary-600 dark:text-primary-400{% endif %}">
+                    <svg class="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    الإعدادات
+                </a>
+            </nav>
+            
+            <!-- Admin Panel Link -->
+            <div class="border-t border-white/10 dark:border-slate-600/10 pt-4 mt-4">
+                <a href="{% url 'admin:index' %}" 
+                   class="glass-card-hover flex items-center px-4 py-3 rounded-lg text-slate-700 dark:text-slate-300 transition-all duration-200">
+                    <svg class="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    لوحة الإدارة
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Top Navigation Bar -->
+    <header class="glass-panel sticky top-0 z-40 backdrop-blur-xl border-b border-white/10 dark:border-slate-600/10 lg:mr-64">
+        <div class="flex items-center justify-between px-6 py-4">
+            <!-- Mobile Menu Button -->
+            <button @click="sidebarOpen = !sidebarOpen" class="btn-glass p-2 rounded-lg lg:hidden">
+                <svg class="w-6 h-6 text-slate-700 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            
+            <!-- Page Title - Hidden on Mobile -->
+            <div class="hidden lg:block">
+                <h1 class="text-xl font-semibold text-slate-900 dark:text-slate-100">
+                    {% block page_title %}لوحة التحكم{% endblock %}
+                </h1>
+            </div>
+            
+            <!-- Top Bar Actions -->
+            <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                <!-- Telegram Bot Link -->
+                <a href="https://t.me/tashaleeh_bot" target="_blank" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">
+                    <i class="fab fa-telegram ml-1"></i>
+                    البوت
+                </a>
+                
+                <!-- Simple User Display -->
+                {% if user.is_authenticated %}
+                <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                    <div class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                        {{ user.first_name|first|default:user.username|first|upper }}
+                    </div>
+                    <span class="text-slate-700 dark:text-slate-300 text-sm">{{ user.first_name|default:user.username }}</span>
+                    <a href="{% url 'admin:logout' %}" class="btn-glass px-3 py-2 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 transition-all duration-200">
+                        <i class="fas fa-sign-out-alt ml-1"></i>
+                        خروج
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="lg:mr-64 p-6 min-h-screen transition-all duration-300">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Simplified Dashboard Controller -->
+    <script>
+        // Simple Dashboard Controller (Dark Mode Only)
+        function dashboardController() {
+            return {
+                sidebarOpen: false,
+                
+                init() {
+                    // Force dark mode
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.style.colorScheme = 'dark';
+                    document.documentElement.setAttribute('dir', 'rtl');
+                    document.documentElement.setAttribute('lang', 'ar');
+                    
+                    // Auto-refresh stats every 30 seconds
+                    {% if user.is_authenticated %}
+                    setInterval(() => this.refreshStats(), 30000);
+                    {% endif %}
+                },
+                
+                refreshStats() {
+                    fetch('{% url "dashboard:api_stats" %}')
+                        .then(response => response.json())
+                        .then(data => {
+                            // Update stat elements if they exist
+                            const statElements = {
+                                'total_users': document.getElementById('stat-total-users'),
+                                'active_requests': document.getElementById('stat-active-requests'),
+                                'total_offers': document.getElementById('stat-total-offers'),
+                                'requests_today': document.getElementById('stat-requests-today')
+                            };
+                            
+                            for (const [key, element] of Object.entries(statElements)) {
+                                if (element && data[key] !== undefined) {
+                                    // Add animation effect
+                                    element.style.transform = 'scale(1.1)';
+                                    element.textContent = data[key];
+                                    setTimeout(() => {
+                                        element.style.transform = 'scale(1)';
+                                    }, 200);
+                                }
+                            }
+                        })
+                        .catch(error => console.log('Error refreshing stats:', error));
+                }
+            }
+        }
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

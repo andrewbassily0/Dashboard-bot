@@ -1,0 +1,800 @@
+/* Custom Django Admin Styling - Modern Dashboard Theme */
+
+/* Arabic Font */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap');
+
+/* Dashboard Color Variables */
+:root {
+    --primary-color: #4e73df;
+    --primary-hover: #2e59d9;
+    --secondary-color: #858796;
+    --success-color: #1cc88a;
+    --info-color: #36b9cc;
+    --warning-color: #f6c23e;
+    --danger-color: #e74a3b;
+    --light-color: #f8f9fc;
+    --dark-color: #5a5c69;
+    --sidebar-bg: #fff;
+    --body-bg: #f8f9fc;
+    --card-bg: #fff;
+    --border-color: #e3e6f0;
+    --text-color: #5a5c69;
+    --text-muted: #858796;
+}
+
+/* Global Styles */
+body {
+    font-family: 'Cairo', 'Nunito', sans-serif !important;
+    direction: rtl;
+    background: var(--body-bg) !important;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    color: var(--text-color) !important;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+/* Header Styling - Dashboard Style */
+#header {
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+    border: none !important;
+    position: relative;
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: 1rem 0;
+}
+
+#header h1 {
+    font-weight: 600 !important;
+    font-size: 1.5rem !important;
+    color: var(--text-color) !important;
+    text-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 1.5rem !important;
+}
+
+#header a:link, #header a:visited {
+    color: var(--primary-color) !important;
+    text-decoration: none !important;
+}
+
+#header a:hover {
+    color: var(--primary-hover) !important;
+}
+
+/* Main Content Area - Dashboard Theme */
+#container {
+    background: var(--card-bg) !important;
+    border-radius: 0.35rem !important;
+    margin: 1.5rem !important;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+    overflow: hidden;
+    border: 1px solid var(--border-color) !important;
+}
+
+/* Content Wrapper */
+#content {
+    background: var(--body-bg) !important;
+    min-height: calc(100vh - 200px);
+    padding: 0 !important;
+}
+
+/* Sidebar Styling - Dashboard Style */
+.module h2, .module caption, .inline-group h2 {
+    background: var(--primary-color) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    border-radius: 0.35rem 0.35rem 0 0 !important;
+    padding: 0.75rem 1.25rem !important;
+    margin: 0 !important;
+    border: none !important;
+    font-size: 0.875rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Button Styling - Dashboard Style */
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: var(--primary-color) !important;
+    border: 1px solid var(--primary-color) !important;
+    border-radius: 0.35rem !important;
+    font-weight: 400 !important;
+    padding: 0.375rem 0.75rem !important;
+    transition: all 0.15s ease-in-out !important;
+    color: white !important;
+    font-family: 'Cairo', 'Nunito', sans-serif !important;
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    display: inline-block !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    user-select: none !important;
+}
+
+.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, a.button:hover {
+    background: var(--primary-hover) !important;
+    border-color: var(--primary-hover) !important;
+    color: white !important;
+    text-decoration: none !important;
+}
+
+.button:focus, input[type=submit]:focus, input[type=button]:focus, .submit-row input:focus, a.button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25) !important;
+    outline: 0 !important;
+}
+
+.button:active, input[type=submit]:active, input[type=button]:active, .submit-row input:active, a.button:active {
+    background: var(--primary-hover) !important;
+    border-color: var(--primary-hover) !important;
+}
+
+/* Secondary Buttons */
+.button.secondary, a.button.secondary {
+    background: var(--secondary-color) !important;
+    border-color: var(--secondary-color) !important;
+}
+
+.button.secondary:hover, a.button.secondary:hover {
+    background: #6c757d !important;
+    border-color: #6c757d !important;
+}
+
+/* Form Styling - Dashboard Style */
+.form-row {
+    background: var(--card-bg) !important;
+    border-radius: 0 !important;
+    padding: 1rem 1.25rem !important;
+    margin-bottom: 0 !important;
+    border: none !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    transition: all 0.15s ease-in-out !important;
+}
+
+.form-row:last-child {
+    border-bottom: none !important;
+}
+
+.form-row:hover {
+    background: #f8f9fc !important;
+}
+
+.form-row label {
+    font-weight: 500 !important;
+    color: var(--text-color) !important;
+    font-size: 0.875rem !important;
+    margin-bottom: 0.5rem !important;
+    display: block !important;
+}
+
+.form-row input, .form-row textarea, .form-row select {
+    width: 100% !important;
+    padding: 0.375rem 0.75rem !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0.35rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+    background: var(--card-bg) !important;
+    font-family: 'Cairo', 'Nunito', sans-serif !important;
+    color: var(--text-color) !important;
+    box-sizing: border-box !important;
+}
+
+.form-row input:focus, .form-row textarea:focus, .form-row select:focus {
+    outline: 0 !important;
+    border-color: rgba(78, 115, 223, 0.5) !important;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25) !important;
+    background: var(--card-bg) !important;
+}
+
+/* Table Styling - Dashboard Style */
+#result_list {
+    border-radius: 0.35rem !important;
+    overflow: hidden !important;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+    border: 1px solid var(--border-color) !important;
+    background: var(--card-bg) !important;
+    margin: 0 !important;
+}
+
+#result_list thead th {
+    background: var(--light-color) !important;
+    color: var(--text-color) !important;
+    font-weight: 600 !important;
+    border: none !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.75rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    white-space: nowrap !important;
+}
+
+#result_list tbody tr:nth-child(even) {
+    background: var(--card-bg) !important;
+}
+
+#result_list tbody tr:nth-child(odd) {
+    background: #f8f9fc !important;
+}
+
+#result_list tbody tr:hover {
+    background: rgba(78, 115, 223, 0.05) !important;
+    transition: background-color 0.15s ease-in-out !important;
+}
+
+#result_list tbody td {
+    padding: 0.75rem 1rem !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    color: var(--text-color) !important;
+    font-size: 0.875rem !important;
+    vertical-align: middle !important;
+}
+
+#result_list tbody td a {
+    color: var(--primary-color) !important;
+    text-decoration: none !important;
+    font-weight: 400 !important;
+    transition: color 0.15s ease-in-out !important;
+}
+
+#result_list tbody td a:hover {
+    color: var(--primary-hover) !important;
+    text-decoration: underline !important;
+}
+
+/* Breadcrumbs - Dashboard Style */
+.breadcrumbs {
+    background: var(--light-color) !important;
+    border-radius: 0 !important;
+    padding: 0.75rem 1.25rem !important;
+    margin: 0 !important;
+    border: none !important;
+    color: var(--text-muted) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    font-size: 0.875rem !important;
+}
+
+.breadcrumbs a {
+    color: var(--primary-color) !important;
+    text-decoration: none !important;
+    font-weight: 400 !important;
+    transition: color 0.15s ease-in-out !important;
+}
+
+.breadcrumbs a:hover {
+    color: var(--primary-hover) !important;
+    text-decoration: underline !important;
+}
+
+/* Object Tools - Dashboard Style */
+.object-tools {
+    margin: 1rem 0 !important;
+    text-align: left !important;
+}
+
+.object-tools a:link, .object-tools a:visited {
+    background: var(--primary-color) !important;
+    color: white !important;
+    border-radius: 0.35rem !important;
+    padding: 0.375rem 0.75rem !important;
+    text-decoration: none !important;
+    font-weight: 400 !important;
+    transition: all 0.15s ease-in-out !important;
+    font-size: 0.875rem !important;
+    display: inline-block !important;
+    margin-left: 0.5rem !important;
+    border: 1px solid var(--primary-color) !important;
+}
+
+.object-tools a:hover {
+    background: var(--primary-hover) !important;
+    border-color: var(--primary-hover) !important;
+    color: white !important;
+    text-decoration: none !important;
+}
+
+/* Pagination - Dashboard Style */
+.paginator {
+    text-align: center !important;
+    margin: 1.5rem 0 !important;
+    padding: 1rem !important;
+    background: var(--card-bg) !important;
+    border-top: 1px solid var(--border-color) !important;
+}
+
+.paginator a:link, .paginator a:visited {
+    background: var(--card-bg) !important;
+    color: var(--primary-color) !important;
+    border-radius: 0.35rem !important;
+    padding: 0.375rem 0.75rem !important;
+    text-decoration: none !important;
+    font-weight: 400 !important;
+    margin: 0 0.25rem !important;
+    transition: all 0.15s ease-in-out !important;
+    border: 1px solid var(--border-color) !important;
+    font-size: 0.875rem !important;
+    display: inline-block !important;
+}
+
+.paginator a:hover {
+    background: var(--primary-color) !important;
+    color: white !important;
+    border-color: var(--primary-color) !important;
+    text-decoration: none !important;
+}
+
+.paginator .this-page {
+    background: var(--primary-color) !important;
+    color: white !important;
+    border-radius: 0.35rem !important;
+    padding: 0.375rem 0.75rem !important;
+    font-weight: 500 !important;
+    border: 1px solid var(--primary-color) !important;
+    font-size: 0.875rem !important;
+    display: inline-block !important;
+    margin: 0 0.25rem !important;
+}
+
+/* Module Styling - Dashboard Style */
+.module {
+    border-radius: 0.35rem !important;
+    overflow: hidden !important;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+    margin-bottom: 1.5rem !important;
+    border: 1px solid var(--border-color) !important;
+    background: var(--card-bg) !important;
+}
+
+/* Inline Forms - Dashboard Style */
+.inline-group {
+    border-radius: 0.35rem !important;
+    overflow: hidden !important;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+    margin-bottom: 1.5rem !important;
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+/* Submit Row - Dashboard Style */
+.submit-row {
+    background: var(--light-color) !important;
+    padding: 1rem 1.25rem !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    border-top: 1px solid var(--border-color) !important;
+    text-align: right !important;
+}
+
+.submit-row input {
+    margin: 0 0.5rem !important;
+}
+
+/* Error Messages - Dashboard Style */
+.errornote {
+    background: var(--danger-color) !important;
+    color: white !important;
+    padding: 0.75rem 1.25rem !important;
+    border-radius: 0.35rem !important;
+    margin-bottom: 1rem !important;
+    text-align: center !important;
+    font-weight: 400 !important;
+    border: none !important;
+    font-size: 0.875rem !important;
+}
+
+/* Success Messages - Dashboard Style */
+.messagelist {
+    margin: 1rem 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+
+.messagelist li {
+    background: var(--success-color) !important;
+    color: white !important;
+    padding: 0.75rem 1.25rem !important;
+    border-radius: 0.35rem !important;
+    margin-bottom: 0.5rem !important;
+    border: none !important;
+    list-style: none !important;
+    font-size: 0.875rem !important;
+    font-weight: 400 !important;
+}
+
+.messagelist li.warning {
+    background: var(--warning-color) !important;
+    color: #212529 !important;
+}
+
+.messagelist li.error {
+    background: var(--danger-color) !important;
+    color: white !important;
+}
+
+.messagelist li.info {
+    background: var(--info-color) !important;
+    color: white !important;
+}
+
+/* Help Text - Dashboard Style */
+.help {
+    color: var(--text-muted) !important;
+    font-size: 0.75rem !important;
+    font-style: normal !important;
+    margin-top: 0.25rem !important;
+    line-height: 1.4 !important;
+}
+
+/* Field Required - Dashboard Style */
+.required {
+    color: var(--danger-color) !important;
+    font-weight: 500 !important;
+}
+
+/* Admin Index - Dashboard Style */
+.app-list {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.app-list .app {
+    background: var(--card-bg) !important;
+    border-radius: 0.35rem !important;
+    padding: 0 !important;
+    margin-bottom: 1.5rem !important;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+    border: 1px solid var(--border-color) !important;
+    overflow: hidden !important;
+}
+
+.app-list .app:hover {
+    box-shadow: 0 0.25rem 2rem 0 rgba(58, 59, 69, 0.2) !important;
+    transition: all 0.15s ease-in-out !important;
+}
+
+.app-list .app h2 {
+    background: var(--primary-color) !important;
+    color: white !important;
+    border-radius: 0 !important;
+    padding: 0.75rem 1.25rem !important;
+    margin: 0 !important;
+    border: none !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+}
+
+/* Model List - Dashboard Style */
+.model-list {
+    margin: 0 !important;
+    padding: 1.25rem !important;
+    list-style: none !important;
+}
+
+.model-list li {
+    background: var(--card-bg) !important;
+    border-radius: 0.35rem !important;
+    padding: 0.75rem 1rem !important;
+    margin-bottom: 0.5rem !important;
+    border: 1px solid var(--border-color) !important;
+    transition: all 0.15s ease-in-out !important;
+    list-style: none !important;
+}
+
+.model-list li:hover {
+    background: rgba(78, 115, 223, 0.05) !important;
+    border-color: var(--primary-color) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 0.15rem 1rem 0 rgba(58, 59, 69, 0.15) !important;
+}
+
+.model-list a {
+    color: var(--primary-color) !important;
+    text-decoration: none !important;
+    font-weight: 400 !important;
+    transition: color 0.15s ease-in-out !important;
+    font-size: 0.875rem !important;
+    display: block !important;
+}
+
+.model-list a:hover {
+    color: var(--primary-hover) !important;
+    text-decoration: none !important;
+}
+
+/* Content Main Wrapper */
+#content-main {
+    padding: 1.5rem !important;
+    background: var(--body-bg) !important;
+    min-height: calc(100vh - 300px) !important;
+}
+
+/* Change Form Styling */
+.change-form .form-row .field-box {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+/* Filter Sidebar */
+#changelist-filter {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0.35rem !important;
+    padding: 0 !important;
+    margin-bottom: 1rem !important;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+}
+
+#changelist-filter h2 {
+    background: var(--primary-color) !important;
+    color: white !important;
+    padding: 0.75rem 1rem !important;
+    margin: 0 !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+}
+
+#changelist-filter h3 {
+    background: var(--light-color) !important;
+    color: var(--text-color) !important;
+    padding: 0.5rem 1rem !important;
+    margin: 0 !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+#changelist-filter ul {
+    padding: 0.5rem 0 !important;
+    margin: 0 !important;
+    list-style: none !important;
+}
+
+#changelist-filter li {
+    padding: 0.25rem 1rem !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    list-style: none !important;
+}
+
+#changelist-filter li:last-child {
+    border-bottom: none !important;
+}
+
+#changelist-filter a {
+    color: var(--primary-color) !important;
+    text-decoration: none !important;
+    font-size: 0.875rem !important;
+    transition: color 0.15s ease-in-out !important;
+}
+
+#changelist-filter a:hover {
+    color: var(--primary-hover) !important;
+}
+
+#changelist-filter .selected a {
+    color: var(--text-color) !important;
+    font-weight: 500 !important;
+}
+
+/* Search Box */
+#changelist-search {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0.35rem !important;
+    padding: 1rem !important;
+    margin-bottom: 1.5rem !important;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+}
+
+#searchbar {
+    width: 100% !important;
+    padding: 0.375rem 0.75rem !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0.35rem !important;
+    font-size: 0.875rem !important;
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+}
+
+#searchbar:focus {
+    outline: 0 !important;
+    border-color: rgba(78, 115, 223, 0.5) !important;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25) !important;
+}
+
+/* Actions */
+.actions {
+    background: var(--light-color) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0.35rem !important;
+    padding: 1rem !important;
+    margin-bottom: 1rem !important;
+}
+
+.actions label {
+    font-size: 0.875rem !important;
+    color: var(--text-color) !important;
+    font-weight: 500 !important;
+}
+
+.actions select {
+    padding: 0.375rem 0.75rem !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0.35rem !important;
+    font-size: 0.875rem !important;
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    margin: 0 0.5rem !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #container {
+        margin: 0.5rem !important;
+        border-radius: 0 !important;
+    }
+    
+    .form-row {
+        padding: 0.75rem 1rem !important;
+    }
+    
+    .submit-row {
+        padding: 0.75rem 1rem !important;
+    }
+    
+    #header h1 {
+        font-size: 1.25rem !important;
+        padding: 0 1rem !important;
+    }
+    
+    #content-main {
+        padding: 1rem !important;
+    }
+    
+    .object-tools {
+        text-align: center !important;
+    }
+    
+    .object-tools a {
+        display: block !important;
+        margin: 0.25rem 0 !important;
+    }
+}
+
+/* Custom Scrollbar - Modern Theme */
+::-webkit-scrollbar {
+    width: 8px !important;
+    height: 8px !important;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--light-color) !important;
+    border-radius: 4px !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color) !important;
+    border-radius: 4px !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-color) !important;
+}
+
+/* Fix for specific Django admin elements */
+.change-list .filtered {
+    background: var(--body-bg) !important;
+}
+
+.change-list .filtered .results {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0.35rem !important;
+    overflow: hidden !important;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+}
+
+.change-list .filtered #changelist-filter {
+    width: 240px !important;
+    position: sticky !important;
+    top: 1rem !important;
+}
+
+/* Calendar Widget */
+.calendar {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0.35rem !important;
+}
+
+.calendar th, .calendar td {
+    padding: 0.5rem !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-color) !important;
+}
+
+.calendar th {
+    background: var(--light-color) !important;
+    font-weight: 600 !important;
+}
+
+/* Fix for long content overflow */
+.change-list .results {
+    overflow-x: auto !important;
+}
+
+.change-list .results table {
+    min-width: 100% !important;
+    white-space: nowrap !important;
+}
+
+/* Improved spacing for better usability */
+.form-row .field-box {
+    margin-bottom: 0 !important;
+}
+
+.form-row:not(.errors) + .form-row {
+    border-top: none !important;
+}
+
+/* Ensure proper height for scrollable content */
+body {
+    overflow-x: hidden !important;
+}
+
+#content {
+    min-height: calc(100vh - 100px) !important;
+    overflow: visible !important;
+} 
+
+/* Final overrides to ensure content accessibility */
+* {
+    max-height: none !important;
+}
+
+html, body, #container, #content, #content-main, .change-list, .change-form {
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+/* Force all admin elements to be accessible */
+.change-list .filtered, .change-list .results, #changelist-filter {
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+/* Ensure tables are fully visible */
+table, tbody, thead, tr, td, th {
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+/* Make sure all form elements are accessible */
+form, fieldset, .form-row, .field-box {
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+/* Ensure buttons and controls are visible */
+.object-tools, .submit-row, .paginator, .actions {
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+} 

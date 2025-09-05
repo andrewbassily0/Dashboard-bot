@@ -1,0 +1,491 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}تشاليح - التحليلات والتقارير{% endblock %}
+
+{% block page_title %}التحليلات والتقارير{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Analytics Header -->
+    <div class="glass-card p-8 rounded-xl text-center animate-fade-up">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <div class="text-right rtl:text-right">
+                <h1 class="text-4xl font-bold text-gradient mb-4">
+                    التحليلات والتقارير
+                </h1>
+                <p class="text-xl text-slate-600 dark:text-slate-400">
+                    تحليل شامل لأداء النظام وإحصائيات الاستخدام
+                </p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button class="btn-primary" onclick="exportData('pdf')">
+                    <i class="fas fa-file-pdf mr-2"></i>
+                    تصدير PDF
+                </button>
+                <button class="btn-secondary" onclick="exportData('excel')">
+                    <i class="fas fa-file-excel mr-2"></i>
+                    تصدير Excel
+                </button>
+                <button class="btn-glass" onclick="window.print()">
+                    <i class="fas fa-print mr-2"></i>
+                    طباعة
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="glass-card p-4 rounded-xl animate-fade-up" style="animation-delay: 0.1s">
+        <div class="flex items-center justify-between">
+            <a href="{% url 'dashboard:home' %}" class="btn-secondary">
+                <i class="fas fa-arrow-right mr-2"></i>
+                العودة للرئيسية
+            </a>
+            
+            <!-- Period Selector -->
+            <form method="GET" class="flex items-center space-x-4 rtl:space-x-reverse">
+                <label class="text-sm font-medium text-slate-700 dark:text-slate-300">فترة التحليل:</label>
+                <select name="days" class="form-control-glass" onchange="this.form.submit()">
+                    <option value="7" {% if days == 7 %}selected{% endif %}>آخر 7 أيام</option>
+                    <option value="30" {% if days == 30 %}selected{% endif %}>آخر 30 يوم</option>
+                    <option value="90" {% if days == 90 %}selected{% endif %}>آخر 3 أشهر</option>
+                    <option value="365" {% if days == 365 %}selected{% endif %}>آخر سنة</option>
+                </select>
+                <span class="text-sm text-slate-500 dark:text-slate-400">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    تحليل البيانات لفترة {{ days }} يوم
+                </span>
+            </form>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="stats-card animate-fade-up" style="animation-delay: 0.2s">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-primary-100 dark:bg-primary-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                    {{ requests_over_time|length }}
+                </h3>
+                <p class="text-slate-600 dark:text-slate-400 mb-2">إجمالي الطلبات</p>
+                <div class="flex items-center justify-center text-sm text-primary-500">
+                    <i class="fas fa-chart-line mr-1"></i>
+                    في آخر {{ days }} يوم
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-card animate-fade-up" style="animation-delay: 0.3s">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                    {{ offers_over_time|length }}
+                </h3>
+                <p class="text-slate-600 dark:text-slate-400 mb-2">إجمالي العروض</p>
+                <div class="flex items-center justify-center text-sm text-green-500">
+                    <i class="fas fa-arrow-up mr-1"></i>
+                    نشاط جيد
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-card animate-fade-up" style="animation-delay: 0.4s">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-yellow-100 dark:bg-yellow-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                    {{ avg_offers_per_request }}
+                </h3>
+                <p class="text-slate-600 dark:text-slate-400 mb-2">متوسط العروض لكل طلب</p>
+                <div class="flex items-center justify-center text-sm text-yellow-500">
+                    <i class="fas fa-calculator mr-1"></i>
+                    معدل الاستجابة
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-card animate-fade-up" style="animation-delay: 0.5s">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                    {{ city_stats|length }}
+                </h3>
+                <p class="text-slate-600 dark:text-slate-400 mb-2">المدن النشطة</p>
+                <div class="flex items-center justify-center text-sm text-blue-500">
+                    <i class="fas fa-map-marker-alt mr-1"></i>
+                    انتشار جغرافي
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Requests Over Time Chart -->
+        <div class="glass-card rounded-xl overflow-hidden animate-fade-up" style="animation-delay: 0.6s">
+            <div class="px-6 py-4 border-b border-white/10 dark:border-slate-600/10 bg-primary-50/50 dark:bg-primary-900/10">
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 flex items-center">
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    الطلبات عبر الزمن
+                </h3>
+            </div>
+            <div class="p-6">
+                <div class="relative h-80">
+                    <canvas id="requestsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Offers Over Time Chart -->
+        <div class="glass-card rounded-xl overflow-hidden animate-fade-up" style="animation-delay: 0.7s">
+            <div class="px-6 py-4 border-b border-white/10 dark:border-slate-600/10 bg-primary-50/50 dark:bg-primary-900/10">
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 flex items-center">
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                    </svg>
+                    العروض عبر الزمن
+                </h3>
+            </div>
+            <div class="p-6">
+                <div class="relative h-80">
+                    <canvas id="offersChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Distribution Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- City Distribution -->
+        <div class="glass-card rounded-xl overflow-hidden animate-fade-up" style="animation-delay: 0.8s">
+            <div class="px-6 py-4 border-b border-white/10 dark:border-slate-600/10 bg-primary-50/50 dark:bg-primary-900/10">
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 flex items-center">
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    توزيع الطلبات حسب المدن
+                </h3>
+            </div>
+            <div class="p-6">
+                {% if city_stats %}
+                    <div class="space-y-4">
+                        {% for city in city_stats %}
+                        <div class="flex items-center justify-between p-3 glass-card-hover rounded-lg">
+                            <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                                <div class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                    {{ forloop.counter }}
+                                </div>
+                                <span class="font-medium text-slate-900 dark:text-slate-100">{{ city.city__name }}</span>
+                            </div>
+                            <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                                <span class="text-sm text-slate-600 dark:text-slate-400">{{ city.count }} طلب</span>
+                                <div class="w-20 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-primary-500 to-primary-600 rounded-full" 
+                                         style="width: {% widthratio city.count city_stats.0.count 100 %}%"></div>
+                                </div>
+                                <span class="text-xs text-slate-500 dark:text-slate-400">
+                                    {% widthratio city.count city_stats.0.count 100 %}%
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-8">
+                        <svg class="w-12 h-12 text-slate-400 dark:text-slate-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <h6 class="text-slate-500 dark:text-slate-400">لا توجد بيانات</h6>
+                        <p class="text-slate-400 dark:text-slate-500 text-sm">لا توجد طلبات في هذه الفترة</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Brand Distribution -->
+        <div class="glass-card rounded-xl overflow-hidden animate-fade-up" style="animation-delay: 0.9s">
+            <div class="px-6 py-4 border-b border-white/10 dark:border-slate-600/10 bg-primary-50/50 dark:bg-primary-900/10">
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 flex items-center">
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    توزيع الطلبات حسب الماركات
+                </h3>
+            </div>
+            <div class="p-6">
+                {% if brand_stats %}
+                    <div class="space-y-4">
+                        {% for brand in brand_stats %}
+                        <div class="flex items-center justify-between p-3 glass-card-hover rounded-lg">
+                            <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                    {{ forloop.counter }}
+                                </div>
+                                <span class="font-medium text-slate-900 dark:text-slate-100">{{ brand.brand__name }}</span>
+                            </div>
+                            <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                                <span class="text-sm text-slate-600 dark:text-slate-400">{{ brand.count }} طلب</span>
+                                <div class="w-20 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-green-500 to-green-600 rounded-full" 
+                                         style="width: {% widthratio brand.count brand_stats.0.count 100 %}%"></div>
+                                </div>
+                                <span class="text-xs text-slate-500 dark:text-slate-400">
+                                    {% widthratio brand.count brand_stats.0.count 100 %}%
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-8">
+                        <svg class="w-12 h-12 text-slate-400 dark:text-slate-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <h6 class="text-slate-500 dark:text-slate-400">لا توجد بيانات</h6>
+                        <p class="text-slate-400 dark:text-slate-500 text-sm">لا توجد طلبات في هذه الفترة</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Report -->
+    <div class="glass-card rounded-xl p-6 animate-fade-up" style="animation-delay: 1s">
+        <div class="flex items-center mb-6">
+            <svg class="w-6 h-6 ml-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100">
+                ملخص التقرير - آخر {{ days }} يوم
+            </h3>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+                <h4 class="text-lg font-medium text-primary-600 dark:text-primary-400 mb-4 flex items-center">
+                    <i class="fas fa-chart-line ml-2"></i>
+                    الأداء العام
+                </h4>
+                <div class="space-y-3">
+                    <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span class="text-slate-700 dark:text-slate-300">تم إنشاء عدد جيد من الطلبات</span>
+                    </div>
+                    <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span class="text-slate-700 dark:text-slate-300">استجابة المخازن للعروض مقبولة</span>
+                    </div>
+                    <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <span class="text-slate-700 dark:text-slate-300">متوسط {{ avg_offers_per_request }} عرض لكل طلب</span>
+                    </div>
+                    <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                        <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                        <span class="text-slate-700 dark:text-slate-300">النشاط موزع على {{ city_stats|length }} مدن</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="text-lg font-medium text-blue-600 dark:text-blue-400 mb-4 flex items-center">
+                    <i class="fas fa-lightbulb ml-2"></i>
+                    التوصيات
+                </h4>
+                <div class="space-y-3">
+                    <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span class="text-slate-700 dark:text-slate-300">تحفيز المخازن لتقديم عروض أكثر</span>
+                    </div>
+                    <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                        <div class="w-2 h-2 bg-primary-500 rounded-full"></div>
+                        <span class="text-slate-700 dark:text-slate-300">زيادة الوعي في المدن الأقل نشاطاً</span>
+                    </div>
+                    <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                        <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                        <span class="text-slate-700 dark:text-slate-300">تحسين أوقات الاستجابة</span>
+                    </div>
+                    <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <span class="text-slate-700 dark:text-slate-300">تطوير نظام التقييمات</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Chart.js Configuration
+    Chart.defaults.font.family = 'Cairo, Arial, sans-serif';
+    Chart.defaults.font.size = 12;
+
+    // Requests Over Time Chart
+    const requestsCtx = document.getElementById('requestsChart').getContext('2d');
+    const requestsChart = new Chart(requestsCtx, {
+        type: 'line',
+        data: {
+            labels: [
+                {% for item in requests_over_time %}
+                    '{{ item.date }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'الطلبات',
+                data: [
+                    {% for item in requests_over_time %}
+                        {{ item.count }},
+                    {% endfor %}
+                ],
+                borderColor: '#14b8a6',
+                backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#14b8a6',
+                pointBorderColor: '#0d9488',
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(148, 163, 184, 0.1)'
+                    },
+                    ticks: {
+                        color: '#64748b'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(148, 163, 184, 0.1)'
+                    },
+                    ticks: {
+                        color: '#64748b'
+                    }
+                }
+            }
+        }
+    });
+
+    // Offers Over Time Chart
+    const offersCtx = document.getElementById('offersChart').getContext('2d');
+    const offersChart = new Chart(offersCtx, {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for item in offers_over_time %}
+                    '{{ item.date }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'العروض',
+                data: [
+                    {% for item in offers_over_time %}
+                        {{ item.count }},
+                    {% endfor %}
+                ],
+                backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                borderColor: '#22c55e',
+                borderWidth: 2,
+                borderRadius: 4,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(148, 163, 184, 0.1)'
+                    },
+                    ticks: {
+                        color: '#64748b'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(148, 163, 184, 0.1)'
+                    },
+                    ticks: {
+                        color: '#64748b'
+                    }
+                }
+            }
+        }
+    });
+
+    // Export Functions
+    function exportData(format) {
+        if (format === 'pdf') {
+            window.print();
+        } else if (format === 'excel') {
+            // Convert table data to CSV format
+            let csv = 'البيانات,القيمة\n';
+            csv += 'إجمالي الطلبات,{{ requests_over_time|length }}\n';
+            csv += 'إجمالي العروض,{{ offers_over_time|length }}\n';
+            csv += 'متوسط العروض لكل طلب,{{ avg_offers_per_request }}\n';
+            csv += 'المدن النشطة,{{ city_stats|length }}\n';
+            
+            // Create and download file
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'analytics_report.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+
+    // Auto refresh removed for better user experience
+    // Users can manually refresh when needed
+</script>
+{% endblock %}

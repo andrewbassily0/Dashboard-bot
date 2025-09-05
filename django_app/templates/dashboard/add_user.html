@@ -1,0 +1,368 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}إضافة مستخدم جديد - لوحة التحكم{% endblock %}
+
+{% block page_title %}إضافة مستخدم جديد{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="glass-card p-6 rounded-xl animate-fade-up">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                    إضافة مستخدم جديد
+                </h1>
+                <p class="text-slate-600 dark:text-slate-400">
+                    إضافة مستخدم جديد وربطه بتشليح موجود لإدارة الطلبات
+                </p>
+            </div>
+            <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                <a href="{% url 'dashboard:users_list' %}" class="btn-secondary">
+                    <i class="fas fa-arrow-right mr-2"></i>
+                    العودة لقائمة المستخدمين
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="space-y-4 animate-fade-up" style="animation-delay: 0.05s">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} p-4 rounded-xl border backdrop-blur-sm
+            {% if message.tags == 'error' %}
+                bg-red-900/20 border-red-500/30 text-red-100
+            {% elif message.tags == 'success' %}
+                bg-green-900/20 border-green-500/30 text-green-100
+            {% elif message.tags == 'warning' %}
+                bg-yellow-900/20 border-yellow-500/30 text-yellow-100
+            {% else %}
+                bg-blue-900/20 border-blue-500/30 text-blue-100
+            {% endif %}">
+            <div class="flex items-center">
+                {% if message.tags == 'error' %}
+                    <i class="fas fa-exclamation-circle mr-3"></i>
+                {% elif message.tags == 'success' %}
+                    <i class="fas fa-check-circle mr-3"></i>
+                {% elif message.tags == 'warning' %}
+                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                {% else %}
+                    <i class="fas fa-info-circle mr-3"></i>
+                {% endif %}
+                <span>{{ message }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Add User Form -->
+    <div class="glass-card p-6 rounded-xl animate-fade-up" style="animation-delay: 0.1s">
+        <div class="max-w-2xl mx-auto">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Basic Information -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-700 pb-2">
+                        معلومات المستخدم الأساسية
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- First Name -->
+                        <div>
+                            <label for="first_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                الاسم الأول *
+                            </label>
+                            <input 
+                                type="text" 
+                                id="first_name" 
+                                name="first_name" 
+                                required
+                                class="form-input"
+                                placeholder="أدخل الاسم الأول"
+                            >
+                        </div>
+                        
+                        <!-- Last Name -->
+                        <div>
+                            <label for="last_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                الاسم الأخير *
+                            </label>
+                            <input 
+                                type="text" 
+                                id="last_name" 
+                                name="last_name" 
+                                required
+                                class="form-input"
+                                placeholder="أدخل الاسم الأخير"
+                            >
+                        </div>
+                    </div>
+                    
+                    <!-- Username -->
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            اسم المستخدم *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            required
+                            class="form-input"
+                            placeholder="أدخل اسم مستخدم فريد"
+                        >
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            سيتم استخدام هذا الاسم لتسجيل الدخول
+                        </p>
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            البريد الإلكتروني (اختياري)
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email"
+                            class="form-input"
+                            placeholder="example@email.com"
+                        >
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            كلمة المرور *
+                        </label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            required
+                            class="form-input"
+                            placeholder="أدخل كلمة مرور قوية"
+                            minlength="8"
+                        >
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            يجب أن تكون كلمة المرور مكونة من 8 أحرف على الأقل
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-700 pb-2">
+                        معلومات الاتصال
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Phone -->
+                        <div>
+                            <label for="phone" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                رقم الهاتف *
+                            </label>
+                            <input 
+                                type="tel" 
+                                id="phone" 
+                                name="phone" 
+                                required
+                                class="form-input"
+                                placeholder="05xxxxxxxx"
+                                pattern="[0-9+\-\s]+"
+                            >
+                        </div>
+                        
+                        <!-- Telegram ID -->
+                        <div>
+                            <label for="telegram_id" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                معرف التليجرام (Telegram ID) *
+                            </label>
+                            <input 
+                                type="number" 
+                                id="telegram_id" 
+                                name="telegram_id" 
+                                required
+                                class="form-input"
+                                placeholder="123456789"
+                                min="1"
+                            >
+                            <div class="mt-2 p-3 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+                                <p class="text-xs text-blue-200 mb-2">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    <strong>كيفية الحصول على معرف التليجرام:</strong>
+                                </p>
+                                <ol class="text-xs text-blue-300 space-y-1 list-decimal list-inside mr-4">
+                                    <li>افتح تطبيق التليجرام</li>
+                                    <li>ابحث عن البوت: <span class="font-mono bg-blue-800/50 px-1 rounded">@userinfobot</span></li>
+                                    <li>ابدأ محادثة مع البوت بإرسال <span class="font-mono bg-blue-800/50 px-1 rounded">/start</span></li>
+                                    <li>سيرسل لك البوت معرفك الرقمي (Telegram ID)</li>
+                                    <li>انسخ الرقم وألصقه هنا</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Junkyard Assignment -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-700 pb-2">
+                        ربط التشليح
+                    </h3>
+                    
+                    <!-- Junkyard Selection -->
+                    <div>
+                        <label for="junkyard" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            اختر التشليح المراد ربطه *
+                        </label>
+                        <select id="junkyard" name="junkyard" required class="form-input">
+                            <option value="">اختر التشليح</option>
+                            {% for junkyard in junkyards %}
+                            <option value="{{ junkyard.id }}">
+                                {{ junkyard.user.first_name }} - {{ junkyard.city.name }} 
+                                {% if junkyard.user.telegram_id %}
+                                    (مرتبط بالتليجرام)
+                                {% else %}
+                                    (غير مرتبط)
+                                {% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            المستخدم الجديد سيحصل على صلاحيات إدارة طلبات هذا التشليح
+                        </p>
+                    </div>
+
+                    <!-- User Role -->
+                    <div>
+                        <label for="role" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            صلاحيات المستخدم *
+                        </label>
+                        <select id="role" name="role" required class="form-input">
+                            <option value="">اختر نوع الصلاحيات</option>
+                            <option value="junkyard_manager">مدير التشليح - صلاحيات كاملة</option>
+                            <option value="junkyard_staff">موظف التشليح - عرض وإدارة الطلبات فقط</option>
+                        </select>
+                        <div class="mt-2 p-3 bg-gray-900/20 border border-gray-500/30 rounded-lg">
+                            <div class="text-xs text-gray-300 space-y-1">
+                                <div><strong>مدير التشليح:</strong> إدارة كاملة للطلبات + تعديل معلومات التشليح</div>
+                                <div><strong>موظف التشليح:</strong> عرض وإدارة الطلبات فقط</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="flex items-center justify-end space-x-4 rtl:space-x-reverse pt-6 border-t border-slate-200 dark:border-slate-700">
+                    <a href="{% url 'dashboard:users_list' %}" class="btn-secondary">
+                        إلغاء
+                    </a>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        إضافة المستخدم
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Form Validation Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const usernameInput = document.getElementById('username');
+    const phoneInput = document.getElementById('phone');
+    const telegramIdInput = document.getElementById('telegram_id');
+    const passwordInput = document.getElementById('password');
+    
+    // Username validation
+    usernameInput.addEventListener('input', function() {
+        let value = this.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+        this.value = value;
+    });
+    
+    // Phone validation
+    phoneInput.addEventListener('input', function() {
+        let value = this.value.replace(/[^0-9+\-\s]/g, '');
+        this.value = value;
+    });
+    
+    // Telegram ID validation
+    telegramIdInput.addEventListener('input', function() {
+        let value = this.value.replace(/[^0-9]/g, '');
+        this.value = value;
+        
+        // Basic validation - must be positive number with at least 8 digits
+        if (value.length >= 8 && parseInt(value) > 0) {
+            this.classList.remove('border-red-500');
+            this.classList.add('border-green-500');
+        } else {
+            this.classList.remove('border-green-500');
+            this.classList.add('border-red-500');
+        }
+    });
+    
+    // Password strength indicator
+    passwordInput.addEventListener('input', function() {
+        const value = this.value;
+        let strength = 0;
+        
+        if (value.length >= 8) strength++;
+        if (/[a-z]/.test(value)) strength++;
+        if (/[A-Z]/.test(value)) strength++;
+        if (/[0-9]/.test(value)) strength++;
+        if (/[^a-zA-Z0-9]/.test(value)) strength++;
+        
+        // Visual feedback based on strength
+        this.classList.remove('border-red-500', 'border-yellow-500', 'border-green-500');
+        if (strength < 2) {
+            this.classList.add('border-red-500');
+        } else if (strength < 4) {
+            this.classList.add('border-yellow-500');
+        } else {
+            this.classList.add('border-green-500');
+        }
+    });
+    
+    // Form submission validation
+    form.addEventListener('submit', function(e) {
+        console.log('Form submission started');
+        
+        const requiredFields = ['first_name', 'last_name', 'username', 'password', 'phone', 'telegram_id', 'junkyard', 'role'];
+        let isValid = true;
+        
+        requiredFields.forEach(field => {
+            const input = document.getElementById(field);
+            if (!input.value.trim()) {
+                input.classList.add('border-red-500');
+                isValid = false;
+            } else {
+                input.classList.remove('border-red-500');
+            }
+        });
+        
+        // Special validation for telegram_id
+        const telegramId = telegramIdInput.value.trim();
+        if (telegramId.length < 8 || parseInt(telegramId) <= 0) {
+            telegramIdInput.classList.add('border-red-500');
+            isValid = false;
+        }
+        
+        // Password length validation
+        if (passwordInput.value.length < 8) {
+            passwordInput.classList.add('border-red-500');
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('يرجى ملء جميع الحقول المطلوبة بشكل صحيح');
+        }
+    });
+});
+</script>
+{% endblock %}

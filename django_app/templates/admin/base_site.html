@@ -1,0 +1,878 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | تشاليح - لوحة التحكم الإدارية{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/css/tshaleeh-theme.css' %}?v={{ now|date:"U" }}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/tshaleeh-override.css' %}?v={{ now|date:"U" }}">
+    
+    <!-- Force Dark Mode Only -->
+    <script>
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.colorScheme = 'dark';
+        
+        // Remove unwanted inline styles from main elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // IMMEDIATE FORCE - Apply dark styles before anything else
+            const immediateForceStyle = document.createElement('style');
+            immediateForceStyle.innerHTML = `
+                input, textarea, select, 
+                input[type], .vTextField, .vCharField, .vEmailField, .vURLField,
+                .vDateField, .vTimeField, .vDateTimeField, .vLargeTextField,
+                .vSelectField, .vSelectMultipleField, .vIntegerField {
+                    background-color: rgba(15, 23, 42, 0.8) !important;
+                    background: rgba(15, 23, 42, 0.8) !important;
+                    color: #e2e8f0 !important;
+                    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+                }
+                input:focus, textarea:focus, select:focus {
+                    background-color: rgba(15, 23, 42, 0.9) !important;
+                    background: rgba(15, 23, 42, 0.9) !important;
+                    color: #e2e8f0 !important;
+                    border-color: #14b8a6 !important;
+                    outline: none !important;
+                    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2) !important;
+                }
+                select option {
+                    background-color: #1e293b !important;
+                    color: #e2e8f0 !important;
+                }
+            `;
+            document.head.appendChild(immediateForceStyle);
+            
+            function removeUnwantedStyles() {
+                // Target main elements with shift classes or inline styles
+                const mainElements = document.querySelectorAll(
+                    'div.main, main.main, .main, div.shift, main.shift, .shift, ' +
+                    'div.main.shift, main.main.shift, .main.shift, ' +
+                    '#main, #content, #content-main, .content-main, ' +
+                    '[class*="main"], [class*="shift"]'
+                );
+                
+                                    mainElements.forEach(element => {
+                        // Remove specific inline style properties that might cause issues
+                        element.style.removeProperty('background');
+                        element.style.removeProperty('background-color');
+                        element.style.removeProperty('margin');
+                        element.style.removeProperty('margin-left');
+                        element.style.removeProperty('margin-right');
+                        element.style.removeProperty('padding');
+                        element.style.removeProperty('transform');
+                        element.style.removeProperty('transition');
+                        element.style.removeProperty('left');
+                        element.style.removeProperty('right');
+                        element.style.removeProperty('top');
+                        element.style.removeProperty('bottom');
+                        element.style.removeProperty('position');
+                        element.style.removeProperty('width');
+                        element.style.removeProperty('height');
+                        
+                        // If the element has no more inline styles, remove the style attribute entirely
+                        if (!element.style.cssText || element.style.cssText.trim() === '') {
+                            element.removeAttribute('style');
+                        }
+                    });
+                    
+                    // Fix light inline styles on modules
+                    const lightModules = document.querySelectorAll(
+                        '.glass-module[style*="rgba(255, 255, 255"], ' +
+                        '.module[style*="rgba(255, 255, 255"], ' +
+                        '[style*="background: rgba(255, 255, 255, 0.25)"]'
+                    );
+                    
+                    lightModules.forEach(module => {
+                        // Force dark theme styles
+                        module.style.background = 'rgba(15, 23, 42, 0.7)';
+                        module.style.border = '1px solid rgba(148, 163, 184, 0.2)';
+                        module.style.backdropFilter = 'blur(20px)';
+                        module.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.6)';
+                    });
+                    
+                    // ULTRA FORCE - Apply dark theme to ALL form elements immediately
+                    function forceAllFormElementsDark() {
+                        const allFormElements = document.querySelectorAll(
+                            'input:not([type="submit"]):not([type="button"]):not([type="reset"]):not(.button):not(.deletelink):not(.addlink), ' +
+                            'textarea, select, ' +
+                            'input[type="text"], input[type="email"], input[type="password"], ' +
+                            'input[type="number"], input[type="tel"], input[type="url"], input[type="search"], ' +
+                            'input[type="date"], input[type="time"], input[type="datetime-local"], ' +
+                            '.vTextField, .vIntegerField, .vCharField, .vEmailField, ' +
+                            '.vURLField, .vDateField, .vTimeField, .vDateTimeField, ' +
+                            '.vLargeTextField, .vSelectField, .vSelectMultipleField'
+                        );
+                        
+                        allFormElements.forEach(element => {
+                            // CRITICAL FIX: Skip submit buttons and action buttons to prevent interference with save functionality
+                            if (element.type === 'submit' || element.type === 'button' || element.type === 'reset' ||
+                                element.classList.contains('button') || element.classList.contains('submit-row') ||
+                                element.closest('.submit-row') || element.classList.contains('deletelink') ||
+                                element.classList.contains('addlink') || element.classList.contains('default')) {
+                                return; // Skip this element to preserve form submission functionality
+                            }
+                            
+                            // IMMEDIATELY force all styles ONLY for form input elements
+                            element.style.setProperty('background-color', 'rgba(15, 23, 42, 0.8)', 'important');
+                            element.style.setProperty('background', 'rgba(15, 23, 42, 0.8)', 'important');
+                            element.style.setProperty('color', '#e2e8f0', 'important');
+                            element.style.setProperty('border', '1px solid rgba(148, 163, 184, 0.3)', 'important');
+                            element.style.setProperty('border-radius', '8px', 'important');
+                            element.style.setProperty('padding', '8px 12px', 'important');
+                            
+                            // Force remove any white backgrounds
+                            if (element.style.backgroundColor.includes('white') || 
+                                element.style.backgroundColor.includes('#fff') || 
+                                element.style.backgroundColor.includes('255, 255, 255')) {
+                                element.style.setProperty('background-color', 'rgba(15, 23, 42, 0.8)', 'important');
+                                element.style.setProperty('background', 'rgba(15, 23, 42, 0.8)', 'important');
+                            }
+                            
+                            // Add event listeners only once
+                            if (!element.hasAttribute('data-dark-forced')) {
+                                element.setAttribute('data-dark-forced', 'true');
+                                
+                                // REMOVED 'click' and 'mousedown' events to prevent interference with form submission
+                                ['focus'].forEach(eventType => {
+                                    element.addEventListener(eventType, function() {
+                                        this.style.setProperty('background-color', 'rgba(15, 23, 42, 0.9)', 'important');
+                                        this.style.setProperty('background', 'rgba(15, 23, 42, 0.9)', 'important');
+                                        this.style.setProperty('color', '#e2e8f0', 'important');
+                                        this.style.setProperty('border-color', '#14b8a6', 'important');
+                                        this.style.setProperty('outline', 'none', 'important');
+                                        this.style.setProperty('box-shadow', '0 0 0 3px rgba(20, 184, 166, 0.2), 0 4px 12px rgba(0, 0, 0, 0.2)', 'important');
+                                    });
+                                });
+                                
+                                element.addEventListener('blur', function() {
+                                    this.style.setProperty('background-color', 'rgba(15, 23, 42, 0.8)', 'important');
+                                    this.style.setProperty('background', 'rgba(15, 23, 42, 0.8)', 'important');
+                                    this.style.setProperty('color', '#e2e8f0', 'important');
+                                    this.style.setProperty('border-color', 'rgba(148, 163, 184, 0.3)', 'important');
+                                    this.style.setProperty('box-shadow', '0 2px 8px rgba(0, 0, 0, 0.1)', 'important');
+                                });
+                                
+                                // Handle select options
+                                if (element.tagName.toLowerCase() === 'select') {
+                                    Array.from(element.options).forEach(option => {
+                                        option.style.setProperty('background-color', '#1e293b', 'important');
+                                        option.style.setProperty('background', '#1e293b', 'important');
+                                        option.style.setProperty('color', '#e2e8f0', 'important');
+                                    });
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Execute immediately
+                    forceAllFormElementsDark();
+                    
+                    // Execute again after a short delay to catch any late-loading elements
+                    setTimeout(forceAllFormElementsDark, 100);
+                    setTimeout(forceAllFormElementsDark, 500);
+            }
+            
+            // Run immediately
+            removeUnwantedStyles();
+            
+            // Run only once when new elements are added (more efficient)
+            let timeoutId;
+            const observer = new MutationObserver(function(mutations) {
+                let shouldUpdate = false;
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                        // Check if any form elements were added
+                        for (let node of mutation.addedNodes) {
+                            if (node.nodeType === 1) { // Element node
+                                if (node.matches && (node.matches('input, select, textarea') || 
+                                    node.querySelector && node.querySelector('input, select, textarea'))) {
+                                    shouldUpdate = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                if (shouldUpdate) {
+                    // Debounce to avoid excessive calls
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(removeUnwantedStyles, 100);
+                }
+            });
+            
+            observer.observe(document.body, { 
+                childList: true, 
+                subtree: true
+            });
+            
+            // CRITICAL FIX: Ensure form submission works correctly
+            // Protect all form submission functionality
+            document.addEventListener('click', function(e) {
+                // If the clicked element is a submit button or save button, make sure it works
+                if (e.target.type === 'submit' || 
+                    e.target.classList.contains('default') ||
+                    e.target.classList.contains('button') ||
+                    e.target.name === '_save' ||
+                    e.target.name === '_addanother' ||
+                    e.target.name === '_continue' ||
+                    e.target.closest('.submit-row')) {
+                    
+                    // Remove any event interference
+                    e.stopImmediatePropagation();
+                    
+                    // Ensure the form submits properly
+                    const form = e.target.closest('form');
+                    if (form && e.target.type === 'submit') {
+                        // Let the default form submission happen
+                        return true;
+                    }
+                }
+            }, true); // Use capture phase for highest priority
+        });
+    </script>
+    
+    <style>
+        /* COMPLETE DJANGO ADMIN TSHALEEH OVERRIDE */
+        * { box-sizing: border-box !important; }
+        
+        html, body {
+            direction: rtl !important;
+            font-family: 'Cairo', sans-serif !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: linear-gradient(135deg, #0b1220 0%, #0f172a 100%) !important;
+            min-height: 100vh !important;
+            color: #e2e8f0 !important;
+            color-scheme: dark !important;
+        }
+        
+        :root {
+            --primary: #14b8a6 !important;
+            --bg-glass: rgba(15, 23, 42, 0.7) !important;
+            --bg-glass-hover: rgba(15, 23, 42, 0.8) !important;
+            --bg-surface: rgba(15, 23, 42, 0.6) !important;
+            --text-primary: #e2e8f0 !important;
+            --text-secondary: #94a3b8 !important;
+            --border-glass: rgba(148, 163, 184, 0.2) !important;
+            --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+            --backdrop-blur: blur(16px) !important;
+        }
+        
+        html.dark, .dark {
+            --bg-glass: rgba(15, 23, 42, 0.7) !important;
+            --bg-surface: rgba(15, 23, 42, 0.6) !important;
+            --text-primary: #e2e8f0 !important;
+            --border-glass: rgba(100, 116, 139, 0.2) !important;
+        }
+        
+        html.dark, html.dark body {
+            background: linear-gradient(135deg, #0b1220 0%, #0f172a 100%) !important;
+        }
+        
+        /* COMPACT PROFESSIONAL HEADER */
+        #header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+            color: white !important;
+            padding: 0 !important;
+            border: none !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1) !important;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 1000 !important;
+            height: auto !important;
+        }
+        
+        #header a { 
+            color: white !important; 
+            text-decoration: none !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        /* COMPACT BRANDING */
+        #branding {
+            background: transparent !important;
+            padding: 15px 30px !important;
+            float: left !important;
+            width: auto !important;
+        }
+        
+        #branding h1 {
+            margin: 0 !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            font-size: 20px !important;
+            color: white !important;
+            line-height: 1.2 !important;
+        }
+        
+        #branding h1 a {
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            color: white !important;
+            text-decoration: none !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        #branding h1 a:hover {
+            color: #14b8a6 !important;
+        }
+        
+        #branding h1 i {
+            font-size: 18px !important;
+            color: #14b8a6 !important;
+        }
+        
+        /* SIMPLE USER TOOLS */
+        #user-tools {
+            background: transparent !important;
+            padding: 15px 30px !important;
+            border: none !important;
+            color: white !important;
+            float: right !important;
+            width: auto !important;
+        }
+        
+        #user-tools a {
+            color: white !important;
+            padding: 8px 16px !important;
+            border-radius: 8px !important;
+            background: rgba(20, 184, 166, 0.15) !important;
+            border: 1px solid rgba(20, 184, 166, 0.3) !important;
+            text-decoration: none !important;
+            transition: all 0.3s ease !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 500 !important;
+            font-size: 13px !important;
+            margin-left: 8px !important;
+            display: inline-block !important;
+        }
+        
+        #user-tools a:hover {
+            background: rgba(20, 184, 166, 0.25) !important;
+            border-color: rgba(20, 184, 166, 0.5) !important;
+            transform: translateY(-1px) !important;
+        }
+        
+        /* DASHBOARD LINK IN HEADER */
+        .dashboard-link-header {
+            color: white !important;
+            padding: 8px 16px !important;
+            border-radius: 8px !important;
+            background: rgba(20, 184, 166, 0.2) !important;
+            border: 1px solid rgba(20, 184, 166, 0.4) !important;
+            text-decoration: none !important;
+            transition: all 0.3s ease !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 500 !important;
+            font-size: 13px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+        }
+        
+        .dashboard-link-header:hover {
+            background: rgba(20, 184, 166, 0.3) !important;
+            border-color: rgba(20, 184, 166, 0.6) !important;
+            transform: translateY(-1px) !important;
+            color: white !important;
+        }
+        
+        /* UNIFIED USER TOOLS BUTTONS */
+        #user-tools a {
+            color: white !important;
+            padding: 8px 16px !important;
+            border-radius: 8px !important;
+            background: rgba(20, 184, 166, 0.15) !important;
+            border: 1px solid rgba(20, 184, 166, 0.3) !important;
+            text-decoration: none !important;
+            transition: all 0.3s ease !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 500 !important;
+            font-size: 13px !important;
+            margin-left: 8px !important;
+            display: inline-block !important;
+        }
+        
+        #user-tools a:hover {
+            background: rgba(20, 184, 166, 0.25) !important;
+            border-color: rgba(20, 184, 166, 0.5) !important;
+            transform: translateY(-1px) !important;
+        }
+        
+        /* SPECIAL STYLE FOR LOGOUT BUTTON */
+        #user-tools a[href*="logout"] {
+            background: rgba(239, 68, 68, 0.15) !important;
+            border-color: rgba(239, 68, 68, 0.3) !important;
+        }
+        
+        #user-tools a[href*="logout"]:hover {
+            background: rgba(239, 68, 68, 0.25) !important;
+            border-color: rgba(239, 68, 68, 0.5) !important;
+        }
+        
+        /* HIDDEN NAVIGATION */
+        #nav-global {
+            display: none !important;
+        }
+        
+        /* CLEAR FLOATS */
+        #header:after {
+            content: "" !important;
+            display: table !important;
+            clear: both !important;
+        }
+        
+        /* RESPONSIVE HEADER */
+        @media (max-width: 768px) {
+            #branding {
+                padding: 12px 20px !important;
+                float: none !important;
+                text-align: center !important;
+            }
+            
+            #branding div {
+                flex-direction: column !important;
+                gap: 12px !important;
+            }
+            
+            #branding h1 {
+                font-size: 18px !important;
+            }
+            
+            .dashboard-link-header {
+                font-size: 12px !important;
+                padding: 6px 12px !important;
+            }
+            
+            #user-tools {
+                padding: 12px 20px !important;
+                float: none !important;
+                text-align: center !important;
+                border-top: 1px solid rgba(148, 163, 184, 0.1) !important;
+            }
+            
+            #user-tools a {
+                margin: 0 4px !important;
+                font-size: 12px !important;
+                padding: 6px 12px !important;
+            }
+        }
+        
+        /* MAIN CONTENT */
+        #main { background: transparent !important; padding: 30px !important; }
+        #content { background: transparent !important; padding: 0 !important; }
+        
+        /* MODULES */
+        .dashboard .module, .module {
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 20px !important;
+            margin-bottom: 25px !important;
+            box-shadow: var(--shadow-glass) !important;
+            overflow: hidden !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .dashboard .module:hover, .module:hover {
+            transform: translateY(-5px) !important;
+            box-shadow: 0 15px 45px rgba(20, 184, 166, 0.2) !important;
+        }
+        
+        .dashboard .module h2, .module h2 {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+            color: white !important;
+            padding: 20px 25px !important;
+            margin: 0 !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            border: none !important;
+        }
+        
+        .dashboard .module h2 a, .module h2 a { color: white !important; text-decoration: none !important; }
+        
+        /* TABLES */
+        .dashboard .module table, table {
+            background: transparent !important;
+            width: 100% !important;
+            border-collapse: collapse !important;
+        }
+        
+        .dashboard .module th, .dashboard .module td, th, td {
+            background: transparent !important;
+            color: var(--text-primary) !important;
+            border: none !important;
+            border-bottom: 1px solid var(--border-glass) !important;
+            padding: 15px 25px !important;
+            font-family: 'Cairo', sans-serif !important;
+            text-align: right !important;
+        }
+        
+        .dashboard .module tbody tr:hover, tbody tr:hover {
+            background: var(--bg-glass-hover) !important;
+        }
+        
+        /* RESULT LIST */
+        #result_list {
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 20px !important;
+            overflow: hidden !important;
+            box-shadow: var(--shadow-glass) !important;
+        }
+        
+        #result_list thead th {
+            background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%) !important;
+            color: white !important;
+        }
+        
+        /* BUTTONS */
+        .button, input[type="submit"], input[type="button"] {
+            background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 10px !important;
+            padding: 12px 25px !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            text-decoration: none !important;
+            display: inline-block !important;
+        }
+        
+        .button:hover, input[type="submit"]:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 25px rgba(20, 184, 166, 0.3) !important;
+        }
+        
+        .deletelink {
+            background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+        }
+        
+        /* FORMS */
+        .form-row {
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 15px !important;
+            padding: 20px !important;
+            margin-bottom: 20px !important;
+            box-shadow: var(--shadow-glass) !important;
+        }
+        
+        .form-row input, .form-row select, .form-row textarea {
+            background: var(--bg-surface) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 10px !important;
+            padding: 12px 15px !important;
+            font-family: 'Cairo', sans-serif !important;
+            width: 100% !important;
+        }
+        
+        .form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1) !important;
+        }
+        
+        /* BREADCRUMBS */
+        .breadcrumbs {
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 15px !important;
+            padding: 15px 25px !important;
+            margin-bottom: 25px !important;
+            box-shadow: var(--shadow-glass) !important;
+            color: var(--text-primary) !important;
+            font-family: 'Cairo', sans-serif !important;
+        }
+        
+        .breadcrumbs a { color: var(--primary) !important; }
+        
+        /* SIDEBAR */
+        #changelist-filter {
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 20px !important;
+            padding: 25px !important;
+            box-shadow: var(--shadow-glass) !important;
+        }
+        
+        /* MESSAGES */
+        .messagelist {
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 15px !important;
+            margin-bottom: 25px !important;
+            box-shadow: var(--shadow-glass) !important;
+            overflow: hidden !important;
+        }
+        
+        .messagelist li {
+            background: transparent !important;
+            border: none !important;
+            padding: 15px 25px !important;
+            color: var(--text-primary) !important;
+            font-family: 'Cairo', sans-serif !important;
+        }
+        
+        /* PAGINATION */
+        .paginator {
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 15px !important;
+            padding: 20px !important;
+            margin-top: 25px !important;
+            box-shadow: var(--shadow-glass) !important;
+            text-align: center !important;
+        }
+        
+        .paginator a, .paginator .this-page {
+            background: var(--bg-surface) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 8px !important;
+            padding: 8px 15px !important;
+            margin: 0 5px !important;
+            text-decoration: none !important;
+            font-family: 'Cairo', sans-serif !important;
+            display: inline-block !important;
+        }
+        
+        .paginator a:hover { background: var(--primary) !important; color: white !important; }
+        .paginator .this-page { background: var(--primary) !important; color: white !important; }
+        
+        /* DARK MODE TOGGLE */
+        .theme-toggle {
+            position: fixed !important;
+            top: 20px !important;
+            left: 20px !important;
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 50% !important;
+            width: 50px !important;
+            height: 50px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            z-index: 1000 !important;
+            color: var(--primary) !important;
+            font-size: 20px !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .theme-toggle:hover { transform: scale(1.1) !important; }
+        
+        /* ADDITIONAL DARK MODE FORCE */
+        
+        /* FORCE ALL CONTAINERS TO DARK */
+        #container, .container, #content-main, .main-admin-content-wrapper, #content {
+            background: transparent !important;
+            color: var(--text-primary) !important;
+        }
+        
+        /* FORCE ALL TEXT TO DARK MODE COLORS */
+        div, span, p, h1, h2, h3, h4, h5, h6, label, td, th, li, a, strong, em {
+            color: var(--text-primary) !important;
+        }
+        
+        /* FORCE ALL BACKGROUNDS TO DARK */
+        body *, html *, * {
+            background-color: transparent !important;
+        }
+        
+        body, html {
+            background: linear-gradient(135deg, #0b1220 0%, #0f172a 100%) !important;
+            color: #e2e8f0 !important;
+        }
+        
+        /* OVERRIDE ANY LIGHT BACKGROUNDS - SUPER SPECIFIC */
+        .dashboard, .dashboard *, .module *, .breadcrumbs, .paginator, 
+        .module table, .module tbody, .module thead, .module tr, .module td, .module th,
+        #content, #content-main, #main, .main, .app-list, .app-list li {
+            background: var(--bg-glass) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        /* FORCE MODULE HEADERS TO DARK UNIFIED STYLE */
+        .module h2, .dashboard .module h2, h2, .app-list .section h2 {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+            color: white !important;
+            padding: 20px 25px !important;
+            margin: 0px !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            font-size: 18px !important;
+            border: none !important;
+        }
+        
+        /* FORCE LINKS TO BE VISIBLE */
+        a, .module h2 a, .app-list a {
+            color: var(--primary) !important;
+        }
+        
+        .module h2 a {
+            color: white !important;
+        }
+        
+        /* FORCE DARK ON SPECIFIC DJANGO ELEMENTS */
+        .dashboard #content {
+            background: transparent !important;
+        }
+        
+        .dashboard .module table {
+            background: transparent !important;
+        }
+        
+        .dashboard .module tbody tr {
+            background: transparent !important;
+        }
+        
+        .dashboard .module tbody tr:hover {
+            background: var(--bg-glass-hover) !important;
+        }
+        
+        /* FORCE DARK ON APP LIST */
+        .app-list {
+            background: transparent !important;
+        }
+        
+        .app-list .section {
+            background: var(--bg-glass) !important;
+            border-radius: 15px !important;
+            margin-bottom: 20px !important;
+            overflow: hidden !important;
+            box-shadow: var(--shadow-glass) !important;
+            border: 1px solid var(--border-glass) !important;
+        }
+        
+        .app-list .section h2 {
+            background: linear-gradient(135deg, #0f172a 0%, #0f172a 100%) !important;
+            color: white !important;
+            margin: 0 !important;
+            padding: 20px 25px !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            font-size: 18px !important;
+            border: none !important;
+        }
+        
+        .app-list .section h2 a {
+            color: white !important;
+        }
+        
+        /* Force dark mode on everything */
+        * {
+            color-scheme: dark !important;
+        }
+        
+        /* ULTRA SPECIFIC - FORCE DARK ON GLASS MODULES */
+        
+        /* Target specific inline styles with light backgrounds */
+        *[style*="rgba(255, 255, 255, 0.25)"],
+        *[style*="background: rgba(255, 255, 255"],
+        div[style*="rgba(255, 255, 255"],
+        .glass-module,
+        #dashboard-module {
+            background: rgba(15, 23, 42, 0.7) !important;
+            backdrop-filter: blur(16px) !important;
+            border: 1px solid rgba(148, 163, 184, 0.2) !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+        }
+        
+        /* Force dark borders */
+        *[style*="border: 1px solid rgba(255, 255, 255"] {
+            border: 1px solid rgba(148, 163, 184, 0.2) !important;
+        }
+        
+        /* Additional module styling */
+        .module-content, .module-table {
+            background: transparent !important;
+            color: #e2e8f0 !important;
+        }
+        
+        .module-table td {
+            color: #e2e8f0 !important;
+            background: transparent !important;
+        }
+        
+        .module-table td:hover {
+            background: rgba(15, 23, 42, 0.5) !important;
+        }
+        
+        /* Action buttons */
+        .action-btn {
+            background: rgba(20, 184, 166, 0.15) !important;
+            border: 1px solid rgba(20, 184, 166, 0.3) !important;
+            color: #14b8a6 !important;
+            padding: 6px 12px !important;
+            border-radius: 6px !important;
+            text-decoration: none !important;
+            font-size: 11px !important;
+            margin: 0 2px !important;
+        }
+        
+        .action-btn:hover {
+            background: rgba(20, 184, 166, 0.25) !important;
+            transform: translateY(-1px) !important;
+        }
+        
+        .add-btn {
+            background: rgba(34, 197, 94, 0.15) !important;
+            border-color: rgba(34, 197, 94, 0.3) !important;
+            color: #22c55e !important;
+        }
+        
+        .edit-btn {
+            background: rgba(59, 130, 246, 0.15) !important;
+            border-color: rgba(59, 130, 246, 0.3) !important;
+            color: #3b82f6 !important;
+        }
+    </style>
+{% endblock %}
+
+{% block branding %}
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <h1 id="site-name">
+            <a href="{% url 'admin:index' %}">
+                <i class="fas fa-car"></i>
+                تشاليح - قطع غيار السيارات
+            </a>
+        </h1>
+        <a href="{% url 'dashboard:home' %}" class="dashboard-link-header">
+            <i class="fas fa-tachometer-alt"></i>
+            الداشبورد
+        </a>
+    </div>
+{% endblock %}
+
+{% block nav-global %}
+{% endblock %}
+
+{% block usertools %}
+    <div id="user-tools">
+        {{ block.super }}
+    </div>
+{% endblock %}
+
+{% block extrajs %}
+    {{ block.super }}
+    <script>
+        // Force dark mode
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.colorScheme = 'dark';
+    </script>
+{% endblock %} 

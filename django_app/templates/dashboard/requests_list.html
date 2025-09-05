@@ -1,0 +1,337 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}تشاليح - قائمة الطلبات{% endblock %}
+
+{% block page_title %}قائمة الطلبات{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="glass-card p-6 rounded-xl animate-fade-up">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                    إدارة الطلبات
+                </h1>
+                <p class="text-slate-600 dark:text-slate-400">
+                    إدارة جميع طلبات قطع الغيار المقدمة من العملاء
+                </p>
+            </div>
+            <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                <a href="{% url 'dashboard:home' %}" class="btn-secondary">
+                    <i class="fas fa-arrow-right mr-2"></i>
+                    العودة للرئيسية
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="stats-card animate-fade-up" style="animation-delay: 0.1s">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
+                        إجمالي الطلبات
+                    </p>
+                    <p class="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                        {{ stats.total_requests }}
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-primary-100 dark:bg-primary-900/20 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-card animate-fade-up" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
+                        الطلبات النشطة
+                    </p>
+                    <p class="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                        {{ stats.active_requests }}
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-card animate-fade-up" style="animation-delay: 0.3s">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
+                        الطلبات المكتملة
+                    </p>
+                    <p class="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                        {{ stats.completed_requests }}
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-card animate-fade-up" style="animation-delay: 0.4s">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
+                        الطلبات المنتهية
+                    </p>
+                    <p class="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                        {{ stats.expired_requests }}
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="glass-card rounded-xl p-6 animate-fade-up" style="animation-delay: 0.5s">
+        <div class="flex items-center mb-6">
+            <svg class="w-5 h-5 ml-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"></path>
+            </svg>
+            <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100">فلترة النتائج</h3>
+        </div>
+        
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">الحالة</label>
+                <select name="status" class="form-control-glass w-full">
+                    <option value="">جميع الحالات</option>
+                    <option value="new" {% if current_status == 'new' %}selected{% endif %}>جديد</option>
+                    <option value="active" {% if current_status == 'active' %}selected{% endif %}>نشط</option>
+                    <option value="completed" {% if current_status == 'completed' %}selected{% endif %}>مكتمل</option>
+                    <option value="cancelled" {% if current_status == 'cancelled' %}selected{% endif %}>ملغي</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">المدينة</label>
+                <select name="city" class="form-control-glass w-full">
+                    <option value="">جميع المدن</option>
+                    {% for city in cities %}
+                        <option value="{{ city.id }}" {% if current_city == city.id|stringformat:"s" %}selected{% endif %}>
+                            {{ city.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">الماركة</label>
+                <select name="brand" class="form-control-glass w-full">
+                    <option value="">جميع الماركات</option>
+                    {% for brand in brands %}
+                        <option value="{{ brand.id }}" {% if current_brand == brand.id|stringformat:"s" %}selected{% endif %}>
+                            {{ brand.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">انتهاء الصلاحية</label>
+                <select name="expired" class="form-control-glass w-full">
+                    <option value="">جميع الطلبات</option>
+                    <option value="false" {% if current_expired == 'false' %}selected{% endif %}>ساري</option>
+                    <option value="true" {% if current_expired == 'true' %}selected{% endif %}>منتهي</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">&nbsp;</label>
+                <div class="flex space-x-2 rtl:space-x-reverse">
+                    <button type="submit" class="btn-primary px-4 py-2 text-sm">
+                        <i class="fas fa-search ml-1"></i>
+                        بحث
+                    </button>
+                    <a href="{% url 'dashboard:requests_list' %}" class="btn-glass px-4 py-2 text-sm">
+                        <i class="fas fa-refresh ml-1"></i>
+                        إعادة تعيين
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Requests Table -->
+    <div class="glass-card rounded-xl overflow-hidden animate-fade-up" style="animation-delay: 0.6s">
+        {% if requests %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-primary-50 dark:bg-primary-900/20">
+                        <tr>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-primary-700 dark:text-primary-300 uppercase tracking-wider">
+                                رقم الطلب
+                            </th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-primary-700 dark:text-primary-300 uppercase tracking-wider">
+                                العميل
+                            </th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-primary-700 dark:text-primary-300 uppercase tracking-wider">
+                                السيارة
+                            </th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-primary-700 dark:text-primary-300 uppercase tracking-wider">
+                                القطع المطلوبة
+                            </th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-primary-700 dark:text-primary-300 uppercase tracking-wider">
+                                المدينة
+                            </th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-primary-700 dark:text-primary-300 uppercase tracking-wider">
+                                الحالة
+                            </th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-primary-700 dark:text-primary-300 uppercase tracking-wider">
+                                التاريخ
+                            </th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-primary-700 dark:text-primary-300 uppercase tracking-wider">
+                                الإجراءات
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                        {% for req in requests %}
+                        <tr class="hover:bg-white/10 dark:hover:bg-slate-800/20 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-medium text-slate-900 dark:text-slate-100">
+                                        #{{ req.order_id }}
+                                    </span>
+                                    {% if req.is_expired %}
+                                        <span class="badge-glass status-expired text-xs mt-1 inline-block w-fit">
+                                            منتهي الصلاحية
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center text-white text-sm font-medium mr-3">
+                                        {{ req.user.first_name|first|default:req.user.username|first|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-slate-900 dark:text-slate-100">
+                                            {{ req.user.first_name|default:req.user.username|default:"عميل" }}
+                                        </div>
+                                        {% if req.user.phone_number %}
+                                            <div class="text-xs text-slate-500 dark:text-slate-400">{{ req.user.phone_number }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-slate-900 dark:text-slate-100">
+                                    {{ req.brand.name }} {{ req.model.name }}
+                                </div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400">موديل {{ req.year }}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-slate-600 dark:text-slate-400 max-w-xs truncate" title="{{ req.parts }}">
+                                    {{ req.parts }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="badge-glass bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800">
+                                    {{ req.city.name }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="badge-glass status-{{ req.status }}">
+                                    {% if req.status == 'new' %}
+                                        جديد
+                                    {% elif req.status == 'active' %}
+                                        نشط
+                                    {% elif req.status == 'completed' %}
+                                        مكتمل
+                                    {% elif req.status == 'cancelled' %}
+                                        ملغي
+                                    {% else %}
+                                        {{ req.get_status_display }}
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-400">
+                                {{ req.created_at|date:"Y/m/d H:i" }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex space-x-2 rtl:space-x-reverse">
+                                    <a href="{% url 'dashboard:request_detail' req.id %}" 
+                                       class="btn-glass px-3 py-1 text-xs" title="عرض التفاصيل">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if req.user.telegram_username %}
+                                        <a href="https://t.me/{{ req.user.telegram_username }}" 
+                                           target="_blank" class="btn-glass px-3 py-1 text-xs" title="فتح في التليجرام">
+                                            <i class="fab fa-telegram"></i>
+                                        </a>
+                                    {% endif %}
+                                    {% if req.user.phone_number %}
+                                        <a href="tel:{{ req.user.phone_number }}" 
+                                           class="btn-glass px-3 py-1 text-xs" title="اتصال">
+                                            <i class="fas fa-phone"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-12">
+                <svg class="w-16 h-16 text-slate-400 dark:text-slate-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
+                <h3 class="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">لا توجد طلبات</h3>
+                <p class="text-slate-500 dark:text-slate-400 mb-4">لم يتم العثور على أي طلبات بالمعايير المحددة.</p>
+                <a href="{% url 'dashboard:requests_list' %}" class="btn-primary">
+                    <i class="fas fa-refresh mr-1"></i>
+                    عرض جميع الطلبات
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Auto refresh removed for better user experience
+    // Users can manually refresh when needed
+    
+    // Add loading state to form submission
+    document.querySelector('form').addEventListener('submit', function() {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalContent = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin ml-1"></i> جاري البحث...';
+        submitBtn.disabled = true;
+        
+        // Re-enable after 3 seconds in case of no page reload
+        setTimeout(() => {
+            submitBtn.innerHTML = originalContent;
+            submitBtn.disabled = false;
+        }, 3000);
+    });
+    
+    // Contact tracking
+    document.querySelectorAll('a[href^="tel:"], a[href^="https://t.me/"]').forEach(function(link) {
+        link.addEventListener('click', function() {
+            console.log('Contact initiated:', this.href);
+        });
+    });
+</script>
+{% endblock %}

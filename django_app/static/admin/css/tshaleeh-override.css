@@ -1,0 +1,1396 @@
+/* ===== TSHALEEH DJANGO ADMIN - DARK MODE ONLY ===== */
+/* Force override ALL Django Admin default styles with dark theme */
+
+/* RESET EVERYTHING - DARK MODE ONLY */
+html, body {
+    direction: rtl !important;
+    font-family: 'Cairo', sans-serif !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: linear-gradient(135deg, #0b1220 0%, #0f172a 100%) !important;
+    min-height: 100vh !important;
+    color: #e2e8f0 !important;
+    color-scheme: dark !important;
+}
+
+/* DARK MODE ONLY VARIABLES */
+:root {
+    --tshaleeh-primary: #14b8a6 !important;
+    --tshaleeh-primary-dark: #0d9488 !important;
+    --tshaleeh-bg-glass: rgba(15, 23, 42, 0.7) !important;
+    --tshaleeh-bg-glass-hover: rgba(15, 23, 42, 0.8) !important;
+    --tshaleeh-bg-surface: rgba(15, 23, 42, 0.6) !important;
+    --tshaleeh-text-primary: #e2e8f0 !important;
+    --tshaleeh-text-secondary: #cbd5e1 !important;
+    --tshaleeh-border-glass: rgba(100, 116, 139, 0.2) !important;
+    --tshaleeh-shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+    --tshaleeh-backdrop-blur: blur(16px) !important;
+}
+
+/* FORCE HEADER REDESIGN - DARK */
+#header {
+    background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%) !important;
+    color: white !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: 0 4px 20px rgba(20, 184, 166, 0.3) !important;
+}
+
+#header a { 
+    color: white !important; 
+    text-decoration: none !important; 
+}
+
+#branding {
+    background: transparent !important;
+    padding: 20px 30px !important;
+}
+
+#branding h1 {
+    margin: 0 !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 28px !important;
+    color: white !important;
+}
+
+#user-tools {
+    background: rgba(255, 255, 255, 0.1) !important;
+    padding: 15px 30px !important;
+    border: none !important;
+    color: white !important;
+}
+
+#user-tools a {
+    color: white !important;
+    margin: 0 10px !important;
+    padding: 8px 15px !important;
+    border-radius: 20px !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+}
+
+#user-tools a:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* MAIN CONTENT - DARK */
+#main { 
+    background: transparent !important; 
+    padding: 30px !important; 
+    color: var(--tshaleeh-text-primary) !important; 
+}
+
+#content { 
+    background: transparent !important; 
+    padding: 0 !important; 
+}
+
+/* MODULES - DARK GLASS */
+.dashboard .module, .module {
+    background: var(--tshaleeh-bg-glass) !important;
+    backdrop-filter: var(--tshaleeh-backdrop-blur) !important;
+    border: 1px solid var(--tshaleeh-border-glass) !important;
+    border-radius: 20px !important;
+    margin-bottom: 25px !important;
+    box-shadow: var(--tshaleeh-shadow-glass) !important;
+    overflow: hidden !important;
+    transition: all 0.3s ease !important;
+}
+
+.dashboard .module:hover, .module:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 15px 45px rgba(20, 184, 166, 0.2) !important;
+}
+
+.dashboard .module h2, .module h2 {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+    color: white !important;
+    padding: 20px 25px !important;
+    margin: 0 !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 600 !important;
+    border: none !important;
+}
+
+.dashboard .module h2 a, .module h2 a { 
+    color: white !important; 
+    text-decoration: none !important; 
+}
+
+/* TABLES - DARK */
+.dashboard .module table, table {
+    background: transparent !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+}
+
+.dashboard .module th, .dashboard .module td, th, td {
+    background: transparent !important;
+    color: var(--tshaleeh-text-primary) !important;
+    border: none !important;
+    border-bottom: 1px solid var(--tshaleeh-border-glass) !important;
+    padding: 15px 25px !important;
+    font-family: 'Cairo', sans-serif !important;
+    text-align: right !important;
+}
+
+.dashboard .module tbody tr:hover, tbody tr:hover {
+    background: var(--tshaleeh-bg-glass-hover) !important;
+}
+
+/* RESULT LIST - DARK GLASS */
+#result_list {
+    background: var(--tshaleeh-bg-glass) !important;
+    backdrop-filter: var(--tshaleeh-backdrop-blur) !important;
+    border: 1px solid var(--tshaleeh-border-glass) !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+    box-shadow: var(--tshaleeh-shadow-glass) !important;
+}
+
+#result_list thead th {
+    background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%) !important;
+    color: white !important;
+}
+
+/* BUTTONS - DARK THEME */
+.button, input[type="submit"], input[type="button"] {
+    background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 12px 25px !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+    display: inline-block !important;
+}
+
+.button:hover, input[type="submit"]:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(20, 184, 166, 0.3) !important;
+}
+
+.deletelink {
+    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+}
+
+/* FORMS - DARK GLASS */
+.form-row {
+    background: var(--tshaleeh-bg-glass) !important;
+    backdrop-filter: var(--tshaleeh-backdrop-blur) !important;
+    border: 1px solid var(--tshaleeh-border-glass) !important;
+    border-radius: 15px !important;
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+    box-shadow: var(--tshaleeh-shadow-glass) !important;
+}
+
+.form-row input, .form-row select, .form-row textarea {
+    background: var(--tshaleeh-bg-surface) !important;
+    backdrop-filter: var(--tshaleeh-backdrop-blur) !important;
+    border: 1px solid var(--tshaleeh-border-glass) !important;
+    border-radius: 10px !important;
+    color: var(--tshaleeh-text-primary) !important;
+    padding: 10px 15px !important;
+    font-family: 'Cairo', sans-serif !important;
+    transition: all 0.3s ease !important;
+}
+
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+    outline: none !important;
+    border-color: var(--tshaleeh-primary) !important;
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1) !important;
+}
+
+.form-row label {
+    color: var(--tshaleeh-text-primary) !important;
+    font-weight: 600 !important;
+    font-family: 'Cairo', sans-serif !important;
+    margin-bottom: 8px !important;
+    display: block !important;
+}
+
+/* SELECT ELEMENTS - DARK */
+select {
+    background: var(--tshaleeh-bg-surface) !important;
+    color: var(--tshaleeh-text-primary) !important;
+    border: 1px solid var(--tshaleeh-border-glass) !important;
+    border-radius: 8px !important;
+    padding: 8px 35px 8px 12px !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-size: 14px !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23e2e8f0' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: left 12px center !important;
+    background-size: 12px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+}
+
+select:focus {
+    outline: none !important;
+    border-color: var(--tshaleeh-primary) !important;
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2) !important;
+    background-color: var(--tshaleeh-bg-glass-hover) !important;
+}
+
+select option {
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+    padding: 8px 12px !important;
+    font-family: 'Cairo', sans-serif !important;
+}
+
+/* CHANGELIST FILTER - RIGHT SIDEBAR */
+#changelist-filter {
+    background: var(--tshaleeh-bg-glass) !important;
+    backdrop-filter: var(--tshaleeh-backdrop-blur) !important;
+    border: 1px solid var(--tshaleeh-border-glass) !important;
+    border-radius: 15px !important;
+    padding: 20px !important;
+    margin: 0 0 0 20px !important;
+    width: 300px !important;
+    box-shadow: var(--tshaleeh-shadow-glass) !important;
+    float: right !important;
+    position: sticky !important;
+    top: 20px !important;
+    max-height: calc(100vh - 40px) !important;
+    overflow-y: auto !important;
+}
+
+#changelist-filter h2 {
+    background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%) !important;
+    color: white !important;
+    padding: 15px 20px !important;
+    margin: -20px -20px 20px -20px !important;
+    border-radius: 15px 15px 0 0 !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 16px !important;
+}
+
+#changelist-filter h3 {
+    color: var(--tshaleeh-text-primary) !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 600 !important;
+    margin: 20px 0 10px 0 !important;
+    font-size: 14px !important;
+}
+
+#changelist-filter ul {
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+
+#changelist-filter li {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#changelist-filter a {
+    display: block !important;
+    padding: 8px 12px !important;
+    color: var(--tshaleeh-text-secondary) !important;
+    text-decoration: none !important;
+    border-radius: 8px !important;
+    margin-bottom: 4px !important;
+    transition: all 0.2s ease !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-size: 13px !important;
+}
+
+#changelist-filter a:hover {
+    background: var(--tshaleeh-bg-glass-hover) !important;
+    color: var(--tshaleeh-text-primary) !important;
+    transform: translateX(-3px) !important;
+}
+
+#changelist-filter a.selected {
+    background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%) !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+/* CHANGELIST CONTENT - MAIN AREA */
+#changelist {
+    margin-left: 0 !important;
+    margin-right: 340px !important;
+    padding: 0 !important;
+}
+
+/* SUBMIT BUTTONS - ULTRA SPECIFIC DARK STYLING */
+.submit-row {
+    background: var(--tshaleeh-bg-glass) !important;
+    backdrop-filter: var(--tshaleeh-backdrop-blur) !important;
+    border: 1px solid var(--tshaleeh-border-glass) !important;
+    border-radius: 15px !important;
+    padding: 25px 30px !important;
+    margin: 30px 0 !important;
+    box-shadow: var(--tshaleeh-shadow-glass) !important;
+    text-align: center !important;
+}
+
+/* SAVE BUTTON - PRIMARY BLUE */
+.submit-row input[type="submit"] {
+    all: unset !important;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    color: white !important;
+    border: 2px solid #1d4ed8 !important;
+    border-radius: 12px !important;
+    padding: 15px 30px !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 16px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    margin: 0 10px !important;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4) !important;
+    display: inline-block !important;
+    text-align: center !important;
+    min-width: 140px !important;
+}
+
+.submit-row input[type="submit"]:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+    transform: translateY(-3px) scale(1.05) !important;
+    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.6) !important;
+}
+
+/* SAVE AND ADD ANOTHER - GREEN */
+.submit-row input[name="_addanother"] {
+    all: unset !important;
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+    color: white !important;
+    border: 2px solid #15803d !important;
+    border-radius: 12px !important;
+    padding: 15px 30px !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 16px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    margin: 0 10px !important;
+    box-shadow: 0 8px 20px rgba(22, 163, 74, 0.4) !important;
+    display: inline-block !important;
+    text-align: center !important;
+    min-width: 140px !important;
+}
+
+.submit-row input[name="_addanother"]:hover {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+    transform: translateY(-3px) scale(1.05) !important;
+    box-shadow: 0 12px 30px rgba(34, 197, 94, 0.8) !important;
+}
+
+/* SAVE AND CONTINUE - PURPLE */
+.submit-row input[name="_continue"] {
+    all: unset !important;
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
+    color: white !important;
+    border: 2px solid #6d28d9 !important;
+    border-radius: 12px !important;
+    padding: 15px 30px !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 16px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    margin: 0 10px !important;
+    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4) !important;
+    display: inline-block !important;
+    text-align: center !important;
+    min-width: 140px !important;
+}
+
+.submit-row input[name="_continue"]:hover {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+    transform: translateY(-3px) scale(1.05) !important;
+    box-shadow: 0 12px 30px rgba(139, 92, 246, 0.6) !important;
+}
+
+/* ALTERNATIVE BUTTON SELECTORS */
+input[name="_save"] {
+    all: unset !important;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    color: white !important;
+    border: 2px solid #1d4ed8 !important;
+    border-radius: 12px !important;
+    padding: 15px 30px !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 16px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    margin: 0 10px !important;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4) !important;
+    display: inline-block !important;
+    text-align: center !important;
+    min-width: 140px !important;
+}
+
+input[name="_save"]:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+    transform: translateY(-3px) scale(1.05) !important;
+    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.6) !important;
+}
+
+/* LOGIN PAGE - DARK */
+.login #container {
+    background: transparent !important;
+}
+
+.login #content {
+    background: var(--tshaleeh-bg-glass) !important;
+    backdrop-filter: var(--tshaleeh-backdrop-blur) !important;
+    border: 1px solid var(--tshaleeh-border-glass) !important;
+    border-radius: 20px !important;
+    box-shadow: var(--tshaleeh-shadow-glass) !important;
+}
+
+.login form {
+    background: transparent !important;
+}
+
+/* BREADCRUMBS - DARK */
+.breadcrumbs {
+    background: var(--tshaleeh-bg-glass) !important;
+    backdrop-filter: var(--tshaleeh-backdrop-blur) !important;
+    border: 1px solid var(--tshaleeh-border-glass) !important;
+    border-radius: 10px !important;
+    margin-bottom: 20px !important;
+    padding: 15px 25px !important;
+    color: var(--tshaleeh-text-secondary) !important;
+    font-family: 'Cairo', sans-serif !important;
+    box-shadow: var(--tshaleeh-shadow-glass) !important;
+}
+
+.breadcrumbs a {
+    color: var(--tshaleeh-primary) !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+}
+
+.breadcrumbs a:hover {
+    color: var(--tshaleeh-primary-dark) !important;
+}
+
+/* PAGINATION - DARK */
+.paginator {
+    background: var(--tshaleeh-bg-glass) !important;
+    backdrop-filter: var(--tshaleeh-backdrop-blur) !important;
+    border: 1px solid var(--tshaleeh-border-glass) !important;
+    border-radius: 15px !important;
+    padding: 15px 20px !important;
+    margin: 20px 0 !important;
+    text-align: center !important;
+    box-shadow: var(--tshaleeh-shadow-glass) !important;
+}
+
+.paginator a, .paginator .this-page {
+    background: var(--tshaleeh-bg-surface) !important;
+    color: var(--tshaleeh-text-primary) !important;
+    border: 1px solid var(--tshaleeh-border-glass) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    margin: 0 4px !important;
+    text-decoration: none !important;
+    display: inline-block !important;
+    transition: all 0.2s ease !important;
+    font-family: 'Cairo', sans-serif !important;
+}
+
+.paginator a:hover {
+    background: var(--tshaleeh-primary) !important;
+    color: white !important;
+    transform: scale(1.1) !important;
+}
+
+.paginator .this-page {
+    background: var(--tshaleeh-primary) !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+/* ERROR MESSAGES - DARK */
+.errorlist {
+    background: rgba(239, 68, 68, 0.1) !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+    border-radius: 8px !important;
+    padding: 10px 15px !important;
+    margin: 10px 0 !important;
+    color: #fca5a5 !important;
+    font-family: 'Cairo', sans-serif !important;
+    list-style: none !important;
+}
+
+.errorlist li {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* SUCCESS MESSAGES - DARK */
+.success, .messagelist .success {
+    background: rgba(34, 197, 94, 0.1) !important;
+    border: 1px solid rgba(34, 197, 94, 0.3) !important;
+    border-radius: 8px !important;
+    padding: 15px 20px !important;
+    margin: 15px 0 !important;
+    color: #86efac !important;
+    font-family: 'Cairo', sans-serif !important;
+}
+
+/* WARNING MESSAGES - DARK */
+.warning, .messagelist .warning {
+    background: rgba(251, 191, 36, 0.1) !important;
+    border: 1px solid rgba(251, 191, 36, 0.3) !important;
+    border-radius: 8px !important;
+    padding: 15px 20px !important;
+    margin: 15px 0 !important;
+    color: #fde047 !important;
+    font-family: 'Cairo', sans-serif !important;
+}
+
+/* INFO MESSAGES - DARK */
+.info, .messagelist .info {
+    background: rgba(59, 130, 246, 0.1) !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+    border-radius: 8px !important;
+    padding: 15px 20px !important;
+    margin: 15px 0 !important;
+    color: #93c5fd !important;
+    font-family: 'Cairo', sans-serif !important;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    #changelist-filter {
+        width: 100% !important;
+        float: none !important;
+        margin: 0 0 20px 0 !important;
+        position: static !important;
+    }
+    
+    #changelist {
+        margin-right: 0 !important;
+    }
+    
+    .submit-row input[type="submit"],
+    .submit-row input[name="_addanother"],
+    .submit-row input[name="_continue"],
+    input[name="_save"] {
+        display: block !important;
+        width: 100% !important;
+        margin: 10px 0 !important;
+        min-width: auto !important;
+    }
+}
+
+/* SCROLLBAR - DARK */
+::-webkit-scrollbar {
+    width: 8px !important;
+    height: 8px !important;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.3) !important;
+    border-radius: 4px !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(20, 184, 166, 0.5) !important;
+    border-radius: 4px !important;
+    transition: background 0.3s ease !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(20, 184, 166, 0.7) !important;
+}
+
+/* FORCE DARK MODE ON ALL ELEMENTS */
+* {
+    color-scheme: dark !important;
+}
+
+/* ULTRA FORCE DARK MODE - OVERRIDE EVERYTHING */
+
+/* Force all containers to be transparent with dark text */
+* {
+    color: #e2e8f0 !important;
+    color-scheme: dark !important;
+}
+
+/* Force body and html */
+html, body {
+    background: linear-gradient(135deg, #0b1220 0%, #0f172a 100%) !important;
+    color: #e2e8f0 !important;
+}
+
+/* Force all backgrounds to be transparent or dark glass */
+div, section, article, aside, main, header, footer, nav {
+    background-color: transparent !important;
+}
+
+/* Force dashboard specific elements */
+.dashboard, .dashboard-container, #content, #content-main, #main {
+    background: transparent !important;
+    color: #e2e8f0 !important;
+}
+
+/* Force modules to dark glass */
+.module, .dashboard .module, .glass-module, #dashboard-module {
+    background: rgba(15, 23, 42, 0.7) !important;
+    backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    border-radius: 20px !important;
+    color: #e2e8f0 !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Force module headers - Dark Unified Style */
+.module h2, .dashboard .module h2, h2, .app-list .section h2 {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+    color: white !important;
+    padding: 20px 25px !important;
+    margin: 0px !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 18px !important;
+    border: none !important;
+}
+
+/* Force module content */
+.module table, .module tbody, .module thead, .module tr, .module td, .module th {
+    background: transparent !important;
+    color: #e2e8f0 !important;
+}
+
+/* Force app list */
+.app-list {
+    background: transparent !important;
+}
+
+.app-list .section {
+    background: rgba(15, 23, 42, 0.7) !important;
+    backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    border-radius: 15px !important;
+    margin-bottom: 20px !important;
+    overflow: hidden !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+}
+
+.app-list .section h2 {
+    background: linear-gradient(135deg, #0f172a 0%, #0f172a 100%) !important;
+    color: white !important;
+    margin: 0 !important;
+    padding: 20px 25px !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 18px !important;
+    border: none !important;
+}
+
+.app-list .section h2 a {
+    color: white !important;
+    text-decoration: none !important;
+}
+
+/* Force links */
+a {
+    color: #14b8a6 !important;
+}
+
+.module h2 a, .app-list h2 a {
+    color: white !important;
+}
+
+/* Force text elements */
+p, span, div, label, strong, em, small {
+    color: #e2e8f0 !important;
+}
+
+/* Force headings */
+h1, h2, h3, h4, h5, h6 {
+    color: #e2e8f0 !important;
+}
+
+/* Force table elements */
+table, thead, tbody, tr, td, th {
+    color: #e2e8f0 !important;
+    background: transparent !important;
+}
+
+/* Force list elements */
+ul, ol, li {
+    color: #e2e8f0 !important;
+}
+
+/* Remove any white or light backgrounds */
+.white, .light, .bg-white, .bg-light {
+    background: transparent !important;
+}
+
+/* FORCE DARK ON ALL GLASS MODULES AND SIMILAR ELEMENTS */
+
+/* Override any light backgrounds with dark glass */
+*[style*="rgba(255, 255, 255"], 
+*[style*="background: rgba(255"],
+.glass-module,
+#dashboard-module,
+div[style*="rgba(255, 255, 255, 0.25)"] {
+    background: rgba(15, 23, 42, 0.7) !important;
+    backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Force dark borders on all glass elements */
+*[style*="border: 1px solid rgba(255, 255, 255"] {
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+}
+
+/* Force dark shadows */
+*[style*="box-shadow: var(--shadow-glass)"] {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Module rows and tables */
+.module-table, .model-row {
+    background: transparent !important;
+    color: #e2e8f0 !important;
+}
+
+.module-table td {
+    background: transparent !important;
+    color: #e2e8f0 !important;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.1) !important;
+}
+
+.module-table td:hover {
+    background: rgba(15, 23, 42, 0.5) !important;
+}
+
+/* Action buttons in modules */
+.action-btn {
+    background: rgba(20, 184, 166, 0.15) !important;
+    border: 1px solid rgba(20, 184, 166, 0.3) !important;
+    color: #14b8a6 !important;
+    padding: 6px 12px !important;
+    border-radius: 8px !important;
+    text-decoration: none !important;
+    font-size: 12px !important;
+    transition: all 0.3s ease !important;
+}
+
+.action-btn:hover {
+    background: rgba(20, 184, 166, 0.25) !important;
+    border-color: rgba(20, 184, 166, 0.5) !important;
+    transform: translateY(-1px) !important;
+}
+
+.add-btn {
+    background: rgba(34, 197, 94, 0.15) !important;
+    border-color: rgba(34, 197, 94, 0.3) !important;
+    color: #22c55e !important;
+}
+
+.add-btn:hover {
+    background: rgba(34, 197, 94, 0.25) !important;
+    border-color: rgba(34, 197, 94, 0.5) !important;
+}
+
+.edit-btn {
+    background: rgba(59, 130, 246, 0.15) !important;
+    border-color: rgba(59, 130, 246, 0.3) !important;
+    color: #3b82f6 !important;
+}
+
+.edit-btn:hover {
+    background: rgba(59, 130, 246, 0.25) !important;
+    border-color: rgba(59, 130, 246, 0.5) !important;
+}
+
+/* Model links */
+.model-link {
+    color: #e2e8f0 !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    transition: color 0.3s ease !important;
+}
+
+.model-link:hover {
+    color: #14b8a6 !important;
+}
+
+.model-link i {
+    color: #14b8a6 !important;
+    margin-left: 8px !important;
+}
+
+/* Override any remaining light elements */
+div[class*="module"][style*="background: rgba(255"] {
+    background: rgba(15, 23, 42, 0.7) !important;
+}
+
+div[style*="border: 1px solid rgba(255"] {
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+}
+
+/* GLOBAL H2 STYLING - DARK UNIFIED */
+
+/* WEBSITE COLOR SCHEME - USER DATA SECTIONS */
+/* Users, Requests, Junkyards, Offers - DARK THEME COLORS */
+#bot-module h2,
+#bot-module .module-header,
+[id*="user"] h2,
+[id*="user"] .module-header,
+[id*="request"] h2,
+[id*="request"] .module-header,
+[id*="junkyard"] h2,
+[id*="junkyard"] .module-header,
+[id*="offer"] h2,
+[id*="offer"] .module-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+    color: white !important;
+    padding: 20px 25px !important;
+    margin: 0px !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 18px !important;
+    border: none !important;
+    border-radius: 20px 20px 0 0 !important;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.3) !important;
+}
+
+/* SYSTEM SECTIONS - Authentication, Admin Interface, Dashboard - MAIN THEME COLORS */
+#auth-module h2,
+#auth-module .module-header,
+#dashboard-module h2,
+#dashboard-module .module-header,
+#admin_interface-module h2,
+#admin_interface-module .module-header,
+[id*="auth"] h2,
+[id*="auth"] .module-header,
+[id*="dashboard"] h2,
+[id*="dashboard"] .module-header,
+[id*="admin"] h2,
+[id*="admin"] .module-header,
+[data-app="auth"] h2,
+[data-app="auth"] .module-header,
+[data-app="dashboard"] h2,
+[data-app="dashboard"] .module-header,
+[data-app="admin_interface"] h2,
+[data-app="admin_interface"] .module-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+    color: white !important;
+    padding: 20px 25px !important;
+    margin: 0px !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 18px !important;
+    border: none !important;
+    border-radius: 20px 20px 0 0 !important;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.3) !important;
+}
+
+/* Apply dark unified style to ALL OTHER h2 elements in admin */
+h2, .module h2, .dashboard .module h2, .app-list .section h2, 
+.module-header h2, .glass-module h2 {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+    color: white !important;
+    padding: 20px 25px !important;
+    margin: 0px !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 18px !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+/* Ensure h2 links are white */
+h2 a, .module h2 a, .dashboard .module h2 a, .app-list .section h2 a,
+.module-header h2 a, .glass-module h2 a, #dashboard-module h2 a {
+    color: white !important;
+    text-decoration: none !important;
+}
+
+/* ENHANCED MODULE STYLING WITH COLOR SCHEMES */
+
+/* USER DATA MODULES - DARK THEME ACCENT */
+#bot-module,
+[id*="user"],
+[id*="request"],
+[id*="junkyard"],
+[id*="offer"] {
+    background: rgba(15, 23, 42, 0.7) !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    box-shadow: 0 8px 32px rgba(15, 23, 42, 0.3) !important;
+}
+
+#bot-module:hover,
+[id*="user"]:hover,
+[id*="request"]:hover,
+[id*="junkyard"]:hover,
+[id*="offer"]:hover {
+    box-shadow: 0 15px 45px rgba(15, 23, 42, 0.6) !important;
+    border-color: rgba(148, 163, 184, 0.5) !important;
+}
+
+/* SYSTEM MODULES - MAIN THEME ACCENT */
+#auth-module,
+#dashboard-module,
+#admin_interface-module,
+[id*="auth"],
+[id*="dashboard"],
+[id*="admin"],
+[data-app="auth"],
+[data-app="dashboard"],
+[data-app="admin_interface"] {
+    background: rgba(15, 23, 42, 0.7) !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    box-shadow: 0 8px 32px rgba(15, 23, 42, 0.3) !important;
+}
+
+#auth-module:hover,
+#dashboard-module:hover,
+#admin_interface-module:hover,
+[id*="auth"]:hover,
+[id*="dashboard"]:hover,
+[id*="admin"]:hover {
+    box-shadow: 0 15px 45px rgba(15, 23, 42, 0.6) !important;
+    border-color: rgba(148, 163, 184, 0.5) !important;
+}
+
+/* Force any remaining light h2 elements and ADMIN INTERFACE inline styles */
+*[style*="background: linear-gradient(135deg, rgb(20, 184, 166)"] h2,
+*[style*="background: linear-gradient(135deg, #14b8a6"] h2,
+*[style*="background: linear-gradient(135deg, rgb(20, 184, 166)"],
+*[style*="background: linear-gradient(135deg, #14b8a6"] {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}
+
+/* ULTRA FORCE - Override Light Inline Styles on Modules */
+*[style*="background: rgba(255, 255, 255, 0.25)"],
+*[style*="rgba(255, 255, 255, 0.25)"],
+.glass-module[style*="rgba(255, 255, 255"],
+.module[style*="rgba(255, 255, 255"],
+#admin_interface-module[style*="rgba(255, 255, 255"],
+#dashboard-module[style*="rgba(255, 255, 255"],
+#auth-module[style*="rgba(255, 255, 255"],
+#bot-module[style*="rgba(255, 255, 255"] {
+    background: rgba(15, 23, 42, 0.7) !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    backdrop-filter: blur(20px) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Force Light Border Inline Styles to Dark */
+*[style*="border: 1px solid rgba(255, 255, 255, 0.18)"],
+*[style*="rgba(255, 255, 255, 0.18)"] {
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+}
+
+/* COMPREHENSIVE FORM ELEMENTS DARK THEME STYLING */
+
+/* ALL INPUT ELEMENTS - DARK THEME */
+input, input[type="text"], input[type="email"], input[type="password"], 
+input[type="number"], input[type="tel"], input[type="url"], input[type="search"],
+.vTextField, .vIntegerField, .vCharField, .vEmailField, .vURLField {
+    background: rgba(15, 23, 42, 0.8) !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    border-radius: 8px !important;
+    padding: 10px 12px !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-size: 14px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* INPUT FOCUS STATE */
+input:focus, input[type="text"]:focus, input[type="email"]:focus, 
+input[type="password"]:focus, input[type="number"]:focus,
+.vTextField:focus, .vIntegerField:focus, .vCharField:focus {
+    outline: none !important;
+    border-color: #14b8a6 !important;
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2), 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    background: rgba(15, 23, 42, 0.9) !important;
+}
+
+/* ALL SELECT ELEMENTS - DARK THEME */
+select, .vSelectField, .vSelectMultipleField, select[multiple] {
+    background: rgba(15, 23, 42, 0.8) !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    border-radius: 8px !important;
+    padding: 10px 35px 10px 12px !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-size: 14px !important;
+    appearance: none !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23e2e8f0' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+    background-position: left 0.5rem center !important;
+    background-repeat: no-repeat !important;
+    background-size: 1.5em 1.5em !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* SELECT FOCUS STATE */
+select:focus, .vSelectField:focus, .vSelectMultipleField:focus {
+    outline: none !important;
+    border-color: #14b8a6 !important;
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2), 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    background-color: rgba(15, 23, 42, 0.9) !important;
+}
+
+/* SELECT OPTIONS - DARK THEME */
+select option, .vSelectField option, .vSelectMultipleField option {
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+    padding: 8px 12px !important;
+    font-family: 'Cairo', sans-serif !important;
+    border: none !important;
+}
+
+/* SELECT OPTION HOVER/SELECTED */
+select option:hover, select option:checked, select option:selected {
+    background: #14b8a6 !important;
+    color: white !important;
+}
+
+/* TEXTAREA ELEMENTS - DARK THEME */
+textarea, .vLargeTextField {
+    background: rgba(15, 23, 42, 0.8) !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    border-radius: 8px !important;
+    padding: 12px !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-size: 14px !important;
+    resize: vertical !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease !important;
+    min-height: 100px !important;
+}
+
+/* TEXTAREA FOCUS STATE */
+textarea:focus, .vLargeTextField:focus {
+    outline: none !important;
+    border-color: #14b8a6 !important;
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2), 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    background: rgba(15, 23, 42, 0.9) !important;
+}
+
+/* FORM ERROR STATES - DARK THEME */
+input[style*="border-color: rgb(220, 38, 38)"], 
+select[style*="border-color: rgb(220, 38, 38)"],
+textarea[style*="border-color: rgb(220, 38, 38)"],
+.errorlist + input, .errorlist + select, .errorlist + textarea,
+input.error, select.error, textarea.error {
+    border-color: #ef4444 !important;
+    background: rgba(15, 23, 42, 0.8) !important;
+    color: #e2e8f0 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* PLACEHOLDER STYLING */
+input::placeholder, textarea::placeholder, select::placeholder {
+    color: #94a3b8 !important;
+    opacity: 0.8 !important;
+    font-style: italic !important;
+}
+
+/* DISABLED FORM ELEMENTS */
+input:disabled, select:disabled, textarea:disabled {
+    background: rgba(15, 23, 42, 0.5) !important;
+    color: #64748b !important;
+    border-color: rgba(148, 163, 184, 0.2) !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+}
+
+/* FORM LABELS - DARK THEME */
+label, .form-row label, .field-box label {
+    color: #e2e8f0 !important;
+    font-weight: 500 !important;
+    font-family: 'Cairo', sans-serif !important;
+    margin-bottom: 6px !important;
+    display: block !important;
+}
+
+/* FORCE OVERRIDE ANY INLINE STYLES ON FORM ELEMENTS */
+*[style*="border-color: rgb(220, 38, 38)"] {
+    background: rgba(15, 23, 42, 0.8) !important;
+    color: #e2e8f0 !important;
+    border-color: #ef4444 !important;
+}
+
+/* SPECIFIC DJANGO ADMIN FORM CLASSES */
+.vDateField, .vTimeField, .vDateTimeField {
+    background: rgba(15, 23, 42, 0.8) !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+}
+
+/* CHECKBOX AND RADIO BUTTONS */
+input[type="checkbox"], input[type="radio"] {
+    background: rgba(15, 23, 42, 0.8) !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    accent-color: #14b8a6 !important;
+}
+
+/* FILE INPUT */
+input[type="file"] {
+    background: rgba(15, 23, 42, 0.8) !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    border-radius: 8px !important;
+    padding: 8px !important;
+}
+
+/* ULTRA FORCE - ABSOLUTELY NO WHITE BACKGROUNDS ANYWHERE */
+
+/* CRITICAL: Force all possible form element selectors */
+input, textarea, select, 
+input[type], input[type="text"], input[type="email"], input[type="password"],
+input[type="number"], input[type="tel"], input[type="url"], input[type="search"],
+input[type="date"], input[type="time"], input[type="datetime-local"],
+textarea, select, select[multiple],
+.vTextField, .vCharField, .vEmailField, .vURLField,
+.vDateField, .vTimeField, .vDateTimeField, .vLargeTextField,
+.vSelectField, .vSelectMultipleField, .vIntegerField,
+form input, form textarea, form select,
+.form-row input, .form-row textarea, .form-row select,
+.field input, .field textarea, .field select,
+.field-box input, .field-box textarea, .field-box select,
+#content input, #content textarea, #content select,
+.module input, .module textarea, .module select,
+div input, div textarea, div select {
+    background-color: rgba(15, 23, 42, 0.8) !important;
+    background: rgba(15, 23, 42, 0.8) !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    font-family: 'Cairo', sans-serif !important;
+}
+
+/* ULTRA SPECIFIC - Force override any computed styles */
+* input, * textarea, * select {
+    background-color: rgba(15, 23, 42, 0.8) !important;
+    background: rgba(15, 23, 42, 0.8) !important;
+    color: #e2e8f0 !important;
+}
+
+/* Force override default browser styles */
+input:not([type="submit"]):not([type="button"]):not([type="reset"]),
+textarea, select {
+    background-color: rgba(15, 23, 42, 0.8) !important;
+    background: rgba(15, 23, 42, 0.8) !important;
+    color: #e2e8f0 !important;
+}
+
+/* Force dark theme on ALL input states including browser autofill */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px rgba(15, 23, 42, 0.8) inset !important;
+    -webkit-text-fill-color: #e2e8f0 !important;
+    background-color: rgba(15, 23, 42, 0.8) !important;
+    color: #e2e8f0 !important;
+    transition: none !important;
+}
+
+/* ULTRA FORCE - ALL FOCUS STATES MUST BE DARK */
+input:focus, textarea:focus, select:focus,
+input[type]:focus, input[type="text"]:focus, input[type="email"]:focus, 
+input[type="password"]:focus, input[type="number"]:focus, input[type="tel"]:focus,
+input[type="url"]:focus, input[type="search"]:focus, input[type="date"]:focus,
+input[type="time"]:focus, input[type="datetime-local"]:focus,
+.vTextField:focus, .vCharField:focus, .vEmailField:focus,
+.vURLField:focus, .vDateField:focus, .vTimeField:focus,
+.vDateTimeField:focus, .vLargeTextField:focus,
+.vSelectField:focus, .vSelectMultipleField:focus, .vIntegerField:focus,
+form input:focus, form textarea:focus, form select:focus,
+.form-row input:focus, .form-row textarea:focus, .form-row select:focus,
+.field input:focus, .field textarea:focus, .field select:focus,
+.field-box input:focus, .field-box textarea:focus, .field-box select:focus,
+#content input:focus, #content textarea:focus, #content select:focus,
+.module input:focus, .module textarea:focus, .module select:focus,
+div input:focus, div textarea:focus, div select:focus,
+* input:focus, * textarea:focus, * select:focus {
+    background-color: rgba(15, 23, 42, 0.9) !important;
+    background: rgba(15, 23, 42, 0.9) !important;
+    color: #e2e8f0 !important;
+    border-color: #14b8a6 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2), 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* ULTRA FORCE - ALL ACTIVE/HOVER STATES */
+input:active, textarea:active, select:active,
+input:hover, textarea:hover, select:hover {
+    background-color: rgba(15, 23, 42, 0.85) !important;
+    background: rgba(15, 23, 42, 0.85) !important;
+    color: #e2e8f0 !important;
+}
+
+/* Force specific for select options */
+select option, option {
+    background-color: #1e293b !important;
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+}
+
+select option:hover, option:hover,
+select option:checked, option:checked,
+select option:selected, option:selected {
+    background-color: #14b8a6 !important;
+    background: #14b8a6 !important;
+    color: white !important;
+}
+
+/* Ultra specific - force any remaining white backgrounds */
+*[style*="background-color: white"],
+*[style*="background-color: #fff"],
+*[style*="background-color: #ffffff"],
+*[style*="background: white"],
+*[style*="background: #fff"],
+*[style*="background: #ffffff"] {
+    background-color: rgba(15, 23, 42, 0.8) !important;
+    background: rgba(15, 23, 42, 0.8) !important;
+    color: #e2e8f0 !important;
+}
+
+/* Force dark for range sliders */
+input[type="range"] {
+    background: rgba(15, 23, 42, 0.8) !important;
+    accent-color: #14b8a6 !important;
+}
+
+/* Simplified select arrow and appearance reset */
+select {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23e2e8f0' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+    background-position: left 0.5rem center !important;
+    background-repeat: no-repeat !important;
+    background-size: 1.5em 1.5em !important;
+    padding-left: 2.5rem !important;
+}
+
+/* ULTRA SPECIFIC - Force System Module Headers (Auth, Admin Interface) */
+#auth-module h2[style],
+#auth-module .module-header[style],
+#admin_interface-module h2[style],
+#admin_interface-module .module-header[style],
+[id*="auth"] h2[style],
+[id*="auth"] .module-header[style],
+[id*="admin_interface"] h2[style],
+[id*="admin_interface"] .module-header[style],
+a[href="/admin/auth/"],
+a[href="/admin/admin_interface/"] {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+    color: white !important;
+}
+
+/* Force override any inline teal gradients in system sections */
+.module-header h2[style*="rgb(20, 184, 166)"],
+.module-header[style*="rgb(20, 184, 166)"],
+h2[style*="rgb(20, 184, 166)"],
+h2[style*="#14b8a6"],
+h2[style*="#0d9488"] {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+    color: white !important;
+}
+
+/* ULTRA FORCE - Auth Module Specific */
+#auth-module h2,
+#auth-module .module-header,
+#auth-module .module-header h2,
+[class*="auth"] h2,
+[class*="auth"] .module-header,
+div[id="auth-module"] h2,
+div[id="auth-module"] .module-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+    color: white !important;
+    padding: 20px 25px !important;
+    margin: 0px !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 18px !important;
+    border: none !important;
+}
+
+/* Force Auth Links */
+a[href="/admin/auth/"] {
+    color: white !important;
+}
+
+/* FORCE REMOVE UNWANTED INLINE STYLES FROM MAIN ELEMENTS */
+
+/* Target any main elements with shift classes and remove inline styles */
+div.main,
+main.main,
+.main,
+div.shift,
+main.shift,
+.shift,
+div.main.shift,
+main.main.shift,
+.main.shift {
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    transition: none !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    position: relative !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+/* Force override any inline styles on admin content containers */
+*[style*="background"],
+*[style*="margin"],
+*[style*="padding"],
+*[style*="transform"],
+*[style*="left"],
+*[style*="right"] {
+    background: transparent !important;
+}
+
+/* Specific targeting for Django admin's main content areas */
+#main,
+.main,
+#content,
+#content-main,
+.content-main,
+div[class*="main"],
+div[class*="shift"] {
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 30px !important;
+    transform: none !important;
+    transition: none !important;
+    left: auto !important;
+    right: auto !important;
+    position: relative !important;
+}
+
+/* END OF ULTRA FORCE DARK MODE OVERRIDES */

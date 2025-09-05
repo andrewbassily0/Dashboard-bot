@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}لوحة تحكم بوت قطع غيار السيارات{% endblock %}</title>
+    
+    <!-- Bootstrap CSS (RTL) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom CSS -->
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        /* Navbar Styles */
+        .navbar-brand {
+            font-weight: bold;
+            color: #ffffff !important;
+        }
+        
+        .navbar-brand i {
+            color: #ffffff !important;
+            margin-right: 8px;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            margin: 2px 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+            transform: translateX(-5px);
+        }
+        
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-left: 10px;
+        }
+        
+        /* Universal Card Styles */
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            background: white;
+            margin-bottom: 20px;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+        
+        /* Universal Card Header */
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            border-radius: 15px 15px 0 0 !important;
+            font-weight: bold;
+            border: none !important;
+            padding: 15px 20px;
+        }
+        
+        .card-header h5, .card-header h6 {
+            color: white !important;
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .card-header i {
+            margin-left: 8px;
+        }
+        
+        /* Universal Stat Cards */
+        .stat-card, .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card:hover, .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .stat-card .stat-number, .stats-card .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: white;
+        }
+        
+        .stat-card .stat-label, .stats-card .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            color: white;
+        }
+        
+        /* Universal Filter Section */
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: none;
+        }
+        
+        .filter-section .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            margin: -20px -20px 20px -20px;
+            border-radius: 15px 15px 0 0 !important;
+        }
+        
+        /* Universal Tables */
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+            border: none;
+            background: white;
+        }
+        
+        .table thead th {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: none;
+            font-weight: 600;
+            color: #333;
+            padding: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .table tbody td {
+            padding: 15px;
+            border-color: #f8f9fa;
+            vertical-align: middle;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+        
+        /* Universal Buttons */
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 10px 20px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6b4190 100%);
+            color: white;
+        }
+        
+        .btn-outline-primary {
+            border: 2px solid #667eea;
+            color: #667eea;
+            background: transparent;
+        }
+        
+        .btn-outline-primary:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .btn-telegram {
+            background: linear-gradient(135deg, #0088cc 0%, #00a8ff 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .btn-telegram:hover {
+            background: linear-gradient(135deg, #0077b3 0%, #0099e6 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,136,204,0.3);
+        }
+        
+        .btn-outline-telegram {
+            border: 2px solid #0088cc;
+            color: #0088cc;
+            background: transparent;
+        }
+        
+        .btn-outline-telegram:hover {
+            background: #0088cc;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,136,204,0.3);
+        }
+        
+        /* Universal Success/Warning/Danger Buttons */
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #218838 0%, #1abc9c 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #ff8c00 100%);
+            border: none;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #e0a800 0%, #e07b00 100%);
+            color: #212529;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #e74a3b 100%);
+            border: none;
+        }
+        
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #c82333 0%, #d62c1a 100%);
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #36b9cc 100%);
+            border: none;
+        }
+        
+        .btn-info:hover {
+            background: linear-gradient(135deg, #138496 0%, #2a9fbc 100%);
+        }
+        
+        /* Universal Badges */
+        .badge {
+            font-size: 0.75rem;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        
+        .badge.bg-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        }
+        
+        .badge.bg-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+        }
+        
+        .badge.bg-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #ff8c00 100%) !important;
+            color: #212529 !important;
+        }
+        
+        .badge.bg-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #e74a3b 100%) !important;
+        }
+        
+        .badge.bg-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #36b9cc 100%) !important;
+        }
+        
+        /* Universal Page Elements */
+        .main-content {
+            padding: 20px;
+            background-color: #f8f9fa;
+            min-height: calc(100vh - 70px);
+        }
+        
+        .page-title {
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+        
+        .page-title i {
+            margin-left: 10px;
+            color: #667eea;
+        }
+        
+        /* Universal Status Badges */
+        .status-new { 
+            background: linear-gradient(135deg, #17a2b8 0%, #36b9cc 100%) !important;
+            color: white !important;
+        }
+        
+        .status-active { 
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+            color: white !important;
+        }
+        
+        .status-accepted { 
+            background: linear-gradient(135deg, #007bff 0%, #667eea 100%) !important;
+            color: white !important;
+        }
+        
+        .status-expired { 
+            background: linear-gradient(135deg, #dc3545 0%, #e74a3b 100%) !important;
+            color: white !important;
+        }
+        
+        .status-cancelled { 
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%) !important;
+            color: white !important;
+        }
+        
+        /* Universal User Elements */
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .user-type-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .user-type-client {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            color: #1976d2;
+        }
+        
+        .user-type-junkyard {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            color: #7b1fa2;
+        }
+        
+        .user-active {
+            color: #4caf50;
+            font-weight: 600;
+        }
+        
+        .user-inactive {
+            color: #f44336;
+            font-weight: 600;
+        }
+        
+        /* Universal Rating */
+        .rating-stars {
+            color: #ffc107;
+        }
+        
+        .verified-badge {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        /* Universal Forms */
+        .form-control {
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .form-select {
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            padding: 10px 15px;
+        }
+        
+        .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        /* Universal Alerts */
+        .alert {
+            border-radius: 12px;
+            border: none;
+            font-weight: 500;
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+        }
+        
+        .alert-warning {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            color: #856404;
+        }
+        
+        .alert-danger {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+        }
+        
+        .alert-info {
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+            color: #0c5460;
+        }
+        
+        /* Universal Pagination */
+        .pagination .page-link {
+            border-radius: 8px;
+            margin: 0 2px;
+            border: 2px solid #e9ecef;
+            color: #667eea;
+        }
+        
+        .pagination .page-link:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+        }
+        
+        /* Universal Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                right: -250px;
+                width: 250px;
+                height: 100vh;
+                z-index: 1000;
+                transition: right 0.3s ease;
+            }
+            
+            .sidebar.show {
+                right: 0;
+            }
+            
+            .main-content {
+                margin-right: 0;
+                padding: 15px;
+            }
+            
+            .page-title {
+                font-size: 1.5rem;
+            }
+            
+            .stat-card .stat-number {
+                font-size: 2rem;
+            }
+            
+            .card {
+                margin-bottom: 15px;
+            }
+        }
+        
+        /* Additional utility classes */
+        .text-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+        
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        }
+        
+        .border-gradient {
+            border: 2px solid transparent;
+            background: linear-gradient(white, white) padding-box, 
+                        linear-gradient(135deg, #667eea 0%, #764ba2 100%) border-box;
+            border-radius: 12px;
+        }
+        
+        /* Loading animations */
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Smooth animations */
+        * {
+            transition: all 0.3s ease;
+        }
+        
+        /* Override any conflicting styles */
+        .card-body {
+            padding: 20px;
+        }
+        
+        .container-fluid {
+            padding: 20px;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <button class="navbar-toggler d-lg-none" type="button" id="sidebarToggle">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <a class="navbar-brand" href="{% url 'dashboard:public_dashboard' %}">
+                <i class="fas fa-car"></i>
+                بوت قطع غيار السيارات
+            </a>
+            
+            <div class="navbar-nav ms-auto">
+                <!-- Telegram Bot Link -->
+                <a class="nav-link me-3" href="https://t.me/tashaleeh_bot" target="_blank" title="ابدأ المحادثة مع البوت">
+                    <i class="fab fa-telegram"></i>
+                    <span class="d-none d-md-inline">البوت</span>
+                </a>
+                
+                {% if user.is_authenticated %}
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user"></i>
+                            {{ user.first_name|default:user.username }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'admin:index' %}">
+                                <i class="fas fa-cog"></i> الإدارة
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'admin:logout' %}">
+                                <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                            </a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a class="nav-link" href="{% url 'admin:login' %}">
+                        <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            {% if user.is_authenticated and user.is_staff %}
+            <nav class="col-lg-2 sidebar" id="sidebar">
+                <div class="position-sticky pt-3">
+                    <!-- Telegram Bot Link in Sidebar -->
+                    <div class="text-center mb-3">
+                        <a href="https://t.me/tashaleeh_bot" target="_blank" class="btn btn-outline-light btn-sm w-100">
+                            <i class="fab fa-telegram"></i>
+                            البوت
+                        </a>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" 
+                               href="{% url 'dashboard:home' %}">
+                                <i class="fas fa-tachometer-alt"></i>
+                                الرئيسية
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'requests' in request.resolver_match.url_name %}active{% endif %}" 
+                               href="{% url 'dashboard:requests_list' %}">
+                                <i class="fas fa-list-alt"></i>
+                                الطلبات
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'junkyards' in request.resolver_match.url_name %}active{% endif %}" 
+                               href="{% url 'dashboard:junkyards_list' %}">
+                                <i class="fas fa-store"></i>
+                                المخازن
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'users' in request.resolver_match.url_name %}active{% endif %}" 
+                               href="{% url 'dashboard:users_list' %}">
+                                <i class="fas fa-users"></i>
+                                المستخدمين
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}" 
+                               href="{% url 'dashboard:analytics' %}">
+                                <i class="fas fa-chart-bar"></i>
+                                التحليلات
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}" 
+                               href="{% url 'dashboard:settings' %}">
+                                <i class="fas fa-cog"></i>
+                                الإعدادات
+                            </a>
+                        </li>
+                        <li class="nav-item mt-3">
+                            <a class="nav-link" href="{% url 'admin:index' %}">
+                                <i class="fas fa-tools"></i>
+                                لوحة الإدارة
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            {% endif %}
+
+            <!-- Main content -->
+            <main class="{% if user.is_authenticated and user.is_staff %}col-lg-10 ms-sm-auto{% else %}col-12{% endif %} main-content">
+                {% block content %}
+                {% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // Sidebar toggle for mobile
+        document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('show');
+        });
+        
+        // Auto-refresh stats every 30 seconds
+        function refreshStats() {
+            fetch('{% url "dashboard:api_stats" %}')
+                .then(response => response.json())
+                .then(data => {
+                    // Update stat cards if they exist
+                    const statElements = {
+                        'total_users': document.getElementById('stat-total-users'),
+                        'active_requests': document.getElementById('stat-active-requests'),
+                        'total_offers': document.getElementById('stat-total-offers'),
+                        'requests_today': document.getElementById('stat-requests-today')
+                    };
+                    
+                    for (const [key, element] of Object.entries(statElements)) {
+                        if (element && data[key] !== undefined) {
+                            element.textContent = data[key];
+                        }
+                    }
+                })
+                .catch(error => console.log('Error refreshing stats:', error));
+        }
+        
+        // Refresh stats every 30 seconds if user is authenticated
+        {% if user.is_authenticated %}
+        setInterval(refreshStats, 30000);
+        {% endif %}
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+

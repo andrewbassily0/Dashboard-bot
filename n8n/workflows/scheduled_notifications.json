@@ -1,0 +1,295 @@
+{
+  "name": "Scheduled Notifications Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hour",
+              "expression": "*/6"
+            }
+          ]
+        }
+      },
+      "id": "cron-trigger",
+      "name": "Cron Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://django_app:8000/bot/api/requests/expiring-soon/",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "hours",
+              "value": "2"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-expiring-requests",
+      "name": "Get Expiring Requests",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-expiring-requests",
+              "leftValue": "={{ $json.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-expiring-requests",
+      "name": "Check if Expiring Requests Exist",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.telegram.org/bot{{ $env.TELEGRAM_BOT_TOKEN }}/sendMessage",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{ $json.user.telegram_id }}"
+            },
+            {
+              "name": "text",
+              "value": "⚠️ تنبيه: طلبك سينتهي قريباً!\n\n🆔 رقم الطلب: {{ $json.order_id }}\n🚗 السيارة: {{ $json.brand_name }} {{ $json.model_name }} {{ $json.year }}\n🔧 القطع: {{ $json.parts }}\n⏰ ينتهي في: {{ $json.expires_at }}\n\n💡 يمكنك تمديد الطلب أو إنشاء طلب جديد"
+            },
+            {
+              "name": "parse_mode",
+              "value": "HTML"
+            },
+            {
+              "name": "reply_markup",
+              "value": "{\"inline_keyboard\":[[{\"text\":\"🆕 طلب جديد\",\"callback_data\":\"new_request\"},{\"text\":\"⏰ تمديد الطلب\",\"callback_data\":\"extend_request_{{ $json.id }}\"}]]}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notify-user-expiring",
+      "name": "Notify User of Expiring Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://api.telegram.org/bot{{ $env.TELEGRAM_BOT_TOKEN }}/sendMessage",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{ $json.user.telegram_id }}"
+            },
+            {
+              "name": "text",
+              "value": "✅ لا توجد طلبات تنتهي قريباً\n\nجميع طلباتك في حالة جيدة!"
+            },
+            {
+              "name": "parse_mode",
+              "value": "HTML"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "no-expiring-requests",
+      "name": "No Expiring Requests",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [900, 400]
+    },
+    {
+      "parameters": {
+        "url": "http://django_app:8000/bot/api/requests/{{ $json.id }}/extend/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "hours",
+              "value": "6"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "extend-request-api",
+      "name": "Extend Request via API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://api.telegram.org/bot{{ $env.TELEGRAM_BOT_TOKEN }}/sendMessage",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{ $('Get Expiring Requests').item.json.user.telegram_id }}"
+            },
+            {
+              "name": "text",
+              "value": "✅ تم تمديد طلبك بنجاح!\n\n🆔 رقم الطلب: {{ $('Get Expiring Requests').item.json.order_id }}\n⏰ الجديد: {{ $('Extend Request via API').item.json.new_expires_at }}\n\nيمكنك الآن تلقي المزيد من العروض"
+            },
+            {
+              "name": "parse_mode",
+              "value": "HTML"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "confirm-extension",
+      "name": "Confirm Request Extension",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1340, 200]
+    }
+  ],
+  "connections": {
+    "Cron Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Expiring Requests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Expiring Requests": {
+      "main": [
+        [
+          {
+            "node": "Check if Expiring Requests Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Expiring Requests Exist": {
+      "main": [
+        [
+          {
+            "node": "Notify User of Expiring Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Expiring Requests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify User of Expiring Request": {
+      "main": [
+        [
+          {
+            "node": "Extend Request via API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extend Request via API": {
+      "main": [
+        [
+          {
+            "node": "Confirm Request Extension",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2024-08-24T21:44:00.000Z",
+      "updatedAt": "2024-08-24T21:44:00.000Z",
+      "id": "auto-parts-bot",
+      "name": "Auto Parts Bot"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-24T21:44:00.000Z",
+  "versionId": "1"
+} 

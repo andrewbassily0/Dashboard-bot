@@ -1,0 +1,1203 @@
+/* Admin Text Colors Enhancement - Dark Admin Interface Theme */
+
+/* Force text colors for better readability in dark theme */
+
+/* Form Labels */
+label, .form-row label {
+    color: #e0e0e0 !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+}
+
+/* Form Inputs */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="url"],
+input[type="tel"],
+textarea,
+select {
+    color: #e0e0e0 !important;
+    background-color: #2c2c2c !important;
+    border: 2px solid #555 !important;
+}
+
+/* Form Inputs Focus */
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="url"]:focus,
+input[type="tel"]:focus,
+textarea:focus,
+select:focus {
+    color: #e0e0e0 !important;
+    background-color: #333 !important;
+    border-color: #667eea !important;
+}
+
+/* Table Text */
+#result_list tbody td {
+    color: #e0e0e0 !important;
+}
+
+/* Table Links */
+#result_list tbody td a {
+    color: #667eea !important;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+#result_list tbody td a:hover {
+    color: #5a6fd8 !important;
+}
+
+/* Form Help Text */
+.help {
+    color: #9e9e9e !important;
+    font-size: 0.85rem !important;
+    font-style: italic;
+}
+
+/* Required Fields */
+.required {
+    color: #f44336 !important;
+    font-weight: bold !important;
+}
+
+/* Form Field Values */
+.form-row .field-value {
+    color: #e0e0e0 !important;
+    font-weight: 500;
+}
+
+/* Inline Form Labels */
+.inline-group label {
+    color: #e0e0e0 !important;
+    font-weight: 600 !important;
+}
+
+/* Inline Form Inputs */
+.inline-group input,
+.inline-group textarea,
+.inline-group select {
+    color: #e0e0e0 !important;
+}
+
+/* Form Errors */
+.field-error {
+    color: #f44336 !important;
+    font-weight: 500;
+}
+
+/* Form Success */
+.field-success {
+    color: #4caf50 !important;
+    font-weight: 500;
+}
+
+/* Form Warnings */
+.field-warning {
+    color: #ff9800 !important;
+    font-weight: 500;
+}
+
+/* Form Info */
+.field-info {
+    color: #667eea !important;
+    font-weight: 500;
+}
+
+/* Table Headers */
+#result_list thead th {
+    color: #e0e0e0 !important;
+    font-weight: 600 !important;
+}
+
+/* Pagination */
+.paginator a {
+    color: #e0e0e0 !important;
+}
+
+.paginator .this-page {
+    color: white !important;
+}
+
+/* Object Tools */
+.object-tools a {
+    color: white !important;
+}
+
+/* Submit Buttons */
+.submit-row input,
+.button,
+input[type="submit"],
+input[type="button"] {
+    color: white !important;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+    color: #e0e0e0 !important;
+}
+
+.breadcrumbs a {
+    color: #667eea !important;
+}
+
+.breadcrumbs a:hover {
+    color: #5a6fd8 !important;
+}
+
+/* Module Titles */
+.module h2,
+.module caption,
+.inline-group h2 {
+    color: #e0e0e0 !important;
+}
+
+/* App List */
+.app-list .app h2 {
+    color: #e0e0e0 !important;
+}
+
+.model-list a {
+    color: #667eea !important;
+}
+
+.model-list a:hover {
+    color: #5a6fd8 !important;
+}
+
+/* Messages */
+.messagelist li {
+    color: white !important;
+}
+
+.errornote {
+    color: white !important;
+}
+
+/* Form Field Placeholders */
+input::placeholder,
+textarea::placeholder {
+    color: #9e9e9e !important;
+    opacity: 0.7;
+}
+
+/* Form Field Disabled */
+input:disabled,
+textarea:disabled,
+select:disabled {
+    color: #9e9e9e !important;
+    background-color: #404040 !important;
+}
+
+/* Form Field Readonly */
+input[readonly],
+textarea[readonly] {
+    color: #9e9e9e !important;
+    background-color: #404040 !important;
+}
+
+/* Table Row Hover */
+#result_list tbody tr:hover td {
+    color: #e0e0e0 !important;
+}
+
+/* Form Row Hover */
+.form-row:hover label {
+    color: #e0e0e0 !important;
+}
+
+/* Inline Group Hover */
+.inline-group:hover label {
+    color: #e0e0e0 !important;
+}
+
+/* Field Group Labels */
+.field-group label {
+    color: #e0e0e0 !important;
+    font-weight: 600 !important;
+}
+
+/* Field Group Values */
+.field-group .field-value {
+    color: #e0e0e0 !important;
+}
+
+/* Form Section Headers */
+.form-section h3 {
+    color: #e0e0e0 !important;
+    font-weight: 600 !important;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* Form Field Groups */
+.field-group {
+    background: #404040;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid #555;
+}
+
+.field-group:hover {
+    background: #4a4a4a;
+    border-color: #667eea;
+}
+
+/* Form Field Validation */
+.field-valid {
+    border-color: #4caf50 !important;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2) !important;
+}
+
+.field-invalid {
+    border-color: #f44336 !important;
+    box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2) !important;
+}
+
+/* Form Field Focus States */
+.field-focus {
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2) !important;
+}
+
+/* Table Cell Status Colors */
+.status-active {
+    color: #4caf50 !important;
+    font-weight: 600;
+}
+
+.status-inactive {
+    color: #f44336 !important;
+    font-weight: 600;
+}
+
+.status-pending {
+    color: #ff9800 !important;
+    font-weight: 600;
+}
+
+.status-completed {
+    color: #667eea !important;
+    font-weight: 600;
+}
+
+/* Form Field Sizes */
+.form-row input[type="text"],
+.form-row input[type="password"],
+.form-row input[type="email"],
+.form-row input[type="number"],
+.form-row input[type="url"],
+.form-row input[type="tel"] {
+    min-height: 40px;
+    font-size: 1rem;
+}
+
+.form-row textarea {
+    min-height: 80px;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.form-row select {
+    min-height: 40px;
+    font-size: 1rem;
+}
+
+/* Form Field Spacing */
+.form-row {
+    margin-bottom: 0;
+    border-bottom: 1px solid #555;
+}
+
+.form-row label {
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-row input,
+.form-row textarea,
+.form-row select {
+    margin-top: 5px;
+}
+
+/* Form Field Borders */
+.form-row input,
+.form-row textarea,
+.form-row select {
+    border: 2px solid #555;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.form-row input:focus,
+.form-row textarea:focus,
+.form-row select:focus {
+    border-color: #667eea;
+}
+
+/* Form Field Icons */
+.form-row .field-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #667eea;
+    font-size: 1.2rem;
+}
+
+/* Form Field with Icons */
+.form-row .field-with-icon input,
+.form-row .field-with-icon textarea,
+.form-row .field-with-icon select {
+    padding-right: 50px;
+}
+
+/* Form Field Groups */
+.form-field-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+/* Form Field Group Items */
+.form-field-group .form-row {
+    margin-bottom: 0;
+}
+
+/* Responsive Form Layout */
+@media (max-width: 768px) {
+    .form-field-group {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .form-row {
+        margin-bottom: 0;
+    }
+    
+    .form-row input,
+    .form-row textarea,
+    .form-row select {
+        min-height: 40px;
+        font-size: 0.95rem;
+    }
+}
+
+/* Dark Theme Specific Enhancements */
+
+/* Form Row Alternating Colors */
+.form-row:nth-child(even) {
+    background: #404040;
+}
+
+.form-row:nth-child(odd) {
+    background: #3a3a3a;
+}
+
+/* Form Row Hover Effect */
+.form-row:hover {
+    background: #4a4a4a;
+    border-bottom-color: #667eea;
+}
+
+/* Input Field Hover */
+.form-row input:hover,
+.form-row textarea:hover,
+.form-row select:hover {
+    border-color: #666;
+}
+
+/* Input Field Focus Enhancement */
+.form-row input:focus,
+.form-row textarea:focus,
+.form-row select:focus {
+    background: #333 !important;
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2) !important;
+}
+
+/* Label Enhancement */
+.form-row label {
+    color: #e0e0e0 !important;
+    font-weight: 600 !important;
+    margin-bottom: 8px !important;
+    display: block !important;
+}
+
+/* Help Text Enhancement */
+.form-row .help {
+    color: #9e9e9e !important;
+    font-size: 0.85rem !important;
+    font-style: italic !important;
+    margin-top: 5px !important;
+}
+
+/* Required Field Enhancement */
+.form-row .required {
+    color: #f44336 !important;
+    font-weight: bold !important;
+}
+
+/* Form Field Group Enhancement */
+.field-group {
+    background: #404040 !important;
+    border: 1px solid #555 !important;
+    border-radius: 4px !important;
+    padding: 15px !important;
+    margin-bottom: 15px !important;
+}
+
+.field-group:hover {
+    background: #4a4a4a !important;
+    border-color: #667eea !important;
+}
+
+/* Table Enhancement */
+#result_list {
+    background: #2c2c2c !important;
+}
+
+#result_list thead th {
+    background: #404040 !important;
+    color: #e0e0e0 !important;
+    border-bottom: 2px solid #555 !important;
+}
+
+#result_list tbody tr:nth-child(even) {
+    background: #333 !important;
+}
+
+#result_list tbody tr:nth-child(odd) {
+    background: #2c2c2c !important;
+}
+
+#result_list tbody tr:hover {
+    background: #404040 !important;
+}
+
+#result_list tbody td {
+    color: #e0e0e0 !important;
+    border-bottom: 1px solid #555 !important;
+}
+
+/* Button Enhancement */
+.button,
+input[type="submit"],
+input[type="button"],
+.submit-row input,
+a.button {
+    background: #667eea !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 10px 20px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+}
+
+.button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+.submit-row input:hover,
+a.button:hover {
+    background: #5a6fd8 !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Pagination Enhancement */
+.paginator a {
+    background: #404040 !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #555 !important;
+    border-radius: 4px !important;
+}
+
+.paginator a:hover {
+    background: #667eea !important;
+    color: white !important;
+    border-color: #667eea !important;
+}
+
+.paginator .this-page {
+    background: #667eea !important;
+    color: white !important;
+    border: 1px solid #667eea !important;
+} 
+
+/* Additional Admin Interface Fixes - Better Layout & Accessibility */
+
+/* Force proper layout and remove height restrictions */
+html {
+    height: auto !important;
+    overflow-x: hidden !important;
+    scroll-behavior: smooth !important;
+}
+
+body {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    padding-bottom: 3rem !important;
+}
+
+/* Main container fixes */
+#container {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    margin: 1rem !important;
+    max-width: none !important;
+}
+
+#content {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+}
+
+#content-main {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    padding: 1.5rem !important;
+    margin: 0 !important;
+}
+
+/* Fix for changelist specifically */
+.change-list {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    position: relative !important;
+}
+
+.change-list .filtered {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 1rem !important;
+}
+
+.change-list .filtered .results {
+    flex: 1 !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    width: auto !important;
+}
+
+.change-list .filtered #changelist-filter {
+    flex: 0 0 250px !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    position: static !important;
+    top: auto !important;
+}
+
+/* Fix for better responsive layout */
+@media (max-width: 1200px) {
+    .change-list .filtered {
+        flex-direction: column !important;
+    }
+    
+    .change-list .filtered .results {
+        width: 100% !important;
+        order: 2 !important;
+    }
+    
+    .change-list .filtered #changelist-filter {
+        width: 100% !important;
+        flex: none !important;
+        order: 1 !important;
+        margin-bottom: 1rem !important;
+    }
+}
+
+/* Table improvements */
+#result_list {
+    width: 100% !important;
+    table-layout: auto !important;
+    margin: 0 !important;
+    border-collapse: collapse !important;
+}
+
+#result_list thead {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 10 !important;
+    background: var(--light-color) !important;
+}
+
+#result_list tbody {
+    height: auto !important;
+    overflow: visible !important;
+}
+
+#result_list th, #result_list td {
+    padding: 0.75rem 1rem !important;
+    vertical-align: middle !important;
+    word-wrap: break-word !important;
+    white-space: normal !important;
+    min-width: 100px !important;
+    max-width: 300px !important;
+    overflow: visible !important;
+}
+
+/* Form improvements */
+.form-row {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+    position: relative !important;
+    margin-bottom: 0 !important;
+    clear: both !important;
+}
+
+.form-row input, .form-row textarea, .form-row select {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+}
+
+.form-row .field-box {
+    width: 100% !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+}
+
+/* Inline forms fixes */
+.inline-group {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+}
+
+.inline-group .tabular {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    margin: 0 !important;
+    height: auto !important;
+    min-height: auto !important;
+}
+
+.inline-group .tabular table {
+    width: 100% !important;
+    min-width: 100% !important;
+    table-layout: auto !important;
+    height: auto !important;
+    min-height: auto !important;
+}
+
+.inline-group .tabular td, .inline-group .tabular th {
+    white-space: nowrap !important;
+    padding: 0.5rem !important;
+    font-size: 0.875rem !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+}
+
+/* Action buttons improvements */
+.object-tools {
+    margin-bottom: 1rem !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+    clear: both !important;
+}
+
+.object-tools li {
+    float: right !important;
+    margin-left: 0.5rem !important;
+    list-style: none !important;
+    height: auto !important;
+    min-height: auto !important;
+}
+
+.object-tools a {
+    display: block !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+/* Pagination improvements */
+.paginator {
+    clear: both !important;
+    margin-top: 2rem !important;
+    padding: 1rem 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+}
+
+.paginator a, .paginator .this-page {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+/* Filter improvements */
+#changelist-filter {
+    overflow-y: auto !important;
+    overflow-x: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: calc(100vh - 200px) !important;
+}
+
+#changelist-filter h2, #changelist-filter h3 {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+#changelist-filter ul {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+#changelist-filter li {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+/* Search improvements */
+#changelist-search {
+    margin-bottom: 1rem !important;
+    position: relative !important;
+    z-index: 1 !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+#searchbar {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+/* Actions improvements */
+.actions {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    margin-bottom: 1rem !important;
+}
+
+.actions label, .actions select {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+/* Submit row improvements */
+.submit-row {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    flex-wrap: wrap !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    clear: both !important;
+}
+
+.submit-row input {
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+/* Error and message improvements */
+.errorlist {
+    margin: 0.5rem 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+.errorlist li {
+    color: var(--danger-color) !important;
+    font-size: 0.875rem !important;
+    margin-bottom: 0.25rem !important;
+    padding: 0.25rem 0.5rem !important;
+    background: rgba(231, 74, 59, 0.1) !important;
+    border-radius: 0.25rem !important;
+    border-left: 3px solid var(--danger-color) !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+.messagelist {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+.messagelist li {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+/* Fieldset improvements */
+fieldset {
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0.35rem !important;
+    padding: 1rem !important;
+    margin-bottom: 1rem !important;
+    background: var(--card-bg) !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+fieldset legend {
+    background: var(--primary-color) !important;
+    color: white !important;
+    padding: 0.25rem 0.75rem !important;
+    border-radius: 0.25rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+/* Widget improvements */
+.admin-autocomplete, .select2-container {
+    width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+/* Checkbox and radio improvements */
+input[type="checkbox"], input[type="radio"] {
+    width: auto !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    margin-left: 0.5rem !important;
+    transform: scale(1.2) !important;
+}
+
+/* Date/time widget improvements */
+.datetime input, .vDateField, .vTimeField {
+    width: auto !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    display: inline-block !important;
+    margin-left: 0.25rem !important;
+}
+
+.vDateField, .vTimeField {
+    min-width: 150px !important;
+}
+
+/* File upload improvements */
+.file-upload {
+    padding: 1rem !important;
+    border: 2px dashed var(--border-color) !important;
+    border-radius: 0.35rem !important;
+    background: var(--light-color) !important;
+    text-align: center !important;
+    transition: all 0.15s ease-in-out !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+.file-upload:hover {
+    border-color: var(--primary-color) !important;
+    background: rgba(78, 115, 223, 0.05) !important;
+}
+
+/* Sidebar improvements */
+#nav-sidebar {
+    background: var(--card-bg) !important;
+    border-right: 1px solid var(--border-color) !important;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+/* Modal improvements */
+.popup {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 0.35rem !important;
+    box-shadow: 0 0.5rem 3rem 0 rgba(58, 59, 69, 0.3) !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+/* URL link improvements */
+.change-list .results td a {
+    word-break: break-all !important;
+    max-width: 200px !important;
+    display: inline-block !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    height: auto !important;
+    min-height: auto !important;
+}
+
+/* Header improvements */
+#header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+#header h1 {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+/* Footer improvements */
+#footer {
+    background: var(--light-color) !important;
+    border-top: 1px solid var(--border-color) !important;
+    padding: 1rem !important;
+    margin-top: 2rem !important;
+    text-align: center !important;
+    color: var(--text-muted) !important;
+    font-size: 0.875rem !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    clear: both !important;
+}
+
+/* Login page improvements */
+.login {
+    background: var(--body-bg) !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+}
+
+.login #container {
+    max-width: 400px !important;
+    margin: 5rem auto !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+.login .form-row {
+    margin-bottom: 1rem !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+.login input[type="text"], .login input[type="password"] {
+    width: 100% !important;
+    padding: 0.75rem !important;
+    font-size: 1rem !important;
+    border-radius: 0.35rem !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+.login .submit-row {
+    text-align: center !important;
+    margin-top: 1.5rem !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+/* Ensure all elements have proper height */
+* {
+    box-sizing: border-box !important;
+}
+
+div, span, section, article, aside, header, footer, nav, main, form, fieldset, legend, input, textarea, select, button, table, tbody, thead, tfoot, tr, td, th, ul, ol, li, dl, dt, dd, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center {
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+/* Exception for specific elements that need height control */
+html, body {
+    height: auto !important;
+    min-height: 100vh !important;
+}
+
+/* Print styles */
+@media print {
+    #header, #footer, .object-tools, .paginator, #changelist-filter, #changelist-search {
+        display: none !important;
+    }
+    
+    .change-list .results {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+        overflow: visible !important;
+        height: auto !important;
+        min-height: auto !important;
+    }
+    
+    body {
+        font-size: 12pt !important;
+        color: #000 !important;
+        background: #fff !important;
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+    }
+    
+    * {
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --border-color: #000 !important;
+        --text-color: #000 !important;
+        --card-bg: #fff !important;
+        --primary-color: #0000ff !important;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    body[data-theme="dark"] {
+        --body-bg: #1a1a1a !important;
+        --card-bg: #2d2d2d !important;
+        --text-color: #e0e0e0 !important;
+        --border-color: #404040 !important;
+        --light-color: #3a3a3a !important;
+    }
+}
+
+/* Accessibility improvements */
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Focus indicators */
+*:focus {
+    outline: 2px solid var(--primary-color) !important;
+    outline-offset: 2px !important;
+}
+
+/* Skip links for accessibility */
+.skip-link {
+    position: absolute !important;
+    top: -40px !important;
+    left: 6px !important;
+    background: var(--primary-color) !important;
+    color: white !important;
+    padding: 8px !important;
+    text-decoration: none !important;
+    z-index: 9999 !important;
+    border-radius: 0.25rem !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+.skip-link:focus {
+    top: 6px !important;
+}
+
+/* RTL improvements */
+[dir="rtl"] .object-tools li {
+    float: left !important;
+    margin-right: 0.5rem !important;
+    margin-left: 0 !important;
+}
+
+[dir="rtl"] .submit-row {
+    text-align: left !important;
+}
+
+[dir="rtl"] .breadcrumbs {
+    text-align: right !important;
+}
+
+/* Final global fixes */
+html {
+    overflow-x: hidden !important;
+    scroll-behavior: smooth !important;
+    height: auto !important;
+    min-height: 100% !important;
+}
+
+body {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    padding-bottom: 3rem !important;
+}
+
+/* Force visibility for all admin content */
+.change-list, .change-form, .app-list, .module {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+}
+
+/* Ensure no content is cut off */
+#content, #content-main, #container {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    position: relative !important;
+} 

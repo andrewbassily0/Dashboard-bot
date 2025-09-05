@@ -1,0 +1,190 @@
+{
+  "name": "New Offer Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-offer",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-new-offer",
+      "name": "Webhook - New Offer",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "new-offer-webhook"
+    },
+    {
+      "parameters": {
+        "url": "http://django_app:8000/bot/api/offers/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "request_id",
+              "value": "={{ $json.request_id }}"
+            },
+            {
+              "name": "junkyard_id",
+              "value": "={{ $json.junkyard_id }}"
+            },
+            {
+              "name": "price",
+              "value": "={{ $json.price }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $json.description }}"
+            },
+            {
+              "name": "delivery_time",
+              "value": "={{ $json.delivery_time }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "create-offer-api",
+      "name": "Create Offer via API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://django_app:8000/bot/api/requests/{{ $json.request_id }}/",
+        "options": {}
+      },
+      "id": "get-request-details",
+      "name": "Get Request Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.telegram.org/bot{{ $env.TELEGRAM_BOT_TOKEN }}/sendMessage",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{ $('Get Request Details').item.json.user.telegram_id }}"
+            },
+            {
+              "name": "text",
+              "value": "💰 عرض سعر جديد لطلبك!\n\n🆔 رقم الطلب: {{ $('Get Request Details').item.json.order_id }}\n🏪 المخزن: {{ $('Create Offer via API').item.json.junkyard_name }}\n💰 السعر: {{ $('Create Offer via API').item.json.price }} ريال\n📝 الوصف: {{ $('Create Offer via API').item.json.description }}\n🚚 وقت التوصيل: {{ $('Create Offer via API').item.json.delivery_time }}\n⭐ التقييم: {{ $('Create Offer via API').item.json.rating }}/5"
+            },
+            {
+              "name": "parse_mode",
+              "value": "HTML"
+            },
+            {
+              "name": "reply_markup",
+              "value": "{\"inline_keyboard\":[[{\"text\":\"✅ قبول العرض\",\"callback_data\":\"offer_accept_{{ $('Create Offer via API').item.json.id }}\"},{\"text\":\"❌ رفض العرض\",\"callback_data\":\"offer_reject_{{ $('Create Offer via API').item.json.id }}\"}]]}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notify-user",
+      "name": "Notify User of New Offer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"status\": \"success\", \"message\": \"Offer created and user notified\"}",
+        "options": {}
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "Webhook - New Offer": {
+      "main": [
+        [
+          {
+            "node": "Create Offer via API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Offer via API": {
+      "main": [
+        [
+          {
+            "node": "Get Request Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Request Details": {
+      "main": [
+        [
+          {
+            "node": "Notify User of New Offer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify User of New Offer": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2024-08-24T21:42:00.000Z",
+      "updatedAt": "2024-08-24T21:42:00.000Z",
+      "id": "auto-parts-bot",
+      "name": "Auto Parts Bot"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-24T21:42:00.000Z",
+  "versionId": "1"
+} 

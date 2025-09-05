@@ -1,0 +1,29 @@
+# فحص حالة البوت
+./bot_control.sh status
+
+# إيقاف البوت  
+./bot_control.sh stop
+
+# تشغيل البوت
+./bot_control.sh start
+
+# إعادة تشغيل البوت
+./bot_control.sh restart
+
+# عرض سجلات البوت
+./bot_control.sh logs
+
+--------------------------------------------------------
+
+# 1. تشغيل المشروع
+cd /path/to/auto-bot
+docker-compose up -d
+
+# 2. التأكد من أن جميع الخدمات تعمل
+docker ps
+
+# 3. تطبيق migrations
+docker exec auto-bot-django_app-1 python manage.py migrate
+
+# 4. إنشاء superuser (إذا لم يكن موجود)
+docker exec auto-bot-django_app-1 python manage.py createsuperuser

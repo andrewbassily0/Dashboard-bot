@@ -1,0 +1,843 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <style>
+        /* FORCE COMPLETE TSHALEEH OVERRIDE FOR INDEX PAGE */
+        body {
+            background: linear-gradient(135deg, #0b1220 0%, #0f172a 100%) !important;
+            font-family: 'Cairo', sans-serif !important;
+            color: #e2e8f0 !important;
+        }
+        
+        #content-main {
+            background: transparent !important;
+            padding: 0 !important;
+        }
+        
+        /* FORCE COMPLETE MODULE REDESIGN - DARK THEME */
+        .dashboard .module, .module {
+            background: rgba(15, 23, 42, 0.7) !important;
+            backdrop-filter: blur(20px) !important;
+            border: 1px solid rgba(148, 163, 184, 0.2) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+            margin-bottom: 25px !important;
+            overflow: hidden !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .dashboard .module:hover, .module:hover {
+            transform: translateY(-5px) scale(1.02) !important;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.8) !important;
+        }
+        
+        /* FORCE HEADER COLORS */
+        .dashboard .module h2, .module h2 {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+            color: white !important;
+            padding: 20px 25px !important;
+            margin: 0 !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            font-size: 18px !important;
+            border: none !important;
+        }
+        
+        .dashboard .module h2 a, .module h2 a {
+            color: white !important;
+            text-decoration: none !important;
+        }
+        
+        /* FORCE TABLE STYLES */
+        .dashboard .module table, .module table {
+            background: transparent !important;
+            width: 100% !important;
+            border-collapse: collapse !important;
+        }
+        
+        .dashboard .module th, .dashboard .module td, .module th, .module td {
+            background: transparent !important;
+            color: #e2e8f0 !important;
+            border: none !important;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2) !important;
+            padding: 15px 25px !important;
+            font-family: 'Cairo', sans-serif !important;
+            text-align: right !important;
+        }
+        
+        .dashboard .module tbody tr:hover, .module tbody tr:hover {
+            background: rgba(15, 23, 42, 0.8) !important;
+        }
+        
+        /* FORCE DARK MODE */
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, #0b1220 0%, #0f172a 100%) !important;
+        }
+        
+        [data-theme="dark"] .dashboard .module,
+        [data-theme="dark"] .module {
+            background: rgba(15, 23, 42, 0.7) !important;
+            border: 1px solid rgba(100, 116, 139, 0.2) !important;
+        }
+        
+        [data-theme="dark"] .dashboard .module th,
+        [data-theme="dark"] .dashboard .module td,
+        [data-theme="dark"] .module th,
+        [data-theme="dark"] .module td {
+            color: #e2e8f0 !important;
+            border-bottom: 1px solid rgba(100, 116, 139, 0.2) !important;
+        }
+        
+        [data-theme="dark"] .dashboard .module tbody tr:hover,
+        [data-theme="dark"] .module tbody tr:hover {
+            background: rgba(15, 23, 42, 0.8) !important;
+        }
+        .dashboard {
+            background: transparent !important;
+            padding: 0 !important;
+        }
+        
+        .dashboard-header {
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 20px !important;
+            padding: 30px !important;
+            margin-bottom: 30px !important;
+            box-shadow: var(--shadow-glass) !important;
+            text-align: center !important;
+        }
+        
+        .dashboard-title {
+            font-size: 2.5rem !important;
+            font-weight: 700 !important;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600)) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+            margin-bottom: 10px !important;
+            font-family: 'Cairo', sans-serif !important;
+        }
+        
+        .dashboard-subtitle {
+            color: var(--text-secondary) !important;
+            font-size: 1.2rem !important;
+            font-family: 'Cairo', sans-serif !important;
+        }
+        
+        .dashboard-stats {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+            gap: 20px !important;
+            margin-bottom: 30px !important;
+        }
+        
+        .stat-card {
+            background: var(--bg-glass) !important;
+            backdrop-filter: var(--backdrop-blur) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 15px !important;
+            padding: 25px !important;
+            box-shadow: var(--shadow-glass) !important;
+            text-align: center !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px) !important;
+            box-shadow: 0 15px 45px rgba(20, 184, 166, 0.2) !important;
+        }
+        
+        .stat-icon {
+            width: 60px !important;
+            height: 60px !important;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+            border-radius: 15px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 auto 15px auto !important;
+            color: white !important;
+            font-size: 24px !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+        }
+        
+        .stat-number {
+            font-size: 2rem !important;
+            font-weight: 700 !important;
+            color: var(--text-primary) !important;
+            margin-bottom: 5px !important;
+            font-family: 'Cairo', sans-serif !important;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary) !important;
+            font-weight: 500 !important;
+            font-family: 'Cairo', sans-serif !important;
+        }
+        
+        .module-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)) !important;
+            gap: 25px !important;
+        }
+        
+        /* Enhanced Module Styling */
+        .glass-module {
+            background: rgba(15, 23, 42, 0.7) !important;
+            backdrop-filter: blur(20px) !important;
+            border: 1px solid rgba(148, 163, 184, 0.2) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+            overflow: hidden !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .glass-module:hover {
+            transform: translateY(-5px) !important;
+            box-shadow: 0 15px 45px rgba(15, 23, 42, 0.8) !important;
+        }
+        
+        /* WEBSITE COLOR SCHEME - User Data Sections */
+        /* Users, Requests, Junkyards, Offers - DARK THEME COLORS */
+        #bot-module .module-header,
+        [id*="user"] .module-header,
+        [id*="request"] .module-header,
+        [id*="junkyard"] .module-header,
+        [id*="offer"] .module-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+            padding: 20px 25px !important;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.3) !important;
+            border-radius: 20px 20px 0 0 !important;
+        }
+        
+        /* SYSTEM SECTIONS - Authentication, Admin Interface, Dashboard - MAIN THEME COLORS */
+        #auth-module .module-header,
+        #dashboard-module .module-header,
+        #admin_interface-module .module-header,
+        [id*="auth"] .module-header,
+        [id*="dashboard"] .module-header,
+        [id*="admin"] .module-header,
+        [data-app="auth"] .module-header,
+        [data-app="dashboard"] .module-header,
+        [data-app="admin_interface"] .module-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+            padding: 20px 25px !important;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.3) !important;
+            border-radius: 20px 20px 0 0 !important;
+        }
+        
+        /* ENHANCED HOVER EFFECTS FOR DIFFERENT SECTIONS */
+        #bot-module:hover,
+        [id*="user"]:hover,
+        [id*="request"]:hover,
+        [id*="junkyard"]:hover,
+        [id*="offer"]:hover {
+            box-shadow: 0 15px 45px rgba(15, 23, 42, 0.6) !important;
+        }
+        
+        #auth-module:hover,
+        #dashboard-module:hover,
+        #admin_interface-module:hover,
+        [id*="auth"]:hover,
+        [id*="dashboard"]:hover,
+        [id*="admin"]:hover {
+            box-shadow: 0 15px 45px rgba(15, 23, 42, 0.6) !important;
+        }
+        
+        /* Default module header for other sections */
+        .module-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+            padding: 20px 25px !important;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2) !important;
+        }
+        
+        .module-header h2 {
+            margin: 0 !important;
+            color: white !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            font-size: 18px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+        }
+        
+        .module-header h2 i {
+            font-size: 20px !important;
+            color: white !important;
+        }
+        
+        .module-header h2 a {
+            color: white !important;
+            text-decoration: none !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .module-header h2 a:hover {
+            color: rgba(148, 163, 184, 1) !important;
+        }
+        
+        .module-content {
+            padding: 0 !important;
+        }
+        
+        .module-table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            background: transparent !important;
+        }
+        
+        .model-row {
+            border-bottom: 1px solid var(--border-glass) !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .model-row:last-child {
+            border-bottom: none !important;
+        }
+        
+        .model-row:hover {
+            background: var(--bg-glass-hover) !important;
+        }
+        
+        .model-name {
+            padding: 15px 25px !important;
+            vertical-align: middle !important;
+        }
+        
+        .model-link {
+            color: var(--text-primary) !important;
+            text-decoration: none !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 500 !important;
+            font-size: 16px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .model-link:hover {
+            color: var(--primary-500) !important;
+            transform: translateX(-3px) !important;
+        }
+        
+        .model-link i {
+            font-size: 18px !important;
+            color: var(--primary-500) !important;
+            width: 20px !important;
+            text-align: center !important;
+        }
+        
+        .model-actions {
+            padding: 15px 25px !important;
+            text-align: left !important;
+            vertical-align: middle !important;
+        }
+        
+        .action-btn {
+            background: var(--bg-surface) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-glass) !important;
+            border-radius: 8px !important;
+            padding: 8px 15px !important;
+            margin: 0 5px !important;
+            text-decoration: none !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 500 !important;
+            font-size: 13px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .action-btn i {
+            font-size: 12px !important;
+        }
+        
+        .add-btn:hover {
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+            color: white !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3) !important;
+        }
+        
+        .edit-btn:hover {
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600)) !important;
+            color: white !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 5px 15px rgba(20, 184, 166, 0.3) !important;
+        }
+        
+        .view-btn:hover {
+            background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+            color: white !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3) !important;
+        }
+        
+        .no-models-message {
+            padding: 40px 25px !important;
+            text-align: center !important;
+            color: var(--text-secondary) !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-size: 16px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 10px !important;
+        }
+        
+        .no-models-message i {
+            font-size: 20px !important;
+            color: var(--primary-500) !important;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-title {
+                font-size: 2rem !important;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .module-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">لوحة التحكم الإدارية</h1>
+        <p class="dashboard-subtitle">إدارة شاملة لنظام تشاليح قطع غيار السيارات</p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-number" id="users-count">-</div>
+            <div class="stat-label">المستخدمين</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            <div class="stat-number" id="requests-count">-</div>
+            <div class="stat-label">الطلبات</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-store"></i>
+            </div>
+            <div class="stat-number" id="junkyards-count">-</div>
+            <div class="stat-label">المخازن</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-handshake"></i>
+            </div>
+            <div class="stat-number" id="offers-count">-</div>
+            <div class="stat-label">العروض</div>
+        </div>
+    </div>
+
+    <!-- App Modules -->
+    <div class="module-grid">
+        {% if app_list %}
+            {% for app in app_list %}
+                <div class="module glass-module" id="{{ app.app_label }}-module">
+                    <div class="module-header">
+                        <h2>
+                            <i class="fas fa-{% if app.app_label == 'bot' %}car{% elif app.app_label == 'auth' %}users-cog{% else %}cogs{% endif %}"></i>
+                            <a href="{{ app.app_url }}" class="section" title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">
+                                {{ app.name }}
+                            </a>
+                        </h2>
+                    </div>
+                    
+                    <div class="module-content">
+                        <table class="module-table">
+                            <tbody>
+                            {% for model in app.models %}
+                                <tr class="model-row model-{{ model.object_name|lower }}">
+                                    <td class="model-name">
+                                        {% if model.admin_url %}
+                                            <a href="{{ model.admin_url }}" class="model-link">
+                                                <i class="fas fa-{% if model.object_name == 'User' %}users{% elif model.object_name == 'Request' %}clipboard-list{% elif model.object_name == 'Junkyard' %}store{% elif model.object_name == 'Offer' %}handshake{% elif model.object_name == 'City' %}map-marker-alt{% elif model.object_name == 'Brand' %}tag{% else %}database{% endif %}"></i>
+                                                {{ model.name }}
+                                            </a>
+                                        {% else %}
+                                            <span class="model-link">
+                                                <i class="fas fa-database"></i>
+                                                {{ model.name }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="model-actions">
+                                        {% if model.add_url %}
+                                            <a href="{{ model.add_url }}" class="action-btn add-btn" title="إضافة {{ model.name }}">
+                                                <i class="fas fa-plus"></i>
+                                                <span>إضافة</span>
+                                            </a>
+                                        {% endif %}
+                                        {% if model.admin_url %}
+                                            {% if model.view_only %}
+                                                <a href="{{ model.admin_url }}" class="action-btn view-btn" title="عرض {{ model.name }}">
+                                                    <i class="fas fa-eye"></i>
+                                                    <span>عرض</span>
+                                                </a>
+                                            {% else %}
+                                                <a href="{{ model.admin_url }}" class="action-btn edit-btn" title="تحرير {{ model.name }}">
+                                                    <i class="fas fa-edit"></i>
+                                                    <span>تحرير</span>
+                                                </a>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="module glass-module">
+                <div class="module-header">
+                    <h2>
+                        <i class="fas fa-exclamation-triangle"></i>
+                        {% trans "No models available" %}
+                    </h2>
+                </div>
+                <div class="module-content">
+                    <p class="no-models-message">
+                        <i class="fas fa-info-circle"></i>
+                        لا توجد نماذج متاحة للإدارة في الوقت الحالي
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Enhanced Admin Dashboard Controller
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // Animate page elements on load
+        function animateElements() {
+            // Staggered animation for stat cards
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease-out';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 150);
+            });
+            
+            // Staggered animation for modules
+            const modules = document.querySelectorAll('.glass-module');
+            modules.forEach((module, index) => {
+                module.style.opacity = '0';
+                module.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    module.style.transition = 'all 0.6s ease-out';
+                    module.style.opacity = '1';
+                    module.style.transform = 'translateY(0)';
+                }, 500 + (index * 100));
+            });
+        }
+        
+        // Animate counters with real data
+        function animateCounter(element, target) {
+            let current = 0;
+            const increment = Math.max(1, target / 50);
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current).toLocaleString('ar-EG');
+            }, 30);
+        }
+        
+        // Fetch real statistics from API
+        function loadRealStats() {
+            // Try to fetch real data from Django API
+            fetch('{% url "dashboard:api_stats" %}', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update with real data
+                const usersElement = document.getElementById('users-count');
+                const requestsElement = document.getElementById('requests-count');
+                const junkyardsElement = document.getElementById('junkyards-count');
+                const offersElement = document.getElementById('offers-count');
+                
+                if (usersElement && data.users_count !== undefined) {
+                    animateCounter(usersElement, data.users_count);
+                }
+                if (requestsElement && data.requests_count !== undefined) {
+                    animateCounter(requestsElement, data.requests_count);
+                }
+                if (junkyardsElement && data.junkyards_count !== undefined) {
+                    animateCounter(junkyardsElement, data.junkyards_count);
+                }
+                if (offersElement && data.offers_count !== undefined) {
+                    animateCounter(offersElement, data.offers_count);
+                }
+            })
+            .catch(error => {
+                console.log('Using demo data:', error);
+                // Fallback to demo data
+                const usersElement = document.getElementById('users-count');
+                const requestsElement = document.getElementById('requests-count');
+                const junkyardsElement = document.getElementById('junkyards-count');
+                const offersElement = document.getElementById('offers-count');
+                
+                if (usersElement) animateCounter(usersElement, 247);
+                if (requestsElement) animateCounter(requestsElement, 156);
+                if (junkyardsElement) animateCounter(junkyardsElement, 89);
+                if (offersElement) animateCounter(offersElement, 312);
+            });
+        }
+        
+        // Enhanced interactions
+        function setupInteractions() {
+            // Enhanced module hover effects
+            document.querySelectorAll('.glass-module').forEach(module => {
+                module.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                    this.style.boxShadow = '0 20px 60px rgba(20, 184, 166, 0.25)';
+                });
+                
+                module.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                    this.style.boxShadow = 'var(--shadow-glass)';
+                });
+            });
+            
+            // Enhanced action button effects
+            document.querySelectorAll('.action-btn').forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px) scale(1.05)';
+                });
+                
+                btn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+                
+                btn.addEventListener('click', function(e) {
+                    // Add ripple effect
+                    const ripple = document.createElement('span');
+                    ripple.style.cssText = `
+                        position: absolute;
+                        border-radius: 50%;
+                        background: rgba(148, 163, 184, 0.6);
+                        width: 20px;
+                        height: 20px;
+                        animation: ripple 0.6s linear;
+                        pointer-events: none;
+                    `;
+                    
+                    const rect = this.getBoundingClientRect();
+                    ripple.style.left = (e.clientX - rect.left - 10) + 'px';
+                    ripple.style.top = (e.clientY - rect.top - 10) + 'px';
+                    
+                    this.style.position = 'relative';
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => ripple.remove(), 600);
+                });
+            });
+            
+            // Model row click to navigate
+            document.querySelectorAll('.model-row').forEach(row => {
+                row.addEventListener('click', function(e) {
+                    if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
+                        const mainLink = this.querySelector('.model-link[href]');
+                        if (mainLink) {
+                            window.location.href = mainLink.href;
+                        }
+                    }
+                });
+                
+                row.style.cursor = 'pointer';
+            });
+            
+            // Real-time updates (every 2 minutes to reduce load)
+            setInterval(loadRealStats, 120000);
+        }
+        
+        // Add CSS for ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+            
+            .pulse {
+                animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+            
+            @keyframes pulse {
+                0%, 100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: .5;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Initialize everything
+        setTimeout(() => {
+            animateElements();
+            loadRealStats();
+            setupInteractions();
+            forceThemeApplication();
+        }, 100);
+        
+        // FORCE APPLY TSHALEEH THEME
+        function forceThemeApplication() {
+            // Force clear browser cache
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    for (let name of names) {
+                        caches.delete(name);
+                    }
+                });
+            }
+            
+            // Force reload all stylesheets with new timestamp
+            const links = document.querySelectorAll('link[rel="stylesheet"]');
+            links.forEach(link => {
+                const href = link.href;
+                link.href = href + (href.includes('?') ? '&' : '?') + 'cache_bust=' + Date.now();
+            });
+            
+            // Force apply styles directly
+            document.body.style.cssText = `
+                background: linear-gradient(135deg, #0b1220 0%, #0f172a 100%) !important;
+                font-family: 'Cairo', sans-serif !important;
+                color: #e2e8f0 !important;
+                direction: rtl !important;
+            `;
+            
+            // Force apply to all modules - DARK THEME
+            document.querySelectorAll('.module').forEach(module => {
+                module.style.cssText = `
+                    background: rgba(15, 23, 42, 0.7) !important;
+                    backdrop-filter: blur(20px) !important;
+                    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+                    border-radius: 20px !important;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+                    margin-bottom: 25px !important;
+                    overflow: hidden !important;
+                    transition: all 0.3s ease !important;
+                `;
+                
+                const h2 = module.querySelector('h2');
+                if (h2) {
+                    h2.style.cssText = `
+                        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+                        color: white !important;
+                        padding: 20px 25px !important;
+                        margin: 0 !important;
+                        font-family: 'Cairo', sans-serif !important;
+                        font-weight: 600 !important;
+                        font-size: 18px !important;
+                        border: none !important;
+                    `;
+                }
+            });
+            
+            // Force apply to main content
+            const contentMain = document.querySelector('#content-main');
+            if (contentMain) {
+                contentMain.style.cssText = `
+                    background: transparent !important;
+                    padding: 0 !important;
+                `;
+            }
+            
+            console.log('🎨 Tshaleeh theme force applied!');
+        }
+        
+        // Add welcome message
+        const welcomeNotification = document.createElement('div');
+        welcomeNotification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-glass);
+            backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--border-glass);
+            border-radius: 15px;
+            padding: 20px;
+            color: var(--text-primary);
+            font-family: 'Cairo', sans-serif;
+            box-shadow: var(--shadow-glass);
+            z-index: 1000;
+            max-width: 300px;
+            transform: translateX(350px);
+            transition: all 0.5s ease-out;
+        `;
+        
+        welcomeNotification.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                <i class="fas fa-car" style="color: var(--primary-500); font-size: 20px;"></i>
+                <strong>مرحباً بك في تشاليح</strong>
+            </div>
+            <p style="margin: 0; font-size: 14px; color: var(--text-secondary);">
+                لوحة التحكم الإدارية محدثة بالكامل مع تصميم زجاجي حديث
+            </p>
+        `;
+        
+        document.body.appendChild(welcomeNotification);
+        
+        setTimeout(() => {
+            welcomeNotification.style.transform = 'translateX(0)';
+        }, 1000);
+        
+        setTimeout(() => {
+            welcomeNotification.style.transform = 'translateX(350px)';
+            setTimeout(() => welcomeNotification.remove(), 500);
+        }, 5000);
+    });
+</script>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
