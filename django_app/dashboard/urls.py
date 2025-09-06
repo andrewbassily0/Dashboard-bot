@@ -29,6 +29,10 @@ urlpatterns = [
     # Analytics
     path('analytics/', views.analytics_view, name='analytics'),
     
+    # Telegram Media
+    path('telegram/image/<str:file_id>/', views.telegram_image, name='telegram_image'),
+    path('telegram/video/<str:file_id>/', views.telegram_video, name='telegram_video'),
+    
     # API endpoints
     path('api/stats/', views.api_stats, name='api_stats'),
 ]

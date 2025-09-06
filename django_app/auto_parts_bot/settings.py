@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Security settings
 SECRET_KEY = config('DJANGO_SECRET_KEY', default='django-insecure-g&m_ds(8y5c=8@8*jak&4hr_2c8l8c&2-ms%cinzvj-t(cgy%^')
 DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0,193.187.129.94', cast=lambda v: [s.strip() for s in v.split(',')])
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0,193.187.129.94,dashboard.tashaleeh.com', cast=lambda v: [s.strip() for s in v.split(',')])
 
 # Application definition
 INSTALLED_APPS = [
@@ -174,6 +174,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'http://127.0.0.1:8000',
     'http://193.187.129.94:8888',
+    'https://dashboard.tashaleeh.com',
+    'http://dashboard.tashaleeh.com',
 ]
 
 # Telegram Bot settings

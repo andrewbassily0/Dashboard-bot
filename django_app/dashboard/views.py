@@ -9,6 +9,9 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from bot.models import User, Request, Offer, Junkyard, City, Brand, Model, JunkyardRating, SystemSetting, JunkyardStaff
 from .telegram_service import telegram_service
+import logging
+
+logger = logging.getLogger(__name__)
 
 def is_admin(user):
     return user.is_staff or user.is_superuser
@@ -462,6 +465,91 @@ def analytics_view(request):
     }
     
     return render(request, 'dashboard/analytics.html', context)
+
+# Telegram Media Views
+@staff_member_required
+def telegram_image(request, file_id):
+    """Proxy Telegram image to dashboard"""
+    import requests
+    from django.http import HttpResponse
+    from django.conf import settings
+    
+    try:
+        # Get file path from Telegram
+        bot_token = settings.TELEGRAM_BOT_TOKEN
+        get_file_url = f"https://api.telegram.org/bot{bot_token}/getFile"
+        response = requests.get(get_file_url, params={'file_id': file_id})
+        
+        if response.status_code == 200:
+            file_info = response.json()
+            if file_info.get('ok'):
+                file_path = file_info['result']['file_path']
+                # Download the actual file
+                file_url = f"https://api.telegram.org/file/bot{bot_token}/{file_path}"
+                file_response = requests.get(file_url)
+                
+                if file_response.status_code == 200:
+                    # Determine content type
+                    content_type = 'image/jpeg'
+                    if file_path.lower().endswith('.png'):
+                        content_type = 'image/png'
+                    elif file_path.lower().endswith('.gif'):
+                        content_type = 'image/gif'
+                    elif file_path.lower().endswith('.webp'):
+                        content_type = 'image/webp'
+                    
+                    response = HttpResponse(file_response.content, content_type=content_type)
+                    response['Cache-Control'] = 'public, max-age=3600'  # Cache for 1 hour
+                    return response
+        
+        # If we get here, something went wrong
+        return HttpResponse("Image not found", status=404)
+        
+    except Exception as e:
+        logger.error(f"Error fetching Telegram image {file_id}: {e}")
+        return HttpResponse("Error loading image", status=500)
+
+@staff_member_required
+def telegram_video(request, file_id):
+    """Proxy Telegram video to dashboard"""
+    import requests
+    from django.http import HttpResponse
+    from django.conf import settings
+    
+    try:
+        # Get file path from Telegram
+        bot_token = settings.TELEGRAM_BOT_TOKEN
+        get_file_url = f"https://api.telegram.org/bot{bot_token}/getFile"
+        response = requests.get(get_file_url, params={'file_id': file_id})
+        
+        if response.status_code == 200:
+            file_info = response.json()
+            if file_info.get('ok'):
+                file_path = file_info['result']['file_path']
+                # Download the actual file
+                file_url = f"https://api.telegram.org/file/bot{bot_token}/{file_path}"
+                file_response = requests.get(file_url)
+                
+                if file_response.status_code == 200:
+                    # Determine content type
+                    content_type = 'video/mp4'
+                    if file_path.lower().endswith('.webm'):
+                        content_type = 'video/webm'
+                    elif file_path.lower().endswith('.avi'):
+                        content_type = 'video/avi'
+                    elif file_path.lower().endswith('.mov'):
+                        content_type = 'video/quicktime'
+                    
+                    response = HttpResponse(file_response.content, content_type=content_type)
+                    response['Cache-Control'] = 'public, max-age=3600'  # Cache for 1 hour
+                    return response
+        
+        # If we get here, something went wrong
+        return HttpResponse("Video not found", status=404)
+        
+    except Exception as e:
+        logger.error(f"Error fetching Telegram video {file_id}: {e}")
+        return HttpResponse("Error loading video", status=500)
 
 # API endpoints for AJAX requests
 @staff_member_required

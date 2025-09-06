@@ -18,7 +18,7 @@
                         طلب #{{ request.order_id }}
                     </h1>
                     <p class="text-slate-600 dark:text-slate-400">
-                        {{ request.brand.name }} {{ request.model.name }} {{ request.year }}
+                        {{ request.brand.name }} {% if request.model %}{{ request.model.name }}{% else %}(بدون موديل محدد){% endif %} {{ request.year }}
                     </p>
                 </div>
             </div>
@@ -82,7 +82,7 @@
                     <div>
                         <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">الموديل</label>
                         <p class="text-lg font-medium text-slate-900 dark:text-slate-100">
-                            {{ request.model.name }}
+                            {% if request.model %}{{ request.model.name }}{% else %}غير محدد{% endif %}
                         </p>
                     </div>
                     
@@ -121,6 +121,45 @@
                         {{ request.parts }}
                     </p>
                 </div>
+                
+                <!-- Media Files Section -->
+                {% if request.media_files %}
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-4">
+                        <i class="fas fa-images ml-2 text-primary-500"></i>
+                        الصور والفيديو المرفقة ({{ request.media_files|length }})
+                    </label>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {% for media in request.media_files %}
+                            {% if media.type == 'photo' %}
+                            <div class="relative group cursor-pointer glass-card-hover rounded-lg overflow-hidden" onclick="openImageModal('{{ media.file_id }}')">
+                                <img src="{% url 'dashboard:telegram_image' media.file_id %}" 
+                                     alt="صورة الطلب" 
+                                     class="w-full h-32 object-cover transition-transform duration-300 group-hover:scale-110"
+                                     loading="lazy">
+                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                                    <i class="fas fa-search-plus text-white opacity-0 group-hover:opacity-100 text-xl"></i>
+                                </div>
+                                <div class="absolute bottom-2 left-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded">
+                                    <i class="fas fa-image ml-1"></i>
+                                    صورة
+                                </div>
+                            </div>
+                            {% elif media.type == 'video' %}
+                            <div class="relative group cursor-pointer glass-card-hover rounded-lg overflow-hidden" onclick="openVideoModal('{{ media.file_id }}')">
+                                <div class="w-full h-32 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                                    <i class="fas fa-play-circle text-white text-3xl"></i>
+                                </div>
+                                <div class="absolute bottom-2 left-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded">
+                                    <i class="fas fa-video ml-1"></i>
+                                    فيديو
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
                 
                 {% if request.additional_notes %}
                 <div class="mt-6">
@@ -366,6 +405,27 @@
     </div>
 </div>
 
+<!-- Image/Video Modal -->
+<div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+    <div class="relative max-w-4xl max-h-full p-4">
+        <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 z-10">
+            <i class="fas fa-times"></i>
+        </button>
+        <img id="modalImage" src="" alt="صورة الطلب" class="max-w-full max-h-full object-contain rounded-lg">
+    </div>
+</div>
+
+<div id="videoModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+    <div class="relative max-w-4xl max-h-full p-4">
+        <button onclick="closeVideoModal()" class="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 z-10">
+            <i class="fas fa-times"></i>
+        </button>
+        <video id="modalVideo" controls class="max-w-full max-h-full rounded-lg">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+</div>
+
 <script>
     function copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(function() {
@@ -380,5 +440,57 @@
             }, 3000);
         });
     }
+    
+    function openImageModal(fileId) {
+        const modal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        modalImage.src = `{% url 'dashboard:telegram_image' 'FILE_ID' %}`.replace('FILE_ID', fileId);
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeImageModal() {
+        const modal = document.getElementById('imageModal');
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+    
+    function openVideoModal(fileId) {
+        const modal = document.getElementById('videoModal');
+        const modalVideo = document.getElementById('modalVideo');
+        modalVideo.src = `{% url 'dashboard:telegram_video' 'FILE_ID' %}`.replace('FILE_ID', fileId);
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeVideoModal() {
+        const modal = document.getElementById('videoModal');
+        const modalVideo = document.getElementById('modalVideo');
+        modalVideo.pause();
+        modalVideo.src = '';
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('imageModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeImageModal();
+        }
+    });
+    
+    document.getElementById('videoModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeVideoModal();
+        }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeImageModal();
+            closeVideoModal();
+        }
+    });
 </script>
 {% endblock %}

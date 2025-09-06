@@ -272,6 +272,8 @@ class TelegramBot:
             await self.start_command_from_callback(query, user)
         elif data == "select_brand_again":
             await self.show_brand_selection(query, user)
+        elif data == "show_more_brands":
+            await self.show_all_brands(query, user)
         elif data.startswith("view_request_"):
             await self.show_request_details(query, user, data)
         elif data.startswith("request_action_"):
@@ -404,10 +406,58 @@ class TelegramBot:
         # تسجيل عدد الماركات
         logger.info(f"Found {len(brands)} active brands for brand selection")
         
-        message = f"🚗 اختر ماركة السيارة ({len(brands)} ماركة متاحة):"
+        # الماركات الأكثر شيوعاً أولاً
+        popular_brands = ['تويوتا', 'هوندا', 'نيسان', 'هيونداي', 'كيا', 'مازدا', 'فورد', 'شيفروليه']
+        sorted_brands = []
+        
+        # إضافة الماركات الشائعة أولاً
+        for popular in popular_brands:
+            for brand in brands:
+                if brand.name == popular:
+                    sorted_brands.append(brand)
+                    break
+        
+        # إضافة باقي الماركات
+        for brand in brands:
+            if brand not in sorted_brands:
+                sorted_brands.append(brand)
+        
+        # عرض أول 10 ماركات فقط
+        display_brands = sorted_brands[:10]
+        
+        message = f"🚗 اختر ماركة السيارة (أشهر {len(display_brands)} ماركات):"
         keyboard = []
         
         # تجميع الماركات في صفوف من اثنين لتوفير مساحة
+        for i in range(0, len(display_brands), 2):
+            row = []
+            row.append(InlineKeyboardButton(display_brands[i].name, callback_data=f"brand_{display_brands[i].id}"))
+            if i + 1 < len(display_brands):
+                row.append(InlineKeyboardButton(display_brands[i + 1].name, callback_data=f"brand_{display_brands[i + 1].id}"))
+            keyboard.append(row)
+        
+        # إضافة زر "عرض المزيد" إذا كان هناك ماركات أخرى
+        if len(brands) > 10:
+            remaining = len(brands) - 10
+            keyboard.append([InlineKeyboardButton(f"📄 عرض المزيد ({remaining} ماركة)", callback_data="show_more_brands")])
+        
+        # Add navigation button
+        keyboard.append([InlineKeyboardButton("🔙 القائمة الرئيسية", callback_data="user_type_client")])
+        
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(message, reply_markup=reply_markup)
+    
+    async def show_all_brands(self, query, user):
+        """Show all brands with pagination"""
+        brands = await sync_to_async(list)(Brand.objects.filter(is_active=True).order_by('name'))
+        
+        # تسجيل عدد الماركات
+        logger.info(f"Showing all {len(brands)} active brands")
+        
+        message = f"🚗 جميع الماركات المتاحة ({len(brands)} ماركة):\n\n"
+        keyboard = []
+        
+        # تجميع الماركات في صفوف من اثنين
         for i in range(0, len(brands), 2):
             row = []
             row.append(InlineKeyboardButton(brands[i].name, callback_data=f"brand_{brands[i].id}"))
@@ -415,8 +465,14 @@ class TelegramBot:
                 row.append(InlineKeyboardButton(brands[i + 1].name, callback_data=f"brand_{brands[i + 1].id}"))
             keyboard.append(row)
         
-        # Add navigation button
-        keyboard.append([InlineKeyboardButton("🔙 القائمة الرئيسية", callback_data="user_type_client")])
+        # Add navigation buttons
+        keyboard.append([
+            InlineKeyboardButton("🔙 الماركات الشائعة", callback_data="select_brand_again"),
+            InlineKeyboardButton("📋 طلباتي", callback_data="my_requests")
+        ])
+        keyboard.append([
+            InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="user_type_client")
+        ])
         
         reply_markup = InlineKeyboardMarkup(keyboard)
         await query.edit_message_text(message, reply_markup=reply_markup)
@@ -621,22 +677,46 @@ class TelegramBot:
         # تسجيل عدد الماركات
         logger.info(f"Found {len(brands)} active brands")
         
+        # الماركات الأكثر شيوعاً أولاً (لتحسين تجربة المستخدم)
+        popular_brands = ['تويوتا', 'هوندا', 'نيسان', 'هيونداي', 'كيا', 'مازدا', 'فورد', 'شيفروليه']
+        sorted_brands = []
+        
+        # إضافة الماركات الشائعة أولاً
+        for popular in popular_brands:
+            for brand in brands:
+                if brand.name == popular:
+                    sorted_brands.append(brand)
+                    break
+        
+        # إضافة باقي الماركات
+        for brand in brands:
+            if brand not in sorted_brands:
+                sorted_brands.append(brand)
+        
+        # عرض أول 10 ماركات فقط مع زر "المزيد"
+        display_brands = sorted_brands[:10]
+        
         message = f"""
 📝 **{current_draft['name']}**
 
 ✅ تم اختيار: {city.name}
 
-🚗 اختر ماركة السيارة ({len(brands)} ماركة متاحة):
+🚗 اختر ماركة السيارة (أشهر {len(display_brands)} ماركات):
         """
         keyboard = []
         
         # تجميع الماركات في صفوف من اثنين لتوفير مساحة
-        for i in range(0, len(brands), 2):
+        for i in range(0, len(display_brands), 2):
             row = []
-            row.append(InlineKeyboardButton(brands[i].name, callback_data=f"brand_{brands[i].id}"))
-            if i + 1 < len(brands):
-                row.append(InlineKeyboardButton(brands[i + 1].name, callback_data=f"brand_{brands[i + 1].id}"))
+            row.append(InlineKeyboardButton(display_brands[i].name, callback_data=f"brand_{display_brands[i].id}"))
+            if i + 1 < len(display_brands):
+                row.append(InlineKeyboardButton(display_brands[i + 1].name, callback_data=f"brand_{display_brands[i + 1].id}"))
             keyboard.append(row)
+        
+        # إضافة زر "عرض المزيد" إذا كان هناك ماركات أخرى
+        if len(brands) > 10:
+            remaining = len(brands) - 10
+            keyboard.append([InlineKeyboardButton(f"📄 عرض المزيد ({remaining} ماركة)", callback_data="show_more_brands")])
         
         # Add navigation buttons
         keyboard.append([
@@ -668,23 +748,36 @@ class TelegramBot:
         
         # Check if brand has models
         if not models:
+            # إذا لم تكن هناك موديلات محددة، انتقل مباشرة لاختيار نطاق السنوات
+            current_draft["request_data"]["brand_id"] = brand_id
+            current_draft["request_data"]["model_id"] = None  # لا يوجد موديل محدد
+            current_draft["step"] = "select_year_range"
+            
             message = f"""
 📝 **{current_draft['name']}**
 
-❌ عذراً، ماركة {brand.name} غير متوفرة حالياً
+✅ تم اختيار: {brand.name}
+⚠️ لا توجد موديلات محددة لهذه الماركة
 
-الماركات المتوفرة حالياً:
-🚗 تويوتا 
-🚗 هوندا
-
-يرجى اختيار ماركة أخرى أو المحاولة لاحقاً.
+📅 اختر نطاق سنة الصنع:
             """
             
             keyboard = [
-                [InlineKeyboardButton("🔙 اختيار ماركة أخرى", callback_data="select_brand_again")],
-                [InlineKeyboardButton("📋 طلباتي", callback_data="my_requests")],
-                [InlineKeyboardButton("🏠 العودة للقائمة الرئيسية", callback_data="user_type_client")]
+                [InlineKeyboardButton("2020 - 2024", callback_data="year_range_2020-2024")],
+                [InlineKeyboardButton("2015 - 2019", callback_data="year_range_2015-2019")],
+                [InlineKeyboardButton("2010 - 2014", callback_data="year_range_2010-2014")],
+                [InlineKeyboardButton("2005 - 2009", callback_data="year_range_2005-2009")],
+                [InlineKeyboardButton("2000 - 2004", callback_data="year_range_2000-2004")],
+                [InlineKeyboardButton("1995 - 1999", callback_data="year_range_1995-1999")],
+                [InlineKeyboardButton("أقدم من 1995", callback_data="year_range_older")]
             ]
+            
+            # Add navigation buttons
+            keyboard.append([
+                InlineKeyboardButton("🔙 اختيار ماركة أخرى", callback_data="select_brand_again"),
+                InlineKeyboardButton("📋 طلباتي", callback_data="my_requests")
+            ])
+            
             reply_markup = InlineKeyboardMarkup(keyboard)
             await query.edit_message_text(message, reply_markup=reply_markup)
             return
