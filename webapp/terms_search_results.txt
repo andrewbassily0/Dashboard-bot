@@ -1,0 +1,1728 @@
+نتائج البحث عن المصطلحات المطلوب تغييرها
+============================================================
+
+
+📄 django_app/auto_parts_bot/settings.py
+   • 'trusted' (2 مرة)
+      السطر 170: # CSRF settings - Add trusted origins for Docker/Nginx setup
+      السطر 171: CSRF_TRUSTED_ORIGINS = [
+   • 'model' (3 مرة)
+      السطر 150: # Custom user model
+      السطر 151: AUTH_USER_MODEL = 'bot.User'
+      السطر 154: DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+   • 'Model' (3 مرة)
+      السطر 150: # Custom user model
+      السطر 151: AUTH_USER_MODEL = 'bot.User'
+      السطر 154: DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+📄 django_app/bot/admin.py
+   • 'موديل' (1 مرة)
+      السطر 41: models_count.short_description = _('عدد الموديلات')
+   • 'الموديل' (1 مرة)
+      السطر 41: models_count.short_description = _('عدد الموديلات')
+   • 'brand' (8 مرة)
+      السطر 6: User, City, Brand, Model, Junkyard, Request,
+      السطر 32: @admin.register(Brand)
+      السطر 33: class BrandAdmin(admin.ModelAdmin):
+      السطر 46: list_display = ('name', 'brand', 'is_active')
+      السطر 47: list_filter = ('brand', 'is_active')
+      السطر 48: search_fields = ('name', 'brand__name')
+      السطر 70: list_display = ('order_id', 'user', 'city', 'brand', 'model', 'year', 'status', 'created_at', 'expir
+      السطر 71: list_filter = ('status', 'city', 'brand', 'created_at')
+   • 'Brand' (8 مرة)
+      السطر 6: User, City, Brand, Model, Junkyard, Request,
+      السطر 32: @admin.register(Brand)
+      السطر 33: class BrandAdmin(admin.ModelAdmin):
+      السطر 46: list_display = ('name', 'brand', 'is_active')
+      السطر 47: list_filter = ('brand', 'is_active')
+      السطر 48: search_fields = ('name', 'brand__name')
+      السطر 70: list_display = ('order_id', 'user', 'city', 'brand', 'model', 'year', 'status', 'created_at', 'expir
+      السطر 71: list_filter = ('status', 'city', 'brand', 'created_at')
+   • 'model' (18 مرة)
+      السطر 5: from .models import (
+      السطر 6: User, City, Brand, Model, Junkyard, Request,
+      السطر 25: class CityAdmin(admin.ModelAdmin):
+      السطر 33: class BrandAdmin(admin.ModelAdmin):
+      السطر 34: list_display = ('name', 'is_active', 'models_count')
+      السطر 39: def models_count(self, obj):
+      السطر 40: return obj.models.count()
+      السطر 41: models_count.short_description = _('عدد الموديلات')
+      السطر 44: @admin.register(Model)
+      السطر 45: class ModelAdmin(admin.ModelAdmin):
+      السطر 53: class JunkyardAdmin(admin.ModelAdmin):
+      السطر 69: class RequestAdmin(admin.ModelAdmin):
+      السطر 70: list_display = ('order_id', 'user', 'city', 'brand', 'model', 'year', 'status', 'created_at', 'expir
+      السطر 79: class OfferAdmin(admin.ModelAdmin):
+      السطر 88: class ConversationAdmin(admin.ModelAdmin):
+      السطر 96: class JunkyardRatingAdmin(admin.ModelAdmin):
+      السطر 104: class SystemSettingAdmin(admin.ModelAdmin):
+      السطر 111: class TelegramMessageAdmin(admin.ModelAdmin):
+   • 'Model' (18 مرة)
+      السطر 5: from .models import (
+      السطر 6: User, City, Brand, Model, Junkyard, Request,
+      السطر 25: class CityAdmin(admin.ModelAdmin):
+      السطر 33: class BrandAdmin(admin.ModelAdmin):
+      السطر 34: list_display = ('name', 'is_active', 'models_count')
+      السطر 39: def models_count(self, obj):
+      السطر 40: return obj.models.count()
+      السطر 41: models_count.short_description = _('عدد الموديلات')
+      السطر 44: @admin.register(Model)
+      السطر 45: class ModelAdmin(admin.ModelAdmin):
+      السطر 53: class JunkyardAdmin(admin.ModelAdmin):
+      السطر 69: class RequestAdmin(admin.ModelAdmin):
+      السطر 70: list_display = ('order_id', 'user', 'city', 'brand', 'model', 'year', 'status', 'created_at', 'expir
+      السطر 79: class OfferAdmin(admin.ModelAdmin):
+      السطر 88: class ConversationAdmin(admin.ModelAdmin):
+      السطر 96: class JunkyardRatingAdmin(admin.ModelAdmin):
+      السطر 104: class SystemSettingAdmin(admin.ModelAdmin):
+      السطر 111: class TelegramMessageAdmin(admin.ModelAdmin):
+   • 'year' (1 مرة)
+      السطر 70: list_display = ('order_id', 'user', 'city', 'brand', 'model', 'year', 'status', 'created_at', 'expir
+   • 'Year' (1 مرة)
+      السطر 70: list_display = ('order_id', 'user', 'city', 'brand', 'model', 'year', 'status', 'created_at', 'expir
+   • 'description' (4 مرة)
+      السطر 41: models_count.short_description = _('عدد الموديلات')
+      السطر 65: rating_display.short_description = _('التقييم')
+      السطر 105: list_display = ('key', 'value', 'description', 'updated_at')
+      السطر 106: search_fields = ('key', 'description')
+   • 'Description' (4 مرة)
+      السطر 41: models_count.short_description = _('عدد الموديلات')
+      السطر 65: rating_display.short_description = _('التقييم')
+      السطر 105: list_display = ('key', 'value', 'description', 'updated_at')
+      السطر 106: search_fields = ('key', 'description')
+
+📄 django_app/bot/apps.py
+   • 'model' (1 مرة)
+      السطر 5: default_auto_field = 'django.db.models.BigAutoField'
+   • 'Model' (1 مرة)
+      السطر 5: default_auto_field = 'django.db.models.BigAutoField'
+
+📄 django_app/bot/database_utils.py
+   • 'model' (1 مرة)
+      السطر 75: from bot.models import User, Request, Offer, Junkyard
+   • 'Model' (1 مرة)
+      السطر 75: from bot.models import User, Request, Offer, Junkyard
+
+📄 django_app/bot/management/commands/debug_offer_issue.py
+   • 'model' (1 مرة)
+      السطر 6: from bot.models import Junkyard, User, Request
+   • 'Model' (1 مرة)
+      السطر 6: from bot.models import Junkyard, User, Request
+
+📄 django_app/bot/management/commands/fix_user_types.py
+   • 'model' (1 مرة)
+      السطر 13: from bot.models import Junkyard, User
+   • 'Model' (1 مرة)
+      السطر 13: from bot.models import Junkyard, User
+
+📄 django_app/bot/management/commands/populate_data.py
+   • 'brand' (10 مرة)
+      السطر 4: from bot.models import City, Brand, Model, SystemSetting
+      السطر 46: # Brands
+      السطر 47: brands_data = [
+      السطر 54: for brand_name in brands_data:
+      السطر 55: brand, created = Brand.objects.get_or_create(name=brand_name)
+      السطر 57: self.stdout.write(f'Created brand: {brand.name}')
+      السطر 60: toyota = Brand.objects.get(name='تويوتا')
+      السطر 68: brand=toyota,
+      السطر 75: honda = Brand.objects.get(name='هوندا')
+      السطر 82: brand=honda,
+   • 'Brand' (10 مرة)
+      السطر 4: from bot.models import City, Brand, Model, SystemSetting
+      السطر 46: # Brands
+      السطر 47: brands_data = [
+      السطر 54: for brand_name in brands_data:
+      السطر 55: brand, created = Brand.objects.get_or_create(name=brand_name)
+      السطر 57: self.stdout.write(f'Created brand: {brand.name}')
+      السطر 60: toyota = Brand.objects.get(name='تويوتا')
+      السطر 68: brand=toyota,
+      السطر 75: honda = Brand.objects.get(name='هوندا')
+      السطر 82: brand=honda,
+   • 'model' (15 مرة)
+      السطر 3: from django.contrib.auth import get_user_model
+      السطر 4: from bot.models import City, Brand, Model, SystemSetting
+      السطر 6: User = get_user_model()
+      السطر 59: # Models for Toyota (example)
+      السطر 61: toyota_models = [
+      السطر 66: for model_name in toyota_models:
+      السطر 67: model, created = Model.objects.get_or_create(
+      السطر 69: name=model_name
+      السطر 72: self.stdout.write(f'Created model: {toyota.name} {model.name}')
+      السطر 74: # Models for Honda (example)
+      السطر 76: honda_models = [
+      السطر 80: for model_name in honda_models:
+      السطر 81: model, created = Model.objects.get_or_create(
+      السطر 83: name=model_name
+      السطر 86: self.stdout.write(f'Created model: {honda.name} {model.name}')
+   • 'Model' (15 مرة)
+      السطر 3: from django.contrib.auth import get_user_model
+      السطر 4: from bot.models import City, Brand, Model, SystemSetting
+      السطر 6: User = get_user_model()
+      السطر 59: # Models for Toyota (example)
+      السطر 61: toyota_models = [
+      السطر 66: for model_name in toyota_models:
+      السطر 67: model, created = Model.objects.get_or_create(
+      السطر 69: name=model_name
+      السطر 72: self.stdout.write(f'Created model: {toyota.name} {model.name}')
+      السطر 74: # Models for Honda (example)
+      السطر 76: honda_models = [
+      السطر 80: for model_name in honda_models:
+      السطر 81: model, created = Model.objects.get_or_create(
+      السطر 83: name=model_name
+      السطر 86: self.stdout.write(f'Created model: {honda.name} {model.name}')
+   • 'description' (1 مرة)
+      السطر 105: 'description': f'Default setting for {key}'
+   • 'Description' (1 مرة)
+      السطر 105: 'description': f'Default setting for {key}'
+
+📄 django_app/bot/management/commands/quick_fix.py
+   • 'model' (1 مرة)
+      السطر 6: from bot.models import Junkyard, User
+   • 'Model' (1 مرة)
+      السطر 6: from bot.models import Junkyard, User
+
+📄 django_app/bot/management/commands/run_bot.py
+   • 'description' (1 مرة)
+      السطر 151: self.stdout.write(self.style.ERROR(f'❌ Failed to set webhook: {result.get("description", "Unknown er
+   • 'Description' (1 مرة)
+      السطر 151: self.stdout.write(self.style.ERROR(f'❌ Failed to set webhook: {result.get("description", "Unknown er
+
+📄 django_app/bot/management/commands/setup_bot_webhook.py
+   • 'description' (2 مرة)
+      السطر 74: self.stdout.write(self.style.ERROR(f'❌ فشل حذف الـ webhook: {result.get("description")}'))
+      السطر 115: self.stdout.write(self.style.ERROR(f'❌ فشل إعداد الـ webhook: {result.get("description")}'))
+   • 'Description' (2 مرة)
+      السطر 74: self.stdout.write(self.style.ERROR(f'❌ فشل حذف الـ webhook: {result.get("description")}'))
+      السطر 115: self.stdout.write(self.style.ERROR(f'❌ فشل إعداد الـ webhook: {result.get("description")}'))
+
+📄 django_app/bot/management/commands/test_junkyard_notifications.py
+   • 'model' (1 مرة)
+      السطر 6: from bot.models import Junkyard, User, City, Request
+   • 'Model' (1 مرة)
+      السطر 6: from bot.models import Junkyard, User, City, Request
+
+📄 django_app/bot/models.py
+   • 'brand' (5 مرة)
+      السطر 40: class Brand(models.Model):
+      السطر 41: """Car brands"""
+      السطر 51: brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='models')
+      السطر 56: return f"{self.brand.name} {self.name}"
+      السطر 106: brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+   • 'Brand' (5 مرة)
+      السطر 40: class Brand(models.Model):
+      السطر 41: """Car brands"""
+      السطر 51: brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='models')
+      السطر 56: return f"{self.brand.name} {self.name}"
+      السطر 106: brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+   • 'model' (93 مرة)
+      السطر 1: from django.db import models
+      السطر 2: from django.contrib.auth.models import AbstractUser
+      السطر 9: """Extended user model for Telegram users"""
+      السطر 16: telegram_id = models.BigIntegerField(unique=True, null=True, blank=True)
+      السطر 17: telegram_username = models.CharField(max_length=100, blank=True)
+      السطر 18: user_type = models.CharField(max_length=20, choices=USER_TYPES, default='client')
+      السطر 19: phone_number = models.CharField(max_length=20, blank=True)
+      السطر 20: created_at = models.DateTimeField(auto_now_add=True)
+      السطر 21: is_active_telegram = models.BooleanField(default=True)
+      السطر 27: class City(models.Model):
+      السطر 29: name = models.CharField(max_length=100)
+      السطر 30: code = models.CharField(max_length=10, unique=True)
+      السطر 31: is_active = models.BooleanField(default=True)
+      السطر 40: class Brand(models.Model):
+      السطر 42: name = models.CharField(max_length=100)
+      السطر 43: is_active = models.BooleanField(default=True)
+      السطر 49: class Model(models.Model):
+      السطر 50: """Car models"""
+      السطر 51: brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='models')
+      السطر 52: name = models.CharField(max_length=100)
+      السطر 53: is_active = models.BooleanField(default=True)
+      السطر 59: class Junkyard(models.Model):
+      السطر 61: user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='junkyard_profile')
+      السطر 62: phone = models.CharField(max_length=20)
+      السطر 63: city = models.ForeignKey(City, on_delete=models.CASCADE)
+      السطر 64: location = models.TextField(help_text="Location description or Google Maps link")
+      السطر 65: is_active = models.BooleanField(default=True)
+      السطر 66: is_verified = models.BooleanField(default=False)
+      السطر 67: commission_percentage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+      السطر 68: payment_url = models.URLField(blank=True)
+      السطر 69: created_at = models.DateTimeField(auto_now_add=True)
+      السطر 72: total_ratings = models.PositiveIntegerField(default=0)
+      السطر 73: average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
+      السطر 80: self.average_rating = ratings.aggregate(models.Avg('rating'))['rating__avg'] or 0
+      السطر 93: class Request(models.Model):
+      السطر 103: order_id = models.CharField(max_length=20, unique=True)
+      السطر 104: user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='requests')
+      السطر 105: city = models.ForeignKey(City, on_delete=models.CASCADE)
+      السطر 106: brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+      السطر 107: model = models.ForeignKey(Model, on_delete=models.CASCADE)
+      السطر 108: year = models.PositiveIntegerField()
+      السطر 109: parts = models.TextField(help_text="Required parts description (legacy field)", blank=True)
+      السطر 110: media_files = models.JSONField(default=list, blank=True, help_text="Telegram file IDs for photos/vid
+      السطر 111: status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
+      السطر 112: created_at = models.DateTimeField(auto_now_add=True)
+      السطر 113: expires_at = models.DateTimeField()
+      السطر 181: class RequestItem(models.Model):
+      السطر 183: request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='items')
+      السطر 184: name = models.CharField(max_length=200, help_text="Name of the part/item")
+      السطر 185: description = models.TextField(blank=True, help_text="Additional description of the item")
+      السطر 186: quantity = models.PositiveIntegerField(default=1, help_text="Quantity needed")
+      السطر 187: media_files = models.JSONField(default=list, blank=True, help_text="Telegram file IDs for photos/vid
+      السطر 188: created_at = models.DateTimeField(auto_now_add=True)
+      السطر 197: class Offer(models.Model):
+      السطر 205: request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='offers')
+      السطر 206: junkyard = models.ForeignKey(Junkyard, on_delete=models.CASCADE, related_name='offers')
+      السطر 207: price = models.DecimalField(max_digits=10, decimal_places=2)
+      السطر 208: delivery_time = models.CharField(max_length=100, blank=True, help_text="Expected delivery time")
+      السطر 209: notes = models.TextField(blank=True, help_text="Additional notes from junkyard")
+      السطر 210: status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+      السطر 211: created_at = models.DateTimeField(auto_now_add=True)
+      السطر 220: class Conversation(models.Model):
+      السطر 222: client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='client_conversations')
+      السطر 223: junkyard = models.ForeignKey(User, on_delete=models.CASCADE, related_name='junkyard_conversations')
+      السطر 224: request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='conversations')
+      السطر 225: started_at = models.DateTimeField(auto_now_add=True)
+      السطر 226: ended_at = models.DateTimeField(null=True, blank=True)
+      السطر 227: is_active = models.BooleanField(default=True)
+      السطر 233: class JunkyardRating(models.Model):
+      السطر 235: junkyard = models.ForeignKey(Junkyard, on_delete=models.CASCADE, related_name='ratings')
+      السطر 236: client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='given_ratings')
+      السطر 237: request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='ratings')
+      السطر 238: rating = models.PositiveSmallIntegerField(choices=[(i, i) for i in range(1, 6)])
+      السطر 239: comment = models.TextField(blank=True)
+      السطر 240: created_at = models.DateTimeField(auto_now_add=True)
+      السطر 254: class JunkyardStaff(models.Model):
+      السطر 261: user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='junkyard_roles')
+      السطر 262: junkyard = models.ForeignKey(Junkyard, on_delete=models.CASCADE, related_name='staff_members')
+      السطر 263: role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='junkyard_staff')
+      السطر 264: is_active = models.BooleanField(default=True)
+      السطر 265: created_at = models.DateTimeField(auto_now_add=True)
+      السطر 274: class SystemSetting(models.Model):
+      السطر 276: key = models.CharField(max_length=100, unique=True)
+      السطر 277: value = models.JSONField()
+      السطر 278: description = models.TextField(blank=True)
+      السطر 279: created_at = models.DateTimeField(auto_now_add=True)
+      السطر 280: updated_at = models.DateTimeField(auto_now=True)
+      السطر 307: class TelegramMessage(models.Model):
+      السطر 309: user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+      السطر 310: telegram_message_id = models.BigIntegerField()
+      السطر 311: message_type = models.CharField(max_length=50)
+      السطر 312: content = models.JSONField()
+      السطر 313: created_at = models.DateTimeField(auto_now_add=True)
+   • 'Model' (93 مرة)
+      السطر 1: from django.db import models
+      السطر 2: from django.contrib.auth.models import AbstractUser
+      السطر 9: """Extended user model for Telegram users"""
+      السطر 16: telegram_id = models.BigIntegerField(unique=True, null=True, blank=True)
+      السطر 17: telegram_username = models.CharField(max_length=100, blank=True)
+      السطر 18: user_type = models.CharField(max_length=20, choices=USER_TYPES, default='client')
+      السطر 19: phone_number = models.CharField(max_length=20, blank=True)
+      السطر 20: created_at = models.DateTimeField(auto_now_add=True)
+      السطر 21: is_active_telegram = models.BooleanField(default=True)
+      السطر 27: class City(models.Model):
+      السطر 29: name = models.CharField(max_length=100)
+      السطر 30: code = models.CharField(max_length=10, unique=True)
+      السطر 31: is_active = models.BooleanField(default=True)
+      السطر 40: class Brand(models.Model):
+      السطر 42: name = models.CharField(max_length=100)
+      السطر 43: is_active = models.BooleanField(default=True)
+      السطر 49: class Model(models.Model):
+      السطر 50: """Car models"""
+      السطر 51: brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='models')
+      السطر 52: name = models.CharField(max_length=100)
+      السطر 53: is_active = models.BooleanField(default=True)
+      السطر 59: class Junkyard(models.Model):
+      السطر 61: user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='junkyard_profile')
+      السطر 62: phone = models.CharField(max_length=20)
+      السطر 63: city = models.ForeignKey(City, on_delete=models.CASCADE)
+      السطر 64: location = models.TextField(help_text="Location description or Google Maps link")
+      السطر 65: is_active = models.BooleanField(default=True)
+      السطر 66: is_verified = models.BooleanField(default=False)
+      السطر 67: commission_percentage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+      السطر 68: payment_url = models.URLField(blank=True)
+      السطر 69: created_at = models.DateTimeField(auto_now_add=True)
+      السطر 72: total_ratings = models.PositiveIntegerField(default=0)
+      السطر 73: average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
+      السطر 80: self.average_rating = ratings.aggregate(models.Avg('rating'))['rating__avg'] or 0
+      السطر 93: class Request(models.Model):
+      السطر 103: order_id = models.CharField(max_length=20, unique=True)
+      السطر 104: user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='requests')
+      السطر 105: city = models.ForeignKey(City, on_delete=models.CASCADE)
+      السطر 106: brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+      السطر 107: model = models.ForeignKey(Model, on_delete=models.CASCADE)
+      السطر 108: year = models.PositiveIntegerField()
+      السطر 109: parts = models.TextField(help_text="Required parts description (legacy field)", blank=True)
+      السطر 110: media_files = models.JSONField(default=list, blank=True, help_text="Telegram file IDs for photos/vid
+      السطر 111: status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
+      السطر 112: created_at = models.DateTimeField(auto_now_add=True)
+      السطر 113: expires_at = models.DateTimeField()
+      السطر 181: class RequestItem(models.Model):
+      السطر 183: request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='items')
+      السطر 184: name = models.CharField(max_length=200, help_text="Name of the part/item")
+      السطر 185: description = models.TextField(blank=True, help_text="Additional description of the item")
+      السطر 186: quantity = models.PositiveIntegerField(default=1, help_text="Quantity needed")
+      السطر 187: media_files = models.JSONField(default=list, blank=True, help_text="Telegram file IDs for photos/vid
+      السطر 188: created_at = models.DateTimeField(auto_now_add=True)
+      السطر 197: class Offer(models.Model):
+      السطر 205: request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='offers')
+      السطر 206: junkyard = models.ForeignKey(Junkyard, on_delete=models.CASCADE, related_name='offers')
+      السطر 207: price = models.DecimalField(max_digits=10, decimal_places=2)
+      السطر 208: delivery_time = models.CharField(max_length=100, blank=True, help_text="Expected delivery time")
+      السطر 209: notes = models.TextField(blank=True, help_text="Additional notes from junkyard")
+      السطر 210: status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+      السطر 211: created_at = models.DateTimeField(auto_now_add=True)
+      السطر 220: class Conversation(models.Model):
+      السطر 222: client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='client_conversations')
+      السطر 223: junkyard = models.ForeignKey(User, on_delete=models.CASCADE, related_name='junkyard_conversations')
+      السطر 224: request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='conversations')
+      السطر 225: started_at = models.DateTimeField(auto_now_add=True)
+      السطر 226: ended_at = models.DateTimeField(null=True, blank=True)
+      السطر 227: is_active = models.BooleanField(default=True)
+      السطر 233: class JunkyardRating(models.Model):
+      السطر 235: junkyard = models.ForeignKey(Junkyard, on_delete=models.CASCADE, related_name='ratings')
+      السطر 236: client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='given_ratings')
+      السطر 237: request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='ratings')
+      السطر 238: rating = models.PositiveSmallIntegerField(choices=[(i, i) for i in range(1, 6)])
+      السطر 239: comment = models.TextField(blank=True)
+      السطر 240: created_at = models.DateTimeField(auto_now_add=True)
+      السطر 254: class JunkyardStaff(models.Model):
+      السطر 261: user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='junkyard_roles')
+      السطر 262: junkyard = models.ForeignKey(Junkyard, on_delete=models.CASCADE, related_name='staff_members')
+      السطر 263: role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='junkyard_staff')
+      السطر 264: is_active = models.BooleanField(default=True)
+      السطر 265: created_at = models.DateTimeField(auto_now_add=True)
+      السطر 274: class SystemSetting(models.Model):
+      السطر 276: key = models.CharField(max_length=100, unique=True)
+      السطر 277: value = models.JSONField()
+      السطر 278: description = models.TextField(blank=True)
+      السطر 279: created_at = models.DateTimeField(auto_now_add=True)
+      السطر 280: updated_at = models.DateTimeField(auto_now=True)
+      السطر 307: class TelegramMessage(models.Model):
+      السطر 309: user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+      السطر 310: telegram_message_id = models.BigIntegerField()
+      السطر 311: message_type = models.CharField(max_length=50)
+      السطر 312: content = models.JSONField()
+      السطر 313: created_at = models.DateTimeField(auto_now_add=True)
+   • 'year' (1 مرة)
+      السطر 108: year = models.PositiveIntegerField()
+   • 'Year' (1 مرة)
+      السطر 108: year = models.PositiveIntegerField()
+   • 'description' (13 مرة)
+      السطر 64: location = models.TextField(help_text="Location description or Google Maps link")
+      السطر 109: parts = models.TextField(help_text="Required parts description (legacy field)", blank=True)
+      السطر 157: def all_parts_description(self):
+      السطر 158: """Get all parts as a combined description"""
+      السطر 163: parts_list.append(f"• {item.name}" + (f" - {item.description}" if item.description else ""))
+      السطر 167: def add_item(self, name, description="", quantity=1):
+      السطر 172: description=description,
+      السطر 177: parts_preview = self.all_parts_description[:50] if self.all_parts_description else "No items"
+      السطر 185: description = models.TextField(blank=True, help_text="Additional description of the item")
+      السطر 278: description = models.TextField(blank=True)
+      السطر 294: def set_setting(cls, key, value, description=""):
+      السطر 298: defaults={'value': value, 'description': description}
+      السطر 302: setting.description = description
+   • 'Description' (13 مرة)
+      السطر 64: location = models.TextField(help_text="Location description or Google Maps link")
+      السطر 109: parts = models.TextField(help_text="Required parts description (legacy field)", blank=True)
+      السطر 157: def all_parts_description(self):
+      السطر 158: """Get all parts as a combined description"""
+      السطر 163: parts_list.append(f"• {item.name}" + (f" - {item.description}" if item.description else ""))
+      السطر 167: def add_item(self, name, description="", quantity=1):
+      السطر 172: description=description,
+      السطر 177: parts_preview = self.all_parts_description[:50] if self.all_parts_description else "No items"
+      السطر 185: description = models.TextField(blank=True, help_text="Additional description of the item")
+      السطر 278: description = models.TextField(blank=True)
+      السطر 294: def set_setting(cls, key, value, description=""):
+      السطر 298: defaults={'value': value, 'description': description}
+      السطر 302: setting.description = description
+   • 'quantity' (4 مرة)
+      السطر 167: def add_item(self, name, description="", quantity=1):
+      السطر 173: quantity=quantity
+      السطر 186: quantity = models.PositiveIntegerField(default=1, help_text="Quantity needed")
+      السطر 194: return f"{self.request.order_id} - {self.name}" + (f" (x{self.quantity})" if self.quantity > 1 else 
+   • 'Quantity' (4 مرة)
+      السطر 167: def add_item(self, name, description="", quantity=1):
+      السطر 173: quantity=quantity
+      السطر 186: quantity = models.PositiveIntegerField(default=1, help_text="Quantity needed")
+      السطر 194: return f"{self.request.order_id} - {self.name}" + (f" (x{self.quantity})" if self.quantity > 1 else 
+   • 'delivery_time' (1 مرة)
+      السطر 208: delivery_time = models.CharField(max_length=100, blank=True, help_text="Expected delivery time")
+   • 'delivery time' (1 مرة)
+      السطر 208: delivery_time = models.CharField(max_length=100, blank=True, help_text="Expected delivery time")
+   • 'Delivery Time' (1 مرة)
+      السطر 208: delivery_time = models.CharField(max_length=100, blank=True, help_text="Expected delivery time")
+
+📄 django_app/bot/services.py
+   • 'مدة التوريد' (2 مرة)
+      السطر 233: 💡 يرجى إرسال عرضك مع السعر ومدة التوريد المتوقعة.
+      السطر 247: delivery_info = f"⏰ مدة التوريد: {offer.delivery_time}" if hasattr(offer, 'delivery_time') and offer
+   • 'brand' (2 مرة)
+      السطر 225: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+      السطر 329: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+   • 'Brand' (2 مرة)
+      السطر 225: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+      السطر 329: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+   • 'model' (5 مرة)
+      السطر 10: from django.contrib.auth import get_user_model
+      السطر 14: from .models import Request, Junkyard, Offer, JunkyardStaff
+      السطر 17: User = get_user_model()
+      السطر 225: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+      السطر 329: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+   • 'Model' (5 مرة)
+      السطر 10: from django.contrib.auth import get_user_model
+      السطر 14: from .models import Request, Junkyard, Offer, JunkyardStaff
+      السطر 17: User = get_user_model()
+      السطر 225: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+      السطر 329: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+   • 'year' (2 مرة)
+      السطر 225: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+      السطر 329: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+   • 'Year' (2 مرة)
+      السطر 225: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+      السطر 329: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+   • 'description' (9 مرة)
+      السطر 217: # Get parts description safely in async context
+      السطر 218: parts_description = await self._get_request_parts_description(request)
+      السطر 229: {parts_description}
+      السطر 321: # Get parts description safely in async context
+      السطر 322: parts_description = await self._get_request_parts_description(request)
+      السطر 332: {parts_description}
+      السطر 398: async def _get_request_parts_description(self, request: Request) -> str:
+      السطر 399: """Get parts description safely in async context"""
+      السطر 409: parts_list.append(f"• {item.name}" + (f" - {item.description}" if item.description else ""))
+   • 'Description' (9 مرة)
+      السطر 217: # Get parts description safely in async context
+      السطر 218: parts_description = await self._get_request_parts_description(request)
+      السطر 229: {parts_description}
+      السطر 321: # Get parts description safely in async context
+      السطر 322: parts_description = await self._get_request_parts_description(request)
+      السطر 332: {parts_description}
+      السطر 398: async def _get_request_parts_description(self, request: Request) -> str:
+      السطر 399: """Get parts description safely in async context"""
+      السطر 409: parts_list.append(f"• {item.name}" + (f" - {item.description}" if item.description else ""))
+   • 'delivery_time' (1 مرة)
+      السطر 247: delivery_info = f"⏰ مدة التوريد: {offer.delivery_time}" if hasattr(offer, 'delivery_time') and offer
+
+📄 django_app/bot/telegram_bot.py
+   • 'الموثوقة' (1 مرة)
+      السطر 178: أهلاً بك في **تشاليح** - منصتك الموثوقة للعثور على قطع غيار السيارات 🚗
+   • 'موثوقة' (1 مرة)
+      السطر 178: أهلاً بك في **تشاليح** - منصتك الموثوقة للعثور على قطع غيار السيارات 🚗
+   • 'ماركة' (11 مرة)
+      السطر 474: message = f"🚗 اختر ماركة السيارة (أشهر {len(display_brands)} ماركات):"
+      السطر 488: keyboard.append([InlineKeyboardButton(f"📄 عرض المزيد ({remaining} ماركة)", callback_data="show_more_
+      السطر 503: message = f"🚗 جميع الماركات المتاحة ({len(brands)} ماركة):\n\n"
+      السطر 582: "select_brand": "اختيار الماركة",
+      السطر 750: 🚗 اختر ماركة السيارة (أشهر {len(display_brands)} ماركات):
+      السطر 765: keyboard.append([InlineKeyboardButton(f"📄 عرض المزيد ({remaining} ماركة)", callback_data="show_more_
+      السطر 806: ⚠️ لا توجد موديلات محددة لهذه الماركة
+      السطر 823: InlineKeyboardButton("🔙 اختيار ماركة أخرى", callback_data="select_brand_again"),
+      السطر 1411: ❌ خطأ في بيانات الماركة
+      السطر 1413: الماركة المحددة غير موجودة في النظام.
+      السطر 1414: يرجى بدء طلب جديد واختيار ماركة صحيحة.
+   • 'الماركة' (4 مرة)
+      السطر 582: "select_brand": "اختيار الماركة",
+      السطر 806: ⚠️ لا توجد موديلات محددة لهذه الماركة
+      السطر 1411: ❌ خطأ في بيانات الماركة
+      السطر 1413: الماركة المحددة غير موجودة في النظام.
+   • 'موديل' (10 مرة)
+      السطر 583: "select_model": "اختيار الموديل",
+      السطر 797: # إذا لم تكن هناك موديلات محددة، انتقل مباشرة لاختيار نطاق السنوات
+      السطر 799: current_draft["request_data"]["model_id"] = None  # لا يوجد موديل محدد
+      السطر 806: ⚠️ لا توجد موديلات محددة لهذه الماركة
+      السطر 836: 🚙 اختر موديل السيارة:
+      السطر 1053: يمكنك إدخال تفاصيل أكثر عن حالة القطعة، لونها، موديلها، إلخ.
+      السطر 1138: يمكنك إدخال تفاصيل أكثر عن حالة القطعة، لونها، موديلها، إلخ.
+      السطر 1418: ❌ خطأ في بيانات الموديل
+      السطر 1420: الموديل المحدد غير موجود في النظام.
+      السطر 1421: يرجى بدء طلب جديد واختيار موديل صحيح.
+   • 'الموديل' (3 مرة)
+      السطر 583: "select_model": "اختيار الموديل",
+      السطر 1418: ❌ خطأ في بيانات الموديل
+      السطر 1420: الموديل المحدد غير موجود في النظام.
+   • 'سنة الصنع' (1 مرة)
+      السطر 808: 📅 اختر نطاق سنة الصنع:
+   • 'سنوات الصنع' (1 مرة)
+      السطر 885: 📅 اختر نطاق سنوات الصنع:
+   • 'الوصف' (5 مرة)
+      السطر 1059: [InlineKeyboardButton("⏭️ تخطي الوصف", callback_data=f"skip_description_{current_draft_id}")],
+      السطر 1144: [InlineKeyboardButton("⏭️ تخطي الوصف", callback_data=f"skip_description_{current_draft_id}")],
+      السطر 1168: ✅ الوصف: {description}
+      السطر 2426: 💭 الوصف: {item.get('description', 'لا يوجد')}
+      السطر 2434: [InlineKeyboardButton("💭 تعديل الوصف", callback_data=f"edit_desc_{draft_id}_{item_index}")],
+   • 'الكمية' (5 مرة)
+      السطر 1170: 🔢 أدخل الكمية المطلوبة (رقم):
+      السطر 1195: await update.message.reply_text("❌ يجب أن تكون الكمية رقم موجب. حاول مرة أخرى:")
+      السطر 2304: 🔢 أدخل الكمية المطلوبة (رقم):
+      السطر 2427: 🔢 الكمية: {item.get('quantity', 1)}
+      السطر 2435: [InlineKeyboardButton("🔢 تعديل الكمية", callback_data=f"edit_qty_{draft_id}_{item_index}")],
+   • 'مدة التوريد' (7 مرة)
+      السطر 1711: ❌ هذا العرض غير مكتمل (يفتقر للسعر أو مدة التوريد).
+      السطر 1733: ⏰ مدة التوريد: {offer.delivery_time}
+      السطر 1941: أرسل مدة التوريد المتوقعة:
+      السطر 1983: ⏰ مدة التوريد: {delivery_time}
+      السطر 2009: ⏰ مدة التوريد: {offer.delivery_time}
+      السطر 2031: ⏰ مدة التوريد: {offer.delivery_time}
+      السطر 2073: ⏰ مدة التوريد: {offer.delivery_time}
+   • 'brand' (90 مرة)
+      السطر 11: from .models import User, City, Brand, Model, Request, Junkyard, Offer, Conversation, JunkyardRating
+      السطر 281: elif data.startswith("brand_"):
+      السطر 282: await self.handle_brand_selection(query, user, data)
+      السطر 301: elif data == "select_brand_again":
+      السطر 302: await self.show_brand_selection(query, user)
+      السطر 303: elif data == "show_more_brands":
+      السطر 304: await self.show_all_brands(query, user)
+      السطر 340: request = await sync_to_async(Request.objects.select_related('brand', 'model', 'city').get)(id=reque
+      السطر 362: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+      السطر 414: request = await sync_to_async(Request.objects.select_related('brand', 'model', 'city').get)(id=reque
+      السطر 444: async def show_brand_selection(self, query, user):
+      السطر 445: """Show brand selection again"""
+      السطر 446: # Reset user state to brand selection
+      السطر 448: self.user_states[user.telegram_id]["step"] = "select_brand"
+      السطر 450: brands = await sync_to_async(list)(Brand.objects.filter(is_active=True).order_by('name'))
+      السطر 453: logger.info(f"Found {len(brands)} active brands for brand selection")
+      السطر 456: popular_brands = ['تويوتا', 'هوندا', 'نيسان', 'هيونداي', 'كيا', 'مازدا', 'فورد', 'شيفروليه']
+      السطر 457: sorted_brands = []
+      السطر 460: for popular in popular_brands:
+      السطر 461: for brand in brands:
+      السطر 462: if brand.name == popular:
+      السطر 463: sorted_brands.append(brand)
+      السطر 467: for brand in brands:
+      السطر 468: if brand not in sorted_brands:
+      السطر 469: sorted_brands.append(brand)
+      السطر 472: display_brands = sorted_brands[:10]
+      السطر 474: message = f"🚗 اختر ماركة السيارة (أشهر {len(display_brands)} ماركات):"
+      السطر 478: for i in range(0, len(display_brands), 2):
+      السطر 480: row.append(InlineKeyboardButton(display_brands[i].name, callback_data=f"brand_{display_brands[i].id}
+      السطر 481: if i + 1 < len(display_brands):
+      السطر 482: row.append(InlineKeyboardButton(display_brands[i + 1].name, callback_data=f"brand_{display_brands[i 
+      السطر 486: if len(brands) > 10:
+      السطر 487: remaining = len(brands) - 10
+      السطر 488: keyboard.append([InlineKeyboardButton(f"📄 عرض المزيد ({remaining} ماركة)", callback_data="show_more_
+      السطر 496: async def show_all_brands(self, query, user):
+      السطر 497: """Show all brands with pagination"""
+      السطر 498: brands = await sync_to_async(list)(Brand.objects.filter(is_active=True).order_by('name'))
+      السطر 501: logger.info(f"Showing all {len(brands)} active brands")
+      السطر 503: message = f"🚗 جميع الماركات المتاحة ({len(brands)} ماركة):\n\n"
+      السطر 507: for i in range(0, len(brands), 2):
+      السطر 509: row.append(InlineKeyboardButton(brands[i].name, callback_data=f"brand_{brands[i].id}"))
+      السطر 510: if i + 1 < len(brands):
+      السطر 511: row.append(InlineKeyboardButton(brands[i + 1].name, callback_data=f"brand_{brands[i + 1].id}"))
+      السطر 516: InlineKeyboardButton("🔙 الماركات الشائعة", callback_data="select_brand_again"),
+      السطر 559: .select_related('brand', 'model', 'city')
+      السطر 582: "select_brand": "اختيار الماركة",
+      السطر 610: button_text = f"{status_emoji} {req.order_id} - {req.brand.name} {req.model.name}"
+      السطر 719: current_draft["step"] = "select_brand"
+      السطر 721: brands = await sync_to_async(list)(Brand.objects.filter(is_active=True).order_by('name'))
+      السطر 724: logger.info(f"Found {len(brands)} active brands")
+      السطر 727: popular_brands = ['تويوتا', 'هوندا', 'نيسان', 'هيونداي', 'كيا', 'مازدا', 'فورد', 'شيفروليه']
+      السطر 728: sorted_brands = []
+      السطر 731: for popular in popular_brands:
+      السطر 732: for brand in brands:
+      السطر 733: if brand.name == popular:
+      السطر 734: sorted_brands.append(brand)
+      السطر 738: for brand in brands:
+      السطر 739: if brand not in sorted_brands:
+      السطر 740: sorted_brands.append(brand)
+      السطر 743: display_brands = sorted_brands[:10]
+      السطر 750: 🚗 اختر ماركة السيارة (أشهر {len(display_brands)} ماركات):
+      السطر 755: for i in range(0, len(display_brands), 2):
+      السطر 757: row.append(InlineKeyboardButton(display_brands[i].name, callback_data=f"brand_{display_brands[i].id}
+      السطر 758: if i + 1 < len(display_brands):
+      السطر 759: row.append(InlineKeyboardButton(display_brands[i + 1].name, callback_data=f"brand_{display_brands[i 
+      السطر 763: if len(brands) > 10:
+      السطر 764: remaining = len(brands) - 10
+      السطر 765: keyboard.append([InlineKeyboardButton(f"📄 عرض المزيد ({remaining} ماركة)", callback_data="show_more_
+      السطر 776: async def handle_brand_selection(self, query, user, data):
+      السطر 777: """Handle brand selection"""
+      السطر 778: brand_id = int(data.split("_")[1])
+      السطر 779: brand = await sync_to_async(Brand.objects.get)(id=brand_id)
+      السطر 790: current_draft["request_data"]["brand_id"] = brand_id
+      السطر 793: models = await sync_to_async(list)(brand.models.filter(is_active=True))
+      السطر 795: # Check if brand has models
+      السطر 798: current_draft["request_data"]["brand_id"] = brand_id
+      السطر 805: ✅ تم اختيار: {brand.name}
+      السطر 823: InlineKeyboardButton("🔙 اختيار ماركة أخرى", callback_data="select_brand_again"),
+      السطر 834: ✅ تم اختيار: {brand.name}
+      السطر 940: InlineKeyboardButton("🔙 اختيار نطاق آخر", callback_data="select_brand_again"),
+      السطر 1287: required_fields = ["city_id", "brand_id", "model_id", "year"]
+      السطر 1302: brand = await sync_to_async(Brand.objects.get)(id=request_data["brand_id"])
+      السطر 1309: brand=brand,
+      السطر 1346: 🚗 السيارة: {brand.name} {model.name} {request_data["year"]}
+      السطر 1409: elif "brand" in error_msg and "does not exist" in error_msg:
+      السطر 1468: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+      السطر 1604: elif step == "select_brand":
+      السطر 1605: await self.show_brand_selection(query, user)
+      السطر 1792: Request.objects.select_related('brand', 'model', 'city', 'user').get
+      السطر 1855: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+   • 'Brand' (90 مرة)
+      السطر 11: from .models import User, City, Brand, Model, Request, Junkyard, Offer, Conversation, JunkyardRating
+      السطر 281: elif data.startswith("brand_"):
+      السطر 282: await self.handle_brand_selection(query, user, data)
+      السطر 301: elif data == "select_brand_again":
+      السطر 302: await self.show_brand_selection(query, user)
+      السطر 303: elif data == "show_more_brands":
+      السطر 304: await self.show_all_brands(query, user)
+      السطر 340: request = await sync_to_async(Request.objects.select_related('brand', 'model', 'city').get)(id=reque
+      السطر 362: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+      السطر 414: request = await sync_to_async(Request.objects.select_related('brand', 'model', 'city').get)(id=reque
+      السطر 444: async def show_brand_selection(self, query, user):
+      السطر 445: """Show brand selection again"""
+      السطر 446: # Reset user state to brand selection
+      السطر 448: self.user_states[user.telegram_id]["step"] = "select_brand"
+      السطر 450: brands = await sync_to_async(list)(Brand.objects.filter(is_active=True).order_by('name'))
+      السطر 453: logger.info(f"Found {len(brands)} active brands for brand selection")
+      السطر 456: popular_brands = ['تويوتا', 'هوندا', 'نيسان', 'هيونداي', 'كيا', 'مازدا', 'فورد', 'شيفروليه']
+      السطر 457: sorted_brands = []
+      السطر 460: for popular in popular_brands:
+      السطر 461: for brand in brands:
+      السطر 462: if brand.name == popular:
+      السطر 463: sorted_brands.append(brand)
+      السطر 467: for brand in brands:
+      السطر 468: if brand not in sorted_brands:
+      السطر 469: sorted_brands.append(brand)
+      السطر 472: display_brands = sorted_brands[:10]
+      السطر 474: message = f"🚗 اختر ماركة السيارة (أشهر {len(display_brands)} ماركات):"
+      السطر 478: for i in range(0, len(display_brands), 2):
+      السطر 480: row.append(InlineKeyboardButton(display_brands[i].name, callback_data=f"brand_{display_brands[i].id}
+      السطر 481: if i + 1 < len(display_brands):
+      السطر 482: row.append(InlineKeyboardButton(display_brands[i + 1].name, callback_data=f"brand_{display_brands[i 
+      السطر 486: if len(brands) > 10:
+      السطر 487: remaining = len(brands) - 10
+      السطر 488: keyboard.append([InlineKeyboardButton(f"📄 عرض المزيد ({remaining} ماركة)", callback_data="show_more_
+      السطر 496: async def show_all_brands(self, query, user):
+      السطر 497: """Show all brands with pagination"""
+      السطر 498: brands = await sync_to_async(list)(Brand.objects.filter(is_active=True).order_by('name'))
+      السطر 501: logger.info(f"Showing all {len(brands)} active brands")
+      السطر 503: message = f"🚗 جميع الماركات المتاحة ({len(brands)} ماركة):\n\n"
+      السطر 507: for i in range(0, len(brands), 2):
+      السطر 509: row.append(InlineKeyboardButton(brands[i].name, callback_data=f"brand_{brands[i].id}"))
+      السطر 510: if i + 1 < len(brands):
+      السطر 511: row.append(InlineKeyboardButton(brands[i + 1].name, callback_data=f"brand_{brands[i + 1].id}"))
+      السطر 516: InlineKeyboardButton("🔙 الماركات الشائعة", callback_data="select_brand_again"),
+      السطر 559: .select_related('brand', 'model', 'city')
+      السطر 582: "select_brand": "اختيار الماركة",
+      السطر 610: button_text = f"{status_emoji} {req.order_id} - {req.brand.name} {req.model.name}"
+      السطر 719: current_draft["step"] = "select_brand"
+      السطر 721: brands = await sync_to_async(list)(Brand.objects.filter(is_active=True).order_by('name'))
+      السطر 724: logger.info(f"Found {len(brands)} active brands")
+      السطر 727: popular_brands = ['تويوتا', 'هوندا', 'نيسان', 'هيونداي', 'كيا', 'مازدا', 'فورد', 'شيفروليه']
+      السطر 728: sorted_brands = []
+      السطر 731: for popular in popular_brands:
+      السطر 732: for brand in brands:
+      السطر 733: if brand.name == popular:
+      السطر 734: sorted_brands.append(brand)
+      السطر 738: for brand in brands:
+      السطر 739: if brand not in sorted_brands:
+      السطر 740: sorted_brands.append(brand)
+      السطر 743: display_brands = sorted_brands[:10]
+      السطر 750: 🚗 اختر ماركة السيارة (أشهر {len(display_brands)} ماركات):
+      السطر 755: for i in range(0, len(display_brands), 2):
+      السطر 757: row.append(InlineKeyboardButton(display_brands[i].name, callback_data=f"brand_{display_brands[i].id}
+      السطر 758: if i + 1 < len(display_brands):
+      السطر 759: row.append(InlineKeyboardButton(display_brands[i + 1].name, callback_data=f"brand_{display_brands[i 
+      السطر 763: if len(brands) > 10:
+      السطر 764: remaining = len(brands) - 10
+      السطر 765: keyboard.append([InlineKeyboardButton(f"📄 عرض المزيد ({remaining} ماركة)", callback_data="show_more_
+      السطر 776: async def handle_brand_selection(self, query, user, data):
+      السطر 777: """Handle brand selection"""
+      السطر 778: brand_id = int(data.split("_")[1])
+      السطر 779: brand = await sync_to_async(Brand.objects.get)(id=brand_id)
+      السطر 790: current_draft["request_data"]["brand_id"] = brand_id
+      السطر 793: models = await sync_to_async(list)(brand.models.filter(is_active=True))
+      السطر 795: # Check if brand has models
+      السطر 798: current_draft["request_data"]["brand_id"] = brand_id
+      السطر 805: ✅ تم اختيار: {brand.name}
+      السطر 823: InlineKeyboardButton("🔙 اختيار ماركة أخرى", callback_data="select_brand_again"),
+      السطر 834: ✅ تم اختيار: {brand.name}
+      السطر 940: InlineKeyboardButton("🔙 اختيار نطاق آخر", callback_data="select_brand_again"),
+      السطر 1287: required_fields = ["city_id", "brand_id", "model_id", "year"]
+      السطر 1302: brand = await sync_to_async(Brand.objects.get)(id=request_data["brand_id"])
+      السطر 1309: brand=brand,
+      السطر 1346: 🚗 السيارة: {brand.name} {model.name} {request_data["year"]}
+      السطر 1409: elif "brand" in error_msg and "does not exist" in error_msg:
+      السطر 1468: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+      السطر 1604: elif step == "select_brand":
+      السطر 1605: await self.show_brand_selection(query, user)
+      السطر 1792: Request.objects.select_related('brand', 'model', 'city', 'user').get
+      السطر 1855: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+   • 'model' (32 مرة)
+      السطر 11: from .models import User, City, Brand, Model, Request, Junkyard, Offer, Conversation, JunkyardRating
+      السطر 283: elif data.startswith("model_"):
+      السطر 284: await self.handle_model_selection(query, user, data)
+      السطر 340: request = await sync_to_async(Request.objects.select_related('brand', 'model', 'city').get)(id=reque
+      السطر 362: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+      السطر 414: request = await sync_to_async(Request.objects.select_related('brand', 'model', 'city').get)(id=reque
+      السطر 559: .select_related('brand', 'model', 'city')
+      السطر 583: "select_model": "اختيار الموديل",
+      السطر 610: button_text = f"{status_emoji} {req.order_id} - {req.brand.name} {req.model.name}"
+      السطر 791: current_draft["step"] = "select_model"
+      السطر 793: models = await sync_to_async(list)(brand.models.filter(is_active=True))
+      السطر 795: # Check if brand has models
+      السطر 796: if not models:
+      السطر 799: current_draft["request_data"]["model_id"] = None  # لا يوجد موديل محدد
+      السطر 840: for model in models:
+      السطر 841: keyboard.append([InlineKeyboardButton(model.name, callback_data=f"model_{model.id}")])
+      السطر 852: async def handle_model_selection(self, query, user, data):
+      السطر 853: """Handle model selection"""
+      السطر 854: model_id = int(data.split("_")[1])
+      السطر 855: model = await sync_to_async(Model.objects.get)(id=model_id)
+      السطر 866: current_draft["request_data"]["model_id"] = model_id
+      السطر 883: ✅ تم اختيار: {model.name}
+      السطر 1287: required_fields = ["city_id", "brand_id", "model_id", "year"]
+      السطر 1303: model = await sync_to_async(Model.objects.get)(id=request_data["model_id"])
+      السطر 1310: model=model,
+      السطر 1317: from .models import RequestItem
+      السطر 1346: 🚗 السيارة: {brand.name} {model.name} {request_data["year"]}
+      السطر 1416: elif "model" in error_msg and "does not exist" in error_msg:
+      السطر 1443: from bot.models import JunkyardStaff
+      السطر 1468: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+      السطر 1792: Request.objects.select_related('brand', 'model', 'city', 'user').get
+      السطر 1855: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+   • 'Model' (32 مرة)
+      السطر 11: from .models import User, City, Brand, Model, Request, Junkyard, Offer, Conversation, JunkyardRating
+      السطر 283: elif data.startswith("model_"):
+      السطر 284: await self.handle_model_selection(query, user, data)
+      السطر 340: request = await sync_to_async(Request.objects.select_related('brand', 'model', 'city').get)(id=reque
+      السطر 362: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+      السطر 414: request = await sync_to_async(Request.objects.select_related('brand', 'model', 'city').get)(id=reque
+      السطر 559: .select_related('brand', 'model', 'city')
+      السطر 583: "select_model": "اختيار الموديل",
+      السطر 610: button_text = f"{status_emoji} {req.order_id} - {req.brand.name} {req.model.name}"
+      السطر 791: current_draft["step"] = "select_model"
+      السطر 793: models = await sync_to_async(list)(brand.models.filter(is_active=True))
+      السطر 795: # Check if brand has models
+      السطر 796: if not models:
+      السطر 799: current_draft["request_data"]["model_id"] = None  # لا يوجد موديل محدد
+      السطر 840: for model in models:
+      السطر 841: keyboard.append([InlineKeyboardButton(model.name, callback_data=f"model_{model.id}")])
+      السطر 852: async def handle_model_selection(self, query, user, data):
+      السطر 853: """Handle model selection"""
+      السطر 854: model_id = int(data.split("_")[1])
+      السطر 855: model = await sync_to_async(Model.objects.get)(id=model_id)
+      السطر 866: current_draft["request_data"]["model_id"] = model_id
+      السطر 883: ✅ تم اختيار: {model.name}
+      السطر 1287: required_fields = ["city_id", "brand_id", "model_id", "year"]
+      السطر 1303: model = await sync_to_async(Model.objects.get)(id=request_data["model_id"])
+      السطر 1310: model=model,
+      السطر 1317: from .models import RequestItem
+      السطر 1346: 🚗 السيارة: {brand.name} {model.name} {request_data["year"]}
+      السطر 1416: elif "model" in error_msg and "does not exist" in error_msg:
+      السطر 1443: from bot.models import JunkyardStaff
+      السطر 1468: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+      السطر 1792: Request.objects.select_related('brand', 'model', 'city', 'user').get
+      السطر 1855: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+   • 'year' (49 مرة)
+      السطر 285: elif data.startswith("year_range_"):
+      السطر 286: await self.handle_year_range_selection(query, user, data)
+      السطر 287: elif data.startswith("year_"):
+      السطر 288: await self.handle_year_selection(query, user, data)
+      السطر 362: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+      السطر 584: "select_year_range": "اختيار العقد",
+      السطر 585: "select_year": "اختيار السنة",
+      السطر 800: current_draft["step"] = "select_year_range"
+      السطر 812: [InlineKeyboardButton("2020 - 2024", callback_data="year_range_2020_2024")],
+      السطر 813: [InlineKeyboardButton("2015 - 2019", callback_data="year_range_2015_2019")],
+      السطر 814: [InlineKeyboardButton("2010 - 2014", callback_data="year_range_2010_2014")],
+      السطر 815: [InlineKeyboardButton("2005 - 2009", callback_data="year_range_2005_2009")],
+      السطر 816: [InlineKeyboardButton("2000 - 2004", callback_data="year_range_2000_2004")],
+      السطر 817: [InlineKeyboardButton("1995 - 1999", callback_data="year_range_1995_1999")],
+      السطر 818: [InlineKeyboardButton("أقدم من 1995", callback_data="year_range_older")]
+      السطر 867: current_draft["step"] = "select_year_range"
+      السطر 869: # Generate year range options (decades)
+      السطر 870: current_year = timezone.now().year
+      السطر 871: year_ranges = []
+      السطر 874: for start_year in range(current_year - (current_year % 10), current_year - 40, -10):
+      السطر 875: end_year = start_year + 9
+      السطر 876: if end_year > current_year:
+      السطر 877: end_year = current_year
+      السطر 878: year_ranges.append((start_year, end_year))
+      السطر 889: for start_year, end_year in year_ranges:
+      السطر 890: range_text = f"{start_year} - {end_year}"
+      السطر 891: keyboard.append([InlineKeyboardButton(range_text, callback_data=f"year_range_{start_year}_{end_year}
+      السطر 902: async def handle_year_range_selection(self, query, user, data):
+      السطر 903: """Handle year range selection"""
+      السطر 905: start_year = int(parts[2])
+      السطر 906: end_year = int(parts[3])
+      السطر 917: current_draft["step"] = "select_year"
+      السطر 919: # Generate specific years in the range
+      السطر 920: years = list(range(end_year, start_year - 1, -1))
+      السطر 925: ✅ تم اختيار نطاق: {start_year} - {end_year}
+      السطر 931: # Show years in rows of 5
+      السطر 932: for i in range(0, len(years), 5):
+      السطر 934: for year in years[i:i+5]:
+      السطر 935: row.append(InlineKeyboardButton(str(year), callback_data=f"year_{year}"))
+      السطر 947: async def handle_year_selection(self, query, user, data):
+      السطر 948: """Handle year selection"""
+      السطر 949: year = int(data.split("_")[1])
+      السطر 960: current_draft["request_data"]["year"] = year
+      السطر 966: ✅ تم اختيار: {year}
+      السطر 1287: required_fields = ["city_id", "brand_id", "model_id", "year"]
+      السطر 1311: year=request_data["year"],
+      السطر 1346: 🚗 السيارة: {brand.name} {model.name} {request_data["year"]}
+      السطر 1468: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+      السطر 1855: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+   • 'Year' (49 مرة)
+      السطر 285: elif data.startswith("year_range_"):
+      السطر 286: await self.handle_year_range_selection(query, user, data)
+      السطر 287: elif data.startswith("year_"):
+      السطر 288: await self.handle_year_selection(query, user, data)
+      السطر 362: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+      السطر 584: "select_year_range": "اختيار العقد",
+      السطر 585: "select_year": "اختيار السنة",
+      السطر 800: current_draft["step"] = "select_year_range"
+      السطر 812: [InlineKeyboardButton("2020 - 2024", callback_data="year_range_2020_2024")],
+      السطر 813: [InlineKeyboardButton("2015 - 2019", callback_data="year_range_2015_2019")],
+      السطر 814: [InlineKeyboardButton("2010 - 2014", callback_data="year_range_2010_2014")],
+      السطر 815: [InlineKeyboardButton("2005 - 2009", callback_data="year_range_2005_2009")],
+      السطر 816: [InlineKeyboardButton("2000 - 2004", callback_data="year_range_2000_2004")],
+      السطر 817: [InlineKeyboardButton("1995 - 1999", callback_data="year_range_1995_1999")],
+      السطر 818: [InlineKeyboardButton("أقدم من 1995", callback_data="year_range_older")]
+      السطر 867: current_draft["step"] = "select_year_range"
+      السطر 869: # Generate year range options (decades)
+      السطر 870: current_year = timezone.now().year
+      السطر 871: year_ranges = []
+      السطر 874: for start_year in range(current_year - (current_year % 10), current_year - 40, -10):
+      السطر 875: end_year = start_year + 9
+      السطر 876: if end_year > current_year:
+      السطر 877: end_year = current_year
+      السطر 878: year_ranges.append((start_year, end_year))
+      السطر 889: for start_year, end_year in year_ranges:
+      السطر 890: range_text = f"{start_year} - {end_year}"
+      السطر 891: keyboard.append([InlineKeyboardButton(range_text, callback_data=f"year_range_{start_year}_{end_year}
+      السطر 902: async def handle_year_range_selection(self, query, user, data):
+      السطر 903: """Handle year range selection"""
+      السطر 905: start_year = int(parts[2])
+      السطر 906: end_year = int(parts[3])
+      السطر 917: current_draft["step"] = "select_year"
+      السطر 919: # Generate specific years in the range
+      السطر 920: years = list(range(end_year, start_year - 1, -1))
+      السطر 925: ✅ تم اختيار نطاق: {start_year} - {end_year}
+      السطر 931: # Show years in rows of 5
+      السطر 932: for i in range(0, len(years), 5):
+      السطر 934: for year in years[i:i+5]:
+      السطر 935: row.append(InlineKeyboardButton(str(year), callback_data=f"year_{year}"))
+      السطر 947: async def handle_year_selection(self, query, user, data):
+      السطر 948: """Handle year selection"""
+      السطر 949: year = int(data.split("_")[1])
+      السطر 960: current_draft["request_data"]["year"] = year
+      السطر 966: ✅ تم اختيار: {year}
+      السطر 1287: required_fields = ["city_id", "brand_id", "model_id", "year"]
+      السطر 1311: year=request_data["year"],
+      السطر 1346: 🚗 السيارة: {brand.name} {model.name} {request_data["year"]}
+      السطر 1468: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+      السطر 1855: 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
+   • 'description' (26 مرة)
+      السطر 321: elif data.startswith("skip_description_"):
+      السطر 322: await self.handle_skip_description(query, user, data)
+      السطر 1009: elif step == "enter_item_description":
+      السطر 1010: await self.handle_item_description_input(update, user, update.message.text)
+      السطر 1026: """Handle parts description input - now follows the same flow as adding new items"""
+      السطر 1045: current_draft["step"] = "enter_item_description"
+      السطر 1059: [InlineKeyboardButton("⏭️ تخطي الوصف", callback_data=f"skip_description_{current_draft_id}")],
+      السطر 1089: if item.get('description'):
+      السطر 1090: message += f"   💭 {item['description'][:50]}{'...' if len(item.get('description', '')) > 50 else ''}
+      السطر 1130: current_draft["step"] = "enter_item_description"
+      السطر 1144: [InlineKeyboardButton("⏭️ تخطي الوصف", callback_data=f"skip_description_{current_draft_id}")],
+      السطر 1151: async def handle_item_description_input(self, update, user, description):
+      السطر 1152: """Handle item description input"""
+      السطر 1161: current_draft["temp_item"]["description"] = description
+      السطر 1168: ✅ الوصف: {description}
+      السطر 1209: "description": current_draft["temp_item"].get("description", ""),
+      السطر 1322: description=item_data.get("description", ""),
+      السطر 1337: if item.get('description'):
+      السطر 1338: items_text += f"   💭 {item['description']}\n"
+      السطر 1471: {request.all_parts_description}
+      السطر 1856: 🔧 القطع: {request.all_parts_description}
+      السطر 2279: async def handle_skip_description(self, query, user, data):
+      السطر 2280: """Handle skip description callback"""
+      السطر 2296: current_draft["temp_item"]["description"] = ""
+      السطر 2343: "description": current_draft["temp_item"].get("description", ""),
+      السطر 2426: 💭 الوصف: {item.get('description', 'لا يوجد')}
+   • 'Description' (26 مرة)
+      السطر 321: elif data.startswith("skip_description_"):
+      السطر 322: await self.handle_skip_description(query, user, data)
+      السطر 1009: elif step == "enter_item_description":
+      السطر 1010: await self.handle_item_description_input(update, user, update.message.text)
+      السطر 1026: """Handle parts description input - now follows the same flow as adding new items"""
+      السطر 1045: current_draft["step"] = "enter_item_description"
+      السطر 1059: [InlineKeyboardButton("⏭️ تخطي الوصف", callback_data=f"skip_description_{current_draft_id}")],
+      السطر 1089: if item.get('description'):
+      السطر 1090: message += f"   💭 {item['description'][:50]}{'...' if len(item.get('description', '')) > 50 else ''}
+      السطر 1130: current_draft["step"] = "enter_item_description"
+      السطر 1144: [InlineKeyboardButton("⏭️ تخطي الوصف", callback_data=f"skip_description_{current_draft_id}")],
+      السطر 1151: async def handle_item_description_input(self, update, user, description):
+      السطر 1152: """Handle item description input"""
+      السطر 1161: current_draft["temp_item"]["description"] = description
+      السطر 1168: ✅ الوصف: {description}
+      السطر 1209: "description": current_draft["temp_item"].get("description", ""),
+      السطر 1322: description=item_data.get("description", ""),
+      السطر 1337: if item.get('description'):
+      السطر 1338: items_text += f"   💭 {item['description']}\n"
+      السطر 1471: {request.all_parts_description}
+      السطر 1856: 🔧 القطع: {request.all_parts_description}
+      السطر 2279: async def handle_skip_description(self, query, user, data):
+      السطر 2280: """Handle skip description callback"""
+      السطر 2296: current_draft["temp_item"]["description"] = ""
+      السطر 2343: "description": current_draft["temp_item"].get("description", ""),
+      السطر 2426: 💭 الوصف: {item.get('description', 'لا يوجد')}
+   • 'quantity' (31 مرة)
+      السطر 323: elif data.startswith("set_quantity_"):
+      السطر 324: await self.handle_set_quantity(query, user, data)
+      السطر 1012: elif step == "enter_item_quantity":
+      السطر 1013: await self.handle_item_quantity_input(update, user, update.message.text)
+      السطر 1087: quantity_text = f" (x{item['quantity']})" if item.get('quantity', 1) > 1 else ""
+      السطر 1088: message += f"{i}. {item['name']}{quantity_text}\n"
+      السطر 1162: current_draft["step"] = "enter_item_quantity"
+      السطر 1174: [InlineKeyboardButton("1️⃣", callback_data=f"set_quantity_1_{current_draft_id}")],
+      السطر 1175: [InlineKeyboardButton("2️⃣", callback_data=f"set_quantity_2_{current_draft_id}")],
+      السطر 1176: [InlineKeyboardButton("3️⃣", callback_data=f"set_quantity_3_{current_draft_id}")],
+      السطر 1183: async def handle_item_quantity_input(self, update, user, quantity_text):
+      السطر 1184: """Handle item quantity input"""
+      السطر 1193: quantity = int(quantity_text)
+      السطر 1194: if quantity <= 0:
+      السطر 1210: "quantity": quantity,
+      السطر 1323: quantity=item_data.get("quantity", 1),
+      السطر 1335: quantity_text = f" (x{item['quantity']})" if item.get('quantity', 1) > 1 else ""
+      السطر 1336: items_text += f"{i}. {item['name']}{quantity_text}\n"
+      السطر 2297: current_draft["step"] = "enter_item_quantity"
+      السطر 2308: [InlineKeyboardButton("1️⃣", callback_data=f"set_quantity_1_{draft_id}")],
+      السطر 2309: [InlineKeyboardButton("2️⃣", callback_data=f"set_quantity_2_{draft_id}")],
+      السطر 2310: [InlineKeyboardButton("3️⃣", callback_data=f"set_quantity_3_{draft_id}")],
+      السطر 2317: async def handle_set_quantity(self, query, user, data):
+      السطر 2318: """Handle quantity button callbacks"""
+      السطر 2320: quantity = int(parts[2])
+      السطر 2344: "quantity": quantity,
+      السطر 2371: quantity_text = f" (x{item['quantity']})" if item.get('quantity', 1) > 1 else ""
+      السطر 2372: button_text = f"{i+1}. {item['name']}{quantity_text}"
+      السطر 2396: quantity_text = f" (x{item['quantity']})" if item.get('quantity', 1) > 1 else ""
+      السطر 2397: button_text = f"❌ {i+1}. {item['name']}{quantity_text}"
+      السطر 2427: 🔢 الكمية: {item.get('quantity', 1)}
+   • 'Quantity' (31 مرة)
+      السطر 323: elif data.startswith("set_quantity_"):
+      السطر 324: await self.handle_set_quantity(query, user, data)
+      السطر 1012: elif step == "enter_item_quantity":
+      السطر 1013: await self.handle_item_quantity_input(update, user, update.message.text)
+      السطر 1087: quantity_text = f" (x{item['quantity']})" if item.get('quantity', 1) > 1 else ""
+      السطر 1088: message += f"{i}. {item['name']}{quantity_text}\n"
+      السطر 1162: current_draft["step"] = "enter_item_quantity"
+      السطر 1174: [InlineKeyboardButton("1️⃣", callback_data=f"set_quantity_1_{current_draft_id}")],
+      السطر 1175: [InlineKeyboardButton("2️⃣", callback_data=f"set_quantity_2_{current_draft_id}")],
+      السطر 1176: [InlineKeyboardButton("3️⃣", callback_data=f"set_quantity_3_{current_draft_id}")],
+      السطر 1183: async def handle_item_quantity_input(self, update, user, quantity_text):
+      السطر 1184: """Handle item quantity input"""
+      السطر 1193: quantity = int(quantity_text)
+      السطر 1194: if quantity <= 0:
+      السطر 1210: "quantity": quantity,
+      السطر 1323: quantity=item_data.get("quantity", 1),
+      السطر 1335: quantity_text = f" (x{item['quantity']})" if item.get('quantity', 1) > 1 else ""
+      السطر 1336: items_text += f"{i}. {item['name']}{quantity_text}\n"
+      السطر 2297: current_draft["step"] = "enter_item_quantity"
+      السطر 2308: [InlineKeyboardButton("1️⃣", callback_data=f"set_quantity_1_{draft_id}")],
+      السطر 2309: [InlineKeyboardButton("2️⃣", callback_data=f"set_quantity_2_{draft_id}")],
+      السطر 2310: [InlineKeyboardButton("3️⃣", callback_data=f"set_quantity_3_{draft_id}")],
+      السطر 2317: async def handle_set_quantity(self, query, user, data):
+      السطر 2318: """Handle quantity button callbacks"""
+      السطر 2320: quantity = int(parts[2])
+      السطر 2344: "quantity": quantity,
+      السطر 2371: quantity_text = f" (x{item['quantity']})" if item.get('quantity', 1) > 1 else ""
+      السطر 2372: button_text = f"{i+1}. {item['name']}{quantity_text}"
+      السطر 2396: quantity_text = f" (x{item['quantity']})" if item.get('quantity', 1) > 1 else ""
+      السطر 2397: button_text = f"❌ {i+1}. {item['name']}{quantity_text}"
+      السطر 2427: 🔢 الكمية: {item.get('quantity', 1)}
+   • 'delivery_time' (14 مرة)
+      السطر 1020: elif step == "enter_offer_delivery_time":
+      السطر 1021: await self.handle_offer_delivery_time_input(update, user, update.message.text)
+      السطر 1709: if not offer.price or not offer.delivery_time:
+      السطر 1733: ⏰ مدة التوريد: {offer.delivery_time}
+      السطر 1930: user_state["step"] = "enter_offer_delivery_time"
+      السطر 1950: async def handle_offer_delivery_time_input(self, update, user, delivery_time_text):
+      السطر 1952: delivery_time = delivery_time_text.strip()
+      السطر 1954: if len(delivery_time) < 2:
+      السطر 1961: offer_data["delivery_time"] = delivery_time
+      السطر 1972: delivery_time=delivery_time,
+      السطر 1983: ⏰ مدة التوريد: {delivery_time}
+      السطر 2009: ⏰ مدة التوريد: {offer.delivery_time}
+      السطر 2031: ⏰ مدة التوريد: {offer.delivery_time}
+      السطر 2073: ⏰ مدة التوريد: {offer.delivery_time}
+   • 'delivery time' (2 مرة)
+      السطر 1787: """Start the offer creation process with mandatory price and delivery time"""
+      السطر 1951: """Handle offer delivery time input and create offer"""
+   • 'Delivery Time' (2 مرة)
+      السطر 1787: """Start the offer creation process with mandatory price and delivery time"""
+      السطر 1951: """Handle offer delivery time input and create offer"""
+
+📄 django_app/bot/views.py
+   • 'brand' (3 مرة)
+      السطر 14: from .models import User, Request, Offer, Junkyard, City, Brand, Model
+      السطر 124: 'brand': req.brand.name,
+      السطر 217: 'top_brands': list(Request.objects.values('brand__name').annotate(
+   • 'Brand' (3 مرة)
+      السطر 14: from .models import User, Request, Offer, Junkyard, City, Brand, Model
+      السطر 124: 'brand': req.brand.name,
+      السطر 217: 'top_brands': list(Request.objects.values('brand__name').annotate(
+   • 'model' (4 مرة)
+      السطر 14: from .models import User, Request, Offer, Junkyard, City, Brand, Model
+      السطر 125: 'model': req.model.name,
+      السطر 193: from django.db.models import Count, Avg
+      السطر 299: from .models import Junkyard, City, JunkyardStaff
+   • 'Model' (4 مرة)
+      السطر 14: from .models import User, Request, Offer, Junkyard, City, Brand, Model
+      السطر 125: 'model': req.model.name,
+      السطر 193: from django.db.models import Count, Avg
+      السطر 299: from .models import Junkyard, City, JunkyardStaff
+   • 'year' (1 مرة)
+      السطر 126: 'year': req.year,
+   • 'Year' (1 مرة)
+      السطر 126: 'year': req.year,
+
+📄 django_app/dashboard/admin.py
+   • 'model' (2 مرة)
+      السطر 2: from .models import DashboardStats
+      السطر 6: class DashboardStatsAdmin(admin.ModelAdmin):
+   • 'Model' (2 مرة)
+      السطر 2: from .models import DashboardStats
+      السطر 6: class DashboardStatsAdmin(admin.ModelAdmin):
+
+📄 django_app/dashboard/apps.py
+   • 'model' (1 مرة)
+      السطر 5: default_auto_field = 'django.db.models.BigAutoField'
+   • 'Model' (1 مرة)
+      السطر 5: default_auto_field = 'django.db.models.BigAutoField'
+
+📄 django_app/dashboard/models.py
+   • 'model' (11 مرة)
+      السطر 1: from django.db import models
+      السطر 3: # Create your models here.
+      السطر 6: class DashboardStats(models.Model):
+      السطر 7: """Dashboard statistics model"""
+      السطر 8: date = models.DateField(auto_now_add=True, unique=True)
+      السطر 9: total_users = models.IntegerField(default=0)
+      السطر 10: total_requests = models.IntegerField(default=0)
+      السطر 11: total_offers = models.IntegerField(default=0)
+      السطر 12: total_junkyards = models.IntegerField(default=0)
+      السطر 13: created_at = models.DateTimeField(auto_now_add=True)
+      السطر 14: updated_at = models.DateTimeField(auto_now=True)
+   • 'Model' (11 مرة)
+      السطر 1: from django.db import models
+      السطر 3: # Create your models here.
+      السطر 6: class DashboardStats(models.Model):
+      السطر 7: """Dashboard statistics model"""
+      السطر 8: date = models.DateField(auto_now_add=True, unique=True)
+      السطر 9: total_users = models.IntegerField(default=0)
+      السطر 10: total_requests = models.IntegerField(default=0)
+      السطر 11: total_offers = models.IntegerField(default=0)
+      السطر 12: total_junkyards = models.IntegerField(default=0)
+      السطر 13: created_at = models.DateTimeField(auto_now_add=True)
+      السطر 14: updated_at = models.DateTimeField(auto_now=True)
+
+📄 django_app/dashboard/telegram_service.py
+   • 'description' (1 مرة)
+      السطر 40: error_msg = response_data.get("description", "Unknown error")
+   • 'Description' (1 مرة)
+      السطر 40: error_msg = response_data.get("description", "Unknown error")
+
+📄 django_app/dashboard/views.py
+   • 'موديل' (1 مرة)
+      السطر 420: messages.error(request, 'لا توجد ماركات أو موديلات نشطة للاختبار')
+   • 'brand' (26 مرة)
+      السطر 10: from bot.models import User, Request, Offer, Junkyard, City, Brand, Model, JunkyardRating, SystemSet
+      السطر 59: recent_requests = Request.objects.select_related('user', 'city', 'brand', 'model').order_by('-create
+      السطر 66: # Top brands
+      السطر 67: top_brands = Request.objects.values('brand__name').annotate(
+      السطر 75: 'top_brands': top_brands,
+      السطر 97: recent_requests = Request.objects.select_related('user', 'city', 'brand', 'model').order_by('-create
+      السطر 104: # Top brands
+      السطر 105: top_brands = Request.objects.values('brand__name').annotate(
+      السطر 113: 'top_brands': top_brands,
+      السطر 121: requests = Request.objects.select_related('user', 'city', 'brand', 'model').prefetch_related('items'
+      السطر 126: brand_filter = request.GET.get('brand')
+      السطر 133: if brand_filter:
+      السطر 134: requests = requests.filter(brand_id=brand_filter)
+      السطر 142: brands = Brand.objects.filter(is_active=True)
+      السطر 156: 'brands': brands,
+      السطر 160: 'current_brand': brand_filter,
+      السطر 390: from bot.models import Request, City, Brand, Model, User
+      السطر 415: # Get first brand and model for testing
+      السطر 416: first_brand = Brand.objects.filter(is_active=True).first()
+      السطر 417: first_model = Model.objects.filter(brand=first_brand, is_active=True).first() if first_brand else No
+      السطر 419: if not first_brand or not first_model:
+      السطر 438: brand=first_brand,
+      السطر 1120: # Brand distribution
+      السطر 1121: brand_stats = Request.objects.filter(
+      السطر 1123: ).values('brand__name').annotate(
+      السطر 1137: 'brand_stats': brand_stats,
+   • 'Brand' (26 مرة)
+      السطر 10: from bot.models import User, Request, Offer, Junkyard, City, Brand, Model, JunkyardRating, SystemSet
+      السطر 59: recent_requests = Request.objects.select_related('user', 'city', 'brand', 'model').order_by('-create
+      السطر 66: # Top brands
+      السطر 67: top_brands = Request.objects.values('brand__name').annotate(
+      السطر 75: 'top_brands': top_brands,
+      السطر 97: recent_requests = Request.objects.select_related('user', 'city', 'brand', 'model').order_by('-create
+      السطر 104: # Top brands
+      السطر 105: top_brands = Request.objects.values('brand__name').annotate(
+      السطر 113: 'top_brands': top_brands,
+      السطر 121: requests = Request.objects.select_related('user', 'city', 'brand', 'model').prefetch_related('items'
+      السطر 126: brand_filter = request.GET.get('brand')
+      السطر 133: if brand_filter:
+      السطر 134: requests = requests.filter(brand_id=brand_filter)
+      السطر 142: brands = Brand.objects.filter(is_active=True)
+      السطر 156: 'brands': brands,
+      السطر 160: 'current_brand': brand_filter,
+      السطر 390: from bot.models import Request, City, Brand, Model, User
+      السطر 415: # Get first brand and model for testing
+      السطر 416: first_brand = Brand.objects.filter(is_active=True).first()
+      السطر 417: first_model = Model.objects.filter(brand=first_brand, is_active=True).first() if first_brand else No
+      السطر 419: if not first_brand or not first_model:
+      السطر 438: brand=first_brand,
+      السطر 1120: # Brand distribution
+      السطر 1121: brand_stats = Request.objects.filter(
+      السطر 1123: ).values('brand__name').annotate(
+      السطر 1137: 'brand_stats': brand_stats,
+   • 'model' (13 مرة)
+      السطر 7: from django.db.models import Count, Avg, Q
+      السطر 10: from bot.models import User, Request, Offer, Junkyard, City, Brand, Model, JunkyardRating, SystemSet
+      السطر 59: recent_requests = Request.objects.select_related('user', 'city', 'brand', 'model').order_by('-create
+      السطر 97: recent_requests = Request.objects.select_related('user', 'city', 'brand', 'model').order_by('-create
+      السطر 121: requests = Request.objects.select_related('user', 'city', 'brand', 'model').prefetch_related('items'
+      السطر 390: from bot.models import Request, City, Brand, Model, User
+      السطر 409: from bot.models import Junkyard
+      السطر 415: # Get first brand and model for testing
+      السطر 417: first_model = Model.objects.filter(brand=first_brand, is_active=True).first() if first_brand else No
+      السطر 419: if not first_brand or not first_model:
+      السطر 439: model=first_model,
+      السطر 446: from bot.models import RequestItem
+      السطر 488: from bot.models import Junkyard
+   • 'Model' (13 مرة)
+      السطر 7: from django.db.models import Count, Avg, Q
+      السطر 10: from bot.models import User, Request, Offer, Junkyard, City, Brand, Model, JunkyardRating, SystemSet
+      السطر 59: recent_requests = Request.objects.select_related('user', 'city', 'brand', 'model').order_by('-create
+      السطر 97: recent_requests = Request.objects.select_related('user', 'city', 'brand', 'model').order_by('-create
+      السطر 121: requests = Request.objects.select_related('user', 'city', 'brand', 'model').prefetch_related('items'
+      السطر 390: from bot.models import Request, City, Brand, Model, User
+      السطر 409: from bot.models import Junkyard
+      السطر 415: # Get first brand and model for testing
+      السطر 417: first_model = Model.objects.filter(brand=first_brand, is_active=True).first() if first_brand else No
+      السطر 419: if not first_brand or not first_model:
+      السطر 439: model=first_model,
+      السطر 446: from bot.models import RequestItem
+      السطر 488: from bot.models import Junkyard
+   • 'year' (1 مرة)
+      السطر 440: year=2020,
+   • 'Year' (1 مرة)
+      السطر 440: year=2020,
+   • 'description' (2 مرة)
+      السطر 450: description="مصد أمامي أصلي",
+      السطر 456: description="فانوس أمامي يمين",
+   • 'Description' (2 مرة)
+      السطر 450: description="مصد أمامي أصلي",
+      السطر 456: description="فانوس أمامي يمين",
+   • 'quantity' (2 مرة)
+      السطر 451: quantity=1
+      السطر 457: quantity=1
+   • 'Quantity' (2 مرة)
+      السطر 451: quantity=1
+      السطر 457: quantity=1
+
+📄 django_app/quick_fix_offer_error.py
+   • 'model' (1 مرة)
+      السطر 21: from bot.models import User, Junkyard, Request, Offer, City
+   • 'Model' (1 مرة)
+      السطر 21: from bot.models import User, Junkyard, Request, Offer, City
+   • 'description' (1 مرة)
+      السطر 213: parser = argparse.ArgumentParser(description='أداة إصلاح مشاكل إضافة السعر في بوت التليجرام')
+   • 'Description' (1 مرة)
+      السطر 213: parser = argparse.ArgumentParser(description='أداة إصلاح مشاكل إضافة السعر في بوت التليجرام')
+
+📄 django_app/static/admin/css/tshaleeh-override.css
+   • 'brand' (2 مرة)
+      السطر 44: #branding {
+      السطر 49: #branding h1 {
+   • 'Brand' (2 مرة)
+      السطر 44: #branding {
+      السطر 49: #branding h1 {
+   • 'model' (5 مرة)
+      السطر 768: .module-table, .model-row {
+      السطر 823: /* Model links */
+      السطر 824: .model-link {
+      السطر 831: .model-link:hover {
+      السطر 835: .model-link i {
+   • 'Model' (5 مرة)
+      السطر 768: .module-table, .model-row {
+      السطر 823: /* Model links */
+      السطر 824: .model-link {
+      السطر 831: .model-link:hover {
+      السطر 835: .model-link i {
+
+📄 django_app/static/admin/theme.css
+   • 'brand' (5 مرة)
+      السطر 80: #branding h1 {
+      السطر 86: #branding h1 a:link,
+      السطر 87: #branding h1 a:visited {
+      السطر 582: /* Enhanced branding */
+      السطر 583: .admin-branding {
+   • 'Brand' (5 مرة)
+      السطر 80: #branding h1 {
+      السطر 86: #branding h1 a:link,
+      السطر 87: #branding h1 a:visited {
+      السطر 582: /* Enhanced branding */
+      السطر 583: .admin-branding {
+
+📄 django_app/static/css/admin-custom.css
+   • 'model' (6 مرة)
+      السطر 473: /* Model List - Dashboard Style */
+      السطر 474: .model-list {
+      السطر 480: .model-list li {
+      السطر 490: .model-list li:hover {
+      السطر 497: .model-list a {
+      السطر 506: .model-list a:hover {
+   • 'Model' (6 مرة)
+      السطر 473: /* Model List - Dashboard Style */
+      السطر 474: .model-list {
+      السطر 480: .model-list li {
+      السطر 490: .model-list li:hover {
+      السطر 497: .model-list a {
+      السطر 506: .model-list a:hover {
+
+📄 django_app/static/css/admin-text-colors.css
+   • 'model' (2 مرة)
+      السطر 165: .model-list a {
+      السطر 169: .model-list a:hover {
+   • 'Model' (2 مرة)
+      السطر 165: .model-list a {
+      السطر 169: .model-list a:hover {
+
+📄 django_app/static/dashboard/css/tshaleeh-theme.css
+   • 'brand' (4 مرة)
+      السطر 29: --primary-500: #14b8a6;  /* Main brand color */
+      السطر 596: /* 🎨 Brand Identity */
+      السطر 597: .brand-signature {
+      السطر 606: .brand-signature::after {
+   • 'Brand' (4 مرة)
+      السطر 29: --primary-500: #14b8a6;  /* Main brand color */
+      السطر 596: /* 🎨 Brand Identity */
+      السطر 597: .brand-signature {
+      السطر 606: .brand-signature::after {
+
+📄 django_app/templates/admin/base_site.html
+   • 'brand' (10 مرة)
+      السطر 295: /* COMPACT BRANDING */
+      السطر 296: #branding {
+      السطر 303: #branding h1 {
+      السطر 312: #branding h1 a {
+      السطر 321: #branding h1 a:hover {
+      السطر 325: #branding h1 i {
+      السطر 432: #branding {
+      السطر 438: #branding div {
+      السطر 443: #branding h1 {
+      السطر 847: {% block branding %}
+   • 'Brand' (10 مرة)
+      السطر 295: /* COMPACT BRANDING */
+      السطر 296: #branding {
+      السطر 303: #branding h1 {
+      السطر 312: #branding h1 a {
+      السطر 321: #branding h1 a:hover {
+      السطر 325: #branding h1 i {
+      السطر 432: #branding {
+      السطر 438: #branding div {
+      السطر 443: #branding h1 {
+      السطر 847: {% block branding %}
+
+📄 django_app/templates/admin/change_form.html
+   • 'model' (7 مرة)
+      السطر 382: {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-f
+      السطر 428: <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method
+      السطر 463: data-model-name="{{ opts.model_name }}"
+      السطر 623: const form = document.getElementById('{{ opts.model_name }}_form');
+      السطر 671: localStorage.setItem('admin_form_autosave_{{ opts.model_name }}', JSON.stringify(data));
+      السطر 677: const savedData = localStorage.getItem('admin_form_autosave_{{ opts.model_name }}');
+      السطر 694: localStorage.removeItem('admin_form_autosave_{{ opts.model_name }}');
+   • 'Model' (7 مرة)
+      السطر 382: {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-f
+      السطر 428: <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method
+      السطر 463: data-model-name="{{ opts.model_name }}"
+      السطر 623: const form = document.getElementById('{{ opts.model_name }}_form');
+      السطر 671: localStorage.setItem('admin_form_autosave_{{ opts.model_name }}', JSON.stringify(data));
+      السطر 677: const savedData = localStorage.getItem('admin_form_autosave_{{ opts.model_name }}');
+      السطر 694: localStorage.removeItem('admin_form_autosave_{{ opts.model_name }}');
+
+📄 django_app/templates/admin/change_list.html
+   • 'model' (2 مرة)
+      السطر 462: {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-l
+      السطر 475: <div id="changelist" class="{{ opts.app_label }}-{{ opts.model_name }}-changelist">
+   • 'Model' (2 مرة)
+      السطر 462: {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-l
+      السطر 475: <div id="changelist" class="{{ opts.app_label }}-{{ opts.model_name }}-changelist">
+
+📄 django_app/templates/admin/index.html
+   • 'brand' (1 مرة)
+      السطر 483: <i class="fas fa-{% if model.object_name == 'User' %}users{% elif model.object_name == 'Request' %}c
+   • 'Brand' (1 مرة)
+      السطر 483: <i class="fas fa-{% if model.object_name == 'User' %}users{% elif model.object_name == 'Request' %}c
+   • 'model' (32 مرة)
+      السطر 293: .model-row {
+      السطر 298: .model-row:last-child {
+      السطر 302: .model-row:hover {
+      السطر 306: .model-name {
+      السطر 311: .model-link {
+      السطر 323: .model-link:hover {
+      السطر 328: .model-link i {
+      السطر 335: .model-actions {
+      السطر 383: .no-models-message {
+      السطر 395: .no-models-message i {
+      السطر 469: <a href="{{ app.app_url }}" class="section" title="{% blocktrans with name=app.name %}Models in the 
+      السطر 478: {% for model in app.models %}
+      السطر 479: <tr class="model-row model-{{ model.object_name|lower }}">
+      السطر 480: <td class="model-name">
+      السطر 481: {% if model.admin_url %}
+      السطر 482: <a href="{{ model.admin_url }}" class="model-link">
+      السطر 483: <i class="fas fa-{% if model.object_name == 'User' %}users{% elif model.object_name == 'Request' %}c
+      السطر 484: {{ model.name }}
+      السطر 487: <span class="model-link">
+      السطر 489: {{ model.name }}
+      السطر 493: <td class="model-actions">
+      السطر 494: {% if model.add_url %}
+      السطر 495: <a href="{{ model.add_url }}" class="action-btn add-btn" title="إضافة {{ model.name }}">
+      السطر 500: {% if model.admin_url %}
+      السطر 501: {% if model.view_only %}
+      السطر 502: <a href="{{ model.admin_url }}" class="action-btn view-btn" title="عرض {{ model.name }}">
+      السطر 507: <a href="{{ model.admin_url }}" class="action-btn edit-btn" title="تحرير {{ model.name }}">
+      السطر 526: {% trans "No models available" %}
+      السطر 530: <p class="no-models-message">
+      السطر 682: // Model row click to navigate
+      السطر 683: document.querySelectorAll('.model-row').forEach(row => {
+      السطر 686: const mainLink = this.querySelector('.model-link[href]');
+   • 'Model' (32 مرة)
+      السطر 293: .model-row {
+      السطر 298: .model-row:last-child {
+      السطر 302: .model-row:hover {
+      السطر 306: .model-name {
+      السطر 311: .model-link {
+      السطر 323: .model-link:hover {
+      السطر 328: .model-link i {
+      السطر 335: .model-actions {
+      السطر 383: .no-models-message {
+      السطر 395: .no-models-message i {
+      السطر 469: <a href="{{ app.app_url }}" class="section" title="{% blocktrans with name=app.name %}Models in the 
+      السطر 478: {% for model in app.models %}
+      السطر 479: <tr class="model-row model-{{ model.object_name|lower }}">
+      السطر 480: <td class="model-name">
+      السطر 481: {% if model.admin_url %}
+      السطر 482: <a href="{{ model.admin_url }}" class="model-link">
+      السطر 483: <i class="fas fa-{% if model.object_name == 'User' %}users{% elif model.object_name == 'Request' %}c
+      السطر 484: {{ model.name }}
+      السطر 487: <span class="model-link">
+      السطر 489: {{ model.name }}
+      السطر 493: <td class="model-actions">
+      السطر 494: {% if model.add_url %}
+      السطر 495: <a href="{{ model.add_url }}" class="action-btn add-btn" title="إضافة {{ model.name }}">
+      السطر 500: {% if model.admin_url %}
+      السطر 501: {% if model.view_only %}
+      السطر 502: <a href="{{ model.admin_url }}" class="action-btn view-btn" title="عرض {{ model.name }}">
+      السطر 507: <a href="{{ model.admin_url }}" class="action-btn edit-btn" title="تحرير {{ model.name }}">
+      السطر 526: {% trans "No models available" %}
+      السطر 530: <p class="no-models-message">
+      السطر 682: // Model row click to navigate
+      السطر 683: document.querySelectorAll('.model-row').forEach(row => {
+      السطر 686: const mainLink = this.querySelector('.model-link[href]');
+
+📄 django_app/templates/base/base.html
+   • 'brand' (3 مرة)
+      السطر 27: .navbar-brand {
+      السطر 32: .navbar-brand i {
+      السطر 570: <a class="navbar-brand" href="{% url 'dashboard:public_dashboard' %}">
+   • 'Brand' (3 مرة)
+      السطر 27: .navbar-brand {
+      السطر 32: .navbar-brand i {
+      السطر 570: <a class="navbar-brand" href="{% url 'dashboard:public_dashboard' %}">
+
+📄 django_app/templates/dashboard/analytics.html
+   • 'brand' (7 مرة)
+      السطر 224: <!-- Brand Distribution -->
+      السطر 235: {% if brand_stats %}
+      السطر 237: {% for brand in brand_stats %}
+      السطر 243: <span class="font-medium text-slate-900 dark:text-slate-100">{{ brand.brand__name }}</span>
+      السطر 246: <span class="text-sm text-slate-600 dark:text-slate-400">{{ brand.count }} طلب</span>
+      السطر 249: style="width: {% widthratio brand.count brand_stats.0.count 100 %}%"></div>
+      السطر 252: {% widthratio brand.count brand_stats.0.count 100 %}%
+   • 'Brand' (7 مرة)
+      السطر 224: <!-- Brand Distribution -->
+      السطر 235: {% if brand_stats %}
+      السطر 237: {% for brand in brand_stats %}
+      السطر 243: <span class="font-medium text-slate-900 dark:text-slate-100">{{ brand.brand__name }}</span>
+      السطر 246: <span class="text-sm text-slate-600 dark:text-slate-400">{{ brand.count }} طلب</span>
+      السطر 249: style="width: {% widthratio brand.count brand_stats.0.count 100 %}%"></div>
+      السطر 252: {% widthratio brand.count brand_stats.0.count 100 %}%
+
+📄 django_app/templates/dashboard/home.html
+   • 'brand' (6 مرة)
+      السطر 206: {{ request.brand.name }} {{ request.model.name }} {{ request.year }} - {{ request.city.name }}
+      السطر 263: <!-- Top Brands -->
+      السطر 274: {% if top_brands %}
+      السطر 276: {% for brand in top_brands %}
+      السطر 278: <span class="text-slate-700 dark:text-slate-300">{{ brand.brand__name }}</span>
+      السطر 280: {{ brand.count }}
+   • 'Brand' (6 مرة)
+      السطر 206: {{ request.brand.name }} {{ request.model.name }} {{ request.year }} - {{ request.city.name }}
+      السطر 263: <!-- Top Brands -->
+      السطر 274: {% if top_brands %}
+      السطر 276: {% for brand in top_brands %}
+      السطر 278: <span class="text-slate-700 dark:text-slate-300">{{ brand.brand__name }}</span>
+      السطر 280: {{ brand.count }}
+   • 'model' (1 مرة)
+      السطر 206: {{ request.brand.name }} {{ request.model.name }} {{ request.year }} - {{ request.city.name }}
+   • 'Model' (1 مرة)
+      السطر 206: {{ request.brand.name }} {{ request.model.name }} {{ request.year }} - {{ request.city.name }}
+   • 'year' (1 مرة)
+      السطر 206: {{ request.brand.name }} {{ request.model.name }} {{ request.year }} - {{ request.city.name }}
+   • 'Year' (1 مرة)
+      السطر 206: {{ request.brand.name }} {{ request.model.name }} {{ request.year }} - {{ request.city.name }}
+
+📄 django_app/templates/dashboard/junkyard_detail.html
+   • 'brand' (1 مرة)
+      السطر 154: {{ offer.request.brand.name }} {{ offer.request.model.name }}
+   • 'Brand' (1 مرة)
+      السطر 154: {{ offer.request.brand.name }} {{ offer.request.model.name }}
+   • 'model' (1 مرة)
+      السطر 154: {{ offer.request.brand.name }} {{ offer.request.model.name }}
+   • 'Model' (1 مرة)
+      السطر 154: {{ offer.request.brand.name }} {{ offer.request.model.name }}
+
+📄 django_app/templates/dashboard/public_dashboard.html
+   • 'ماركة' (1 مرة)
+      السطر 122: <p class="text-sm text-slate-600 dark:text-slate-400">حدد ماركة وموديل السيارة وسنة الصنع</p>
+   • 'موديل' (1 مرة)
+      السطر 122: <p class="text-sm text-slate-600 dark:text-slate-400">حدد ماركة وموديل السيارة وسنة الصنع</p>
+   • 'سنة الصنع' (1 مرة)
+      السطر 122: <p class="text-sm text-slate-600 dark:text-slate-400">حدد ماركة وموديل السيارة وسنة الصنع</p>
+
+📄 django_app/templates/dashboard/request_detail.html
+   • 'ماركة' (1 مرة)
+      السطر 76: <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">الماركة</label>
+   • 'الماركة' (1 مرة)
+      السطر 76: <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">الماركة</label>
+   • 'موديل' (2 مرة)
+      السطر 21: {{ request.brand.name }} {% if request.model %}{{ request.model.name }}{% else %}(بدون موديل محدد){%
+      السطر 83: <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">الموديل</label>
+   • 'الموديل' (1 مرة)
+      السطر 83: <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">الموديل</label>
+   • 'سنة الصنع' (1 مرة)
+      السطر 90: <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">سنة الصنع</label>
+   • 'الكمية' (2 مرة)
+      السطر 136: الكمية: {{ item.quantity }}
+      السطر 161: • إجمالي الكمية: {% for item in request.items.all %}{{ item.quantity }}{% if not forloop.last %} + {
+   • 'brand' (3 مرة)
+      السطر 21: {{ request.brand.name }} {% if request.model %}{{ request.model.name }}{% else %}(بدون موديل محدد){%
+      السطر 78: {{ request.brand.name }}
+      السطر 452: <button class="btn-glass w-full" onclick="copyToClipboard('طلب #{{ request.order_id }}: {{ request.b
+   • 'Brand' (3 مرة)
+      السطر 21: {{ request.brand.name }} {% if request.model %}{{ request.model.name }}{% else %}(بدون موديل محدد){%
+      السطر 78: {{ request.brand.name }}
+      السطر 452: <button class="btn-glass w-full" onclick="copyToClipboard('طلب #{{ request.order_id }}: {{ request.b
+   • 'model' (3 مرة)
+      السطر 21: {{ request.brand.name }} {% if request.model %}{{ request.model.name }}{% else %}(بدون موديل محدد){%
+      السطر 85: {% if request.model %}{{ request.model.name }}{% else %}غير محدد{% endif %}
+      السطر 452: <button class="btn-glass w-full" onclick="copyToClipboard('طلب #{{ request.order_id }}: {{ request.b
+   • 'Model' (3 مرة)
+      السطر 21: {{ request.brand.name }} {% if request.model %}{{ request.model.name }}{% else %}(بدون موديل محدد){%
+      السطر 85: {% if request.model %}{{ request.model.name }}{% else %}غير محدد{% endif %}
+      السطر 452: <button class="btn-glass w-full" onclick="copyToClipboard('طلب #{{ request.order_id }}: {{ request.b
+   • 'year' (3 مرة)
+      السطر 21: {{ request.brand.name }} {% if request.model %}{{ request.model.name }}{% else %}(بدون موديل محدد){%
+      السطر 92: {{ request.year }}
+      السطر 452: <button class="btn-glass w-full" onclick="copyToClipboard('طلب #{{ request.order_id }}: {{ request.b
+   • 'Year' (3 مرة)
+      السطر 21: {{ request.brand.name }} {% if request.model %}{{ request.model.name }}{% else %}(بدون موديل محدد){%
+      السطر 92: {{ request.year }}
+      السطر 452: <button class="btn-glass w-full" onclick="copyToClipboard('طلب #{{ request.order_id }}: {{ request.b
+   • 'description' (3 مرة)
+      السطر 140: {% if item.description %}
+      السطر 143: {{ item.description }}
+      السطر 452: <button class="btn-glass w-full" onclick="copyToClipboard('طلب #{{ request.order_id }}: {{ request.b
+   • 'Description' (3 مرة)
+      السطر 140: {% if item.description %}
+      السطر 143: {{ item.description }}
+      السطر 452: <button class="btn-glass w-full" onclick="copyToClipboard('طلب #{{ request.order_id }}: {{ request.b
+   • 'quantity' (3 مرة)
+      السطر 134: {% if item.quantity > 1 %}
+      السطر 136: الكمية: {{ item.quantity }}
+      السطر 161: • إجمالي الكمية: {% for item in request.items.all %}{{ item.quantity }}{% if not forloop.last %} + {
+   • 'Quantity' (3 مرة)
+      السطر 134: {% if item.quantity > 1 %}
+      السطر 136: الكمية: {{ item.quantity }}
+      السطر 161: • إجمالي الكمية: {% for item in request.items.all %}{{ item.quantity }}{% if not forloop.last %} + {
+
+📄 django_app/templates/dashboard/requests_list.html
+   • 'ماركة' (1 مرة)
+      السطر 138: <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">الماركة</label>
+   • 'الماركة' (1 مرة)
+      السطر 138: <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">الماركة</label>
+   • 'موديل' (1 مرة)
+      السطر 241: <div class="text-xs text-slate-500 dark:text-slate-400">موديل {{ req.year }}</div>
+   • 'brand' (5 مرة)
+      السطر 139: <select name="brand" class="form-control-glass w-full">
+      السطر 141: {% for brand in brands %}
+      السطر 142: <option value="{{ brand.id }}" {% if current_brand == brand.id|stringformat:"s" %}selected{% endif %
+      السطر 143: {{ brand.name }}
+      السطر 239: {{ req.brand.name }} {{ req.model.name }}
+   • 'Brand' (5 مرة)
+      السطر 139: <select name="brand" class="form-control-glass w-full">
+      السطر 141: {% for brand in brands %}
+      السطر 142: <option value="{{ brand.id }}" {% if current_brand == brand.id|stringformat:"s" %}selected{% endif %
+      السطر 143: {{ brand.name }}
+      السطر 239: {{ req.brand.name }} {{ req.model.name }}
+   • 'model' (1 مرة)
+      السطر 239: {{ req.brand.name }} {{ req.model.name }}
+   • 'Model' (1 مرة)
+      السطر 239: {{ req.brand.name }} {{ req.model.name }}
+   • 'year' (1 مرة)
+      السطر 241: <div class="text-xs text-slate-500 dark:text-slate-400">موديل {{ req.year }}</div>
+   • 'Year' (1 مرة)
+      السطر 241: <div class="text-xs text-slate-500 dark:text-slate-400">موديل {{ req.year }}</div>
+   • 'description' (1 مرة)
+      السطر 244: <div class="text-sm text-slate-600 dark:text-slate-400 max-w-xs truncate" title="{{ req.all_parts_de
+   • 'Description' (1 مرة)
+      السطر 244: <div class="text-sm text-slate-600 dark:text-slate-400 max-w-xs truncate" title="{{ req.all_parts_de
+   • 'quantity' (1 مرة)
+      السطر 247: {{ item.name }}{% if item.quantity > 1 %} ({{ item.quantity }}){% endif %}{% if not forloop.last %},
+   • 'Quantity' (1 مرة)
+      السطر 247: {{ item.name }}{% if item.quantity > 1 %} ({{ item.quantity }}){% endif %}{% if not forloop.last %},
+
+📄 n8n/QUICK_START.md
+   • 'الوصف' (1 مرة)
+      السطر 115: | المتغير | القيمة | الوصف |
+   • 'brand' (2 مرة)
+      السطر 57: "brand_id": 1,
+      السطر 194: "brand_id": brand.id,
+   • 'Brand' (2 مرة)
+      السطر 57: "brand_id": 1,
+      السطر 194: "brand_id": brand.id,
+   • 'model' (2 مرة)
+      السطر 58: "model_id": 1,
+      السطر 195: "model_id": model.id,
+   • 'Model' (2 مرة)
+      السطر 58: "model_id": 1,
+      السطر 195: "model_id": model.id,
+   • 'year' (2 مرة)
+      السطر 59: "year": 2020,
+      السطر 196: "year": year,
+   • 'Year' (2 مرة)
+      السطر 59: "year": 2020,
+      السطر 196: "year": year,
+   • 'description' (1 مرة)
+      السطر 73: "description": "قطع أصلية",
+   • 'Description' (1 مرة)
+      السطر 73: "description": "قطع أصلية",
+   • 'delivery_time' (1 مرة)
+      السطر 74: "delivery_time": "3 أيام"
+
+📄 n8n/README.md
+   • 'الوصف' (1 مرة)
+      السطر 84: | المتغير | القيمة | الوصف |
+   • 'brand' (1 مرة)
+      السطر 108: "brand_id": 1,
+   • 'Brand' (1 مرة)
+      السطر 108: "brand_id": 1,
+   • 'model' (1 مرة)
+      السطر 109: "model_id": 1,
+   • 'Model' (1 مرة)
+      السطر 109: "model_id": 1,
+   • 'year' (1 مرة)
+      السطر 110: "year": 2020,
+   • 'Year' (1 مرة)
+      السطر 110: "year": 2020,
+   • 'description' (1 مرة)
+      السطر 125: "description": "قطع أصلية",
+   • 'Description' (1 مرة)
+      السطر 125: "description": "قطع أصلية",
+   • 'delivery_time' (1 مرة)
+      السطر 126: "delivery_time": "3 أيام"
+
+📄 n8n/workflows/new_offer_workflow.json
+   • 'الوصف' (1 مرة)
+      السطر 95: "value": "💰 عرض سعر جديد لطلبك!\n\n🆔 رقم الطلب: {{ $('Get Request Details').item.json.order_id }}\n🏪
+   • 'description' (3 مرة)
+      السطر 46: "name": "description",
+      السطر 47: "value": "={{ $json.description }}"
+      السطر 95: "value": "💰 عرض سعر جديد لطلبك!\n\n🆔 رقم الطلب: {{ $('Get Request Details').item.json.order_id }}\n🏪
+   • 'Description' (3 مرة)
+      السطر 46: "name": "description",
+      السطر 47: "value": "={{ $json.description }}"
+      السطر 95: "value": "💰 عرض سعر جديد لطلبك!\n\n🆔 رقم الطلب: {{ $('Get Request Details').item.json.order_id }}\n🏪
+   • 'delivery_time' (3 مرة)
+      السطر 50: "name": "delivery_time",
+      السطر 51: "value": "={{ $json.delivery_time }}"
+      السطر 95: "value": "💰 عرض سعر جديد لطلبك!\n\n🆔 رقم الطلب: {{ $('Get Request Details').item.json.order_id }}\n🏪
+
+📄 n8n/workflows/new_request_workflow.json
+   • 'brand' (4 مرة)
+      السطر 71: "name": "brand_id",
+      السطر 72: "value": "={{ $json.brand_id }}"
+      السطر 145: "value": "🆕 طلب جديد في منطقتك!\n\n🆔 رقم الطلب: {{ $('Create Request via API').item.json.order_id }}
+      السطر 186: "value": "✅ تم إنشاء طلبك بنجاح!\n\n🆔 رقم الطلب: {{ $('Create Request via API').item.json.order_id }
+   • 'Brand' (4 مرة)
+      السطر 71: "name": "brand_id",
+      السطر 72: "value": "={{ $json.brand_id }}"
+      السطر 145: "value": "🆕 طلب جديد في منطقتك!\n\n🆔 رقم الطلب: {{ $('Create Request via API').item.json.order_id }}
+      السطر 186: "value": "✅ تم إنشاء طلبك بنجاح!\n\n🆔 رقم الطلب: {{ $('Create Request via API').item.json.order_id }
+   • 'model' (4 مرة)
+      السطر 75: "name": "model_id",
+      السطر 76: "value": "={{ $json.model_id }}"
+      السطر 145: "value": "🆕 طلب جديد في منطقتك!\n\n🆔 رقم الطلب: {{ $('Create Request via API').item.json.order_id }}
+      السطر 186: "value": "✅ تم إنشاء طلبك بنجاح!\n\n🆔 رقم الطلب: {{ $('Create Request via API').item.json.order_id }
+   • 'Model' (4 مرة)
+      السطر 75: "name": "model_id",
+      السطر 76: "value": "={{ $json.model_id }}"
+      السطر 145: "value": "🆕 طلب جديد في منطقتك!\n\n🆔 رقم الطلب: {{ $('Create Request via API').item.json.order_id }}
+      السطر 186: "value": "✅ تم إنشاء طلبك بنجاح!\n\n🆔 رقم الطلب: {{ $('Create Request via API').item.json.order_id }
+   • 'year' (4 مرة)
+      السطر 79: "name": "year",
+      السطر 80: "value": "={{ $json.year }}"
+      السطر 145: "value": "🆕 طلب جديد في منطقتك!\n\n🆔 رقم الطلب: {{ $('Create Request via API').item.json.order_id }}
+      السطر 186: "value": "✅ تم إنشاء طلبك بنجاح!\n\n🆔 رقم الطلب: {{ $('Create Request via API').item.json.order_id }
+   • 'Year' (4 مرة)
+      السطر 79: "name": "year",
+      السطر 80: "value": "={{ $json.year }}"
+      السطر 145: "value": "🆕 طلب جديد في منطقتك!\n\n🆔 رقم الطلب: {{ $('Create Request via API').item.json.order_id }}
+      السطر 186: "value": "✅ تم إنشاء طلبك بنجاح!\n\n🆔 رقم الطلب: {{ $('Create Request via API').item.json.order_id }
+
+📄 n8n/workflows/new_request_workflow_fixed.json
+   • 'brand' (4 مرة)
+      السطر 58: "name": "brand_id",
+      السطر 59: "value": "={{ $json.brand_id }}"
+      السطر 122: "value": "🆕 طلب جديد في منطقتك!\n\n🆔 الطلب: {{ $('Create Request').first().json.order_id }}\n🚗 السيا
+      السطر 154: "value": "✅ تم إنشاء طلبك بنجاح!\n\n🆔 رقم الطلب: {{ $('Create Request').first().json.order_id }}\n🚗 
+   • 'Brand' (4 مرة)
+      السطر 58: "name": "brand_id",
+      السطر 59: "value": "={{ $json.brand_id }}"
+      السطر 122: "value": "🆕 طلب جديد في منطقتك!\n\n🆔 الطلب: {{ $('Create Request').first().json.order_id }}\n🚗 السيا
+      السطر 154: "value": "✅ تم إنشاء طلبك بنجاح!\n\n🆔 رقم الطلب: {{ $('Create Request').first().json.order_id }}\n🚗 
+   • 'model' (4 مرة)
+      السطر 62: "name": "model_id",
+      السطر 63: "value": "={{ $json.model_id }}"
+      السطر 122: "value": "🆕 طلب جديد في منطقتك!\n\n🆔 الطلب: {{ $('Create Request').first().json.order_id }}\n🚗 السيا
+      السطر 154: "value": "✅ تم إنشاء طلبك بنجاح!\n\n🆔 رقم الطلب: {{ $('Create Request').first().json.order_id }}\n🚗 
+   • 'Model' (4 مرة)
+      السطر 62: "name": "model_id",
+      السطر 63: "value": "={{ $json.model_id }}"
+      السطر 122: "value": "🆕 طلب جديد في منطقتك!\n\n🆔 الطلب: {{ $('Create Request').first().json.order_id }}\n🚗 السيا
+      السطر 154: "value": "✅ تم إنشاء طلبك بنجاح!\n\n🆔 رقم الطلب: {{ $('Create Request').first().json.order_id }}\n🚗 
+   • 'year' (2 مرة)
+      السطر 66: "name": "year",
+      السطر 67: "value": "={{ $json.year }}"
+   • 'Year' (2 مرة)
+      السطر 66: "name": "year",
+      السطر 67: "value": "={{ $json.year }}"
+
+📄 n8n/workflows/scheduled_notifications.json
+   • 'brand' (1 مرة)
+      السطر 91: "value": "⚠️ تنبيه: طلبك سينتهي قريباً!\n\n🆔 رقم الطلب: {{ $json.order_id }}\n🚗 السيارة: {{ $json.br
+   • 'Brand' (1 مرة)
+      السطر 91: "value": "⚠️ تنبيه: طلبك سينتهي قريباً!\n\n🆔 رقم الطلب: {{ $json.order_id }}\n🚗 السيارة: {{ $json.br
+   • 'model' (1 مرة)
+      السطر 91: "value": "⚠️ تنبيه: طلبك سينتهي قريباً!\n\n🆔 رقم الطلب: {{ $json.order_id }}\n🚗 السيارة: {{ $json.br
+   • 'Model' (1 مرة)
+      السطر 91: "value": "⚠️ تنبيه: طلبك سينتهي قريباً!\n\n🆔 رقم الطلب: {{ $json.order_id }}\n🚗 السيارة: {{ $json.br
+   • 'year' (1 مرة)
+      السطر 91: "value": "⚠️ تنبيه: طلبك سينتهي قريباً!\n\n🆔 رقم الطلب: {{ $json.order_id }}\n🚗 السيارة: {{ $json.br
+   • 'Year' (1 مرة)
+      السطر 91: "value": "⚠️ تنبيه: طلبك سينتهي قريباً!\n\n🆔 رقم الطلب: {{ $json.order_id }}\n🚗 السيارة: {{ $json.br
