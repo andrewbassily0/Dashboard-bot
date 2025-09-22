@@ -15,6 +15,12 @@ urlpatterns = [
     # Junkyards
     path('junkyards/', views.junkyards_list, name='junkyards_list'),
     path('junkyards/<int:junkyard_id>/', views.junkyard_detail, name='junkyard_detail'),
+    path('junkyards/<int:junkyard_id>/test-notification/', views.test_junkyard_notification, name='test_junkyard_notification'),
+    path('junkyards/<int:junkyard_id>/diagnose/', views.diagnose_junkyard_issues, name='diagnose_junkyard_issues'),
+    path('junkyards/<int:junkyard_id>/quick-fix/', views.quick_fix_junkyard, name='quick_fix_junkyard'),
+    path('junkyards/<int:junkyard_id>/edit/', views.edit_junkyard, name='edit_junkyard'),
+    path('junkyards/fix-user-types/', views.fix_junkyard_user_types, name='fix_junkyard_user_types'),
+    path('junkyards/debug-edit-issue/', views.debug_junkyard_edit_issue, name='debug_junkyard_edit_issue'),
     path('junkyards/add/', views.add_junkyard, name='add_junkyard'),
     
     # Users
@@ -25,6 +31,9 @@ urlpatterns = [
     
     # Settings
     path('settings/', views.settings_view, name='settings'),
+    
+    # Testing
+    path('test-order-workflow/', views.test_order_workflow, name='test_order_workflow'),
     
     # Analytics
     path('analytics/', views.analytics_view, name='analytics'),

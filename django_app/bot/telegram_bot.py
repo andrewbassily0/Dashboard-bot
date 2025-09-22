@@ -41,18 +41,73 @@ class TelegramBot:
     
     @sync_to_async
     def get_or_create_user(self, telegram_user) -> User:
-        """Get or create user from Telegram user data"""
-        user, created = User.objects.get_or_create(
-            telegram_id=telegram_user.id,
-            defaults={
-                'username': telegram_user.username or f"user_{telegram_user.id}",
-                'first_name': telegram_user.first_name or '',
-                'last_name': telegram_user.last_name or '',
-                'telegram_username': telegram_user.username or '',
-                'user_type': 'client'  # Default to client
-            }
-        )
-        return user
+        """Get or create user from Telegram user data with connection handling"""
+        from django.db import connection
+        
+        # Close any existing connections to force reconnection
+        try:
+            connection.close()
+        except Exception:
+            pass
+            
+        try:
+            user, created = User.objects.get_or_create(
+                telegram_id=telegram_user.id,
+                defaults={
+                    'username': telegram_user.username or f"user_{telegram_user.id}",
+                    'first_name': telegram_user.first_name or '',
+                    'last_name': telegram_user.last_name or '',
+                    'telegram_username': telegram_user.username or '',
+                    'user_type': 'client'  # Default to client
+                }
+            )
+            return user
+        except Exception as e:
+            logger.error(f"Database error in get_or_create_user: {e}")
+            # Try to reconnect and retry once
+            try:
+                connection.close()
+                user, created = User.objects.get_or_create(
+                    telegram_id=telegram_user.id,
+                    defaults={
+                        'username': telegram_user.username or f"user_{telegram_user.id}",
+                        'first_name': telegram_user.first_name or '',
+                        'last_name': telegram_user.last_name or '',
+                        'telegram_username': telegram_user.username or '',
+                        'user_type': 'client'  # Default to client
+                    }
+                )
+                return user
+            except Exception as retry_error:
+                logger.error(f"Retry failed in get_or_create_user: {retry_error}")
+                raise
+    
+    async def get_request_parts_description(self, request: Request) -> str:
+        """Get parts description safely in async context"""
+        # Check if request has items
+        has_items = await sync_to_async(lambda: request.items.exists())()
+        
+        if has_items:
+            items = await sync_to_async(list)(
+                request.items.all()
+            )
+            parts_list = []
+            for i, item in enumerate(items, 1):
+                parts_list.append(f"{i}️⃣ {item.name}")
+            return "\n".join(parts_list)
+        else:
+            return request.parts or "لا توجد قطع محددة"
+    
+    def _format_parts_for_pricing(self, parts_description):
+        """Format parts description for pricing request"""
+        lines = parts_description.split('\n')
+        pricing_lines = []
+        for line in lines:
+            if line.strip():
+                # Extract part name (remove emoji and number)
+                part_name = line.split(' ', 1)[-1] if ' ' in line else line
+                pricing_lines.append(f"- {part_name}: ___ ريال")
+        return '\n'.join(pricing_lines)
     
     async def check_user_status(self, update: Update) -> bool:
         """Check if user is banned/inactive and send appropriate message"""
@@ -147,7 +202,7 @@ class TelegramBot:
         welcome_message = f"""
 🔧 مرحباً {user_greeting}!
 
-أهلاً بك في **تشاليح** - منصتك الموثوقة للعثور على قطع غيار السيارات 🚗
+أهلاً بك في **تشاليح** - منصتك  للعثور على قطع غيار السيارات 🚗
 
 نحن نربطك بأفضل التشاليح المسجلة في منطقتك لتحصل على أفضل العروض والأسعار.
 
@@ -223,69 +278,153 @@ class TelegramBot:
         query = update.callback_query
         await query.answer()
         
-        # التحقق من حالة المستخدم أولاً
-        if not await self.check_user_status(update):
-            return  # المستخدم محجوب، تم إرسال رسالة الحجب
-        
-        user = await self.get_or_create_user(update.effective_user)
-        data = query.data
-        
-        # معالج زر "ابدأ ✅" - يقوم بتشغيل البوت وإظهار خيارات نوع الحساب
-        if data == "start_bot":
-            await self.show_main_welcome(query, user)
-        elif data == "start_ordering":
-            # بدء الطلبات - يذهب للقائمة الرئيسية للعملاء
-            await self.show_client_menu(query, user)
-        elif data == "about_tashaleeh":
-            # شاشة "ما هو تشاليح"
-            await self.show_about_tashaleeh(query, user)
-        elif data == "usage_policy":
-            # شاشة طريقة الاستخدام وسياسة الاستخدام
-            await self.show_usage_policy(query, user)
-        elif data == "back_to_main":
-            # العودة للرئيسية
-            await self.show_main_welcome(query, user)
-        elif data == "user_type_client":
-            # Direct to client menu since we removed junkyard option
-            await self.show_client_menu(query, user)
-        elif data.startswith("city_"):
-            await self.handle_city_selection(query, user, data)
-        elif data.startswith("brand_"):
-            await self.handle_brand_selection(query, user, data)
-        elif data.startswith("model_"):
-            await self.handle_model_selection(query, user, data)
-        elif data.startswith("year_range_"):
-            await self.handle_year_range_selection(query, user, data)
-        elif data.startswith("year_"):
-            await self.handle_year_selection(query, user, data)
-        elif data.startswith("offer_"):
-            await self.handle_offer_action(query, user, data)
-        elif data.startswith("rating_"):
-            await self.handle_rating_selection(query, user, data)
-        elif data == "new_request":
-            await self.start_new_request(query, user)
-        elif data == "my_requests":
-            await self.show_user_requests(query, user)
-        elif data.startswith("confirm_request_"):
-            await self.confirm_request(query, user, data)
-        elif data == "back_to_main":
-            await self.start_command_from_callback(query, user)
-        elif data == "select_brand_again":
-            await self.show_brand_selection(query, user)
-        elif data == "show_more_brands":
-            await self.show_all_brands(query, user)
-        elif data.startswith("view_request_"):
-            await self.show_request_details(query, user, data)
-        elif data.startswith("request_action_"):
-            await self.handle_request_action(query, user, data)
-        elif data.startswith("draft_"):
-            await self.handle_draft_action(query, user, data)
-        elif data.startswith("switch_draft_"):
-            await self.switch_to_draft(query, user, data)
-        elif data.startswith("delete_draft_"):
-            await self.delete_draft(query, user, data)
-        elif data.startswith("offer_details_"):
-            await self.show_offer_details(query, user, data)
+        try:
+            # التحقق من حالة المستخدم أولاً
+            if not await self.check_user_status(update):
+                return  # المستخدم محجوب، تم إرسال رسالة الحجب
+            
+            user = await self.get_or_create_user(update.effective_user)
+            data = query.data
+            
+            logger.info(f"Button callback: user {user.telegram_id} clicked '{data}'")
+            
+            # معالج زر "ابدأ ✅" - يقوم بتشغيل البوت وإظهار خيارات نوع الحساب
+            if data == "start_bot":
+                await self.show_main_welcome(query, user)
+            elif data == "start_ordering":
+                # بدء الطلبات - يذهب للقائمة الرئيسية للعملاء
+                await self.show_client_menu(query, user)
+            elif data == "about_tashaleeh":
+                # شاشة "ما هو تشاليح"
+                await self.show_about_tashaleeh(query, user)
+            elif data == "usage_policy":
+                # شاشة طريقة الاستخدام وسياسة الاستخدام
+                await self.show_usage_policy(query, user)
+            elif data == "back_to_main":
+                # العودة للرئيسية
+                await self.show_main_welcome(query, user)
+            elif data == "user_type_client":
+                # Direct to client menu since we removed junkyard option
+                await self.show_client_menu(query, user)
+            elif data.startswith("city_"):
+                await self.handle_city_selection(query, user, data)
+            elif data.startswith("brand_"):
+                await self.handle_brand_selection(query, user, data)
+            elif data.startswith("model_"):
+                await self.handle_model_selection(query, user, data)
+            elif data.startswith("year_range_"):
+                await self.handle_year_range_selection(query, user, data)
+            elif data.startswith("year_"):
+                await self.handle_year_selection(query, user, data)
+            elif data.startswith("offer_"):
+                await self.handle_offer_action(query, user, data)
+            elif data.startswith("rating_"):
+                await self.handle_rating_selection(query, user, data)
+            elif data == "new_request":
+                await self.start_new_request(query, user)
+            elif data == "my_requests":
+                await self.show_user_requests(query, user)
+            elif data.startswith("confirm_request_"):
+                await self.confirm_request(query, user, data)
+            elif data == "select_brand_again":
+                await self.show_brand_selection(query, user)
+            elif data == "show_more_brands":
+                await self.show_all_brands(query, user)
+            elif data.startswith("view_request_"):
+                await self.show_request_details(query, user, data)
+            elif data.startswith("request_action_"):
+                await self.handle_request_action(query, user, data)
+            elif data.startswith("draft_"):
+                await self.handle_draft_action(query, user, data)
+            elif data.startswith("switch_draft_"):
+                await self.switch_to_draft(query, user, data)
+            elif data.startswith("delete_draft_"):
+                await self.delete_draft(query, user, data)
+            elif data.startswith("offer_details_"):
+                await self.show_offer_details(query, user, data)
+            elif data.startswith("add_item_"):
+                await self.handle_add_item(query, user, data)
+            elif data.startswith("manage_items_"):
+                await self.handle_manage_items(query, user, data)
+            elif data.startswith("view_items_"):
+                await self.handle_view_items(query, user, data)
+            elif data.startswith("skip_description_"):
+                await self.handle_skip_description(query, user, data)
+            elif data.startswith("set_quantity_"):
+                await self.handle_set_quantity(query, user, data)
+            elif data.startswith("edit_item_menu_"):
+                await self.handle_edit_item_menu(query, user, data)
+            elif data.startswith("delete_item_menu_"):
+                await self.handle_delete_item_menu(query, user, data)
+            elif data.startswith("edit_item_"):
+                await self.handle_edit_item(query, user, data)
+            elif data.startswith("delete_item_"):
+                await self.handle_delete_item(query, user, data)
+            elif data.startswith("add_media_"):
+                await self.handle_add_media_callback(query, user, data)
+            elif data.startswith("chat_with_customer_"):
+                await self.handle_chat_with_customer(query, user, data)
+            elif data.startswith("view_all_offers_"):
+                await self.handle_view_all_offers(query, user, data)
+            elif data == "main_menu":
+                await self.show_client_menu(query, user)
+            else:
+                # Handle unknown button clicks
+                logger.warning(f"Unknown button callback: '{data}' from user {user.telegram_id}")
+                await self.handle_unknown_button(query, user, data)
+                
+        except Exception as e:
+            logger.error(f"Error in button_callback: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            
+            try:
+                await query.edit_message_text("""
+❌ حدث خطأ مؤقت في النظام
+
+🔧 يرجى المحاولة مرة أخرى، وإذا استمرت المشكلة:
+• اضغط /start لإعادة تشغيل البوت
+• تواصل مع الدعم الفني
+
+نعتذر عن هذا الإزعاج المؤقت.""")
+            except Exception as send_error:
+                logger.error(f"Failed to send error message: {send_error}")
+                # Try to answer the callback at least
+                try:
+                    await query.answer("حدث خطأ، يرجى المحاولة مرة أخرى أو استخدم /start", show_alert=True)
+                except:
+                    pass
+
+    async def handle_unknown_button(self, query, user, data):
+        """Handle unknown or expired button clicks"""
+        try:
+            # Check if it might be an expired or old button
+            expired_button_message = """
+❓ هذا الزر غير متاح الآن
+
+قد يكون هذا الزر منتهي الصلاحية أو من رسالة قديمة.
+
+🔄 لاستخدام البوت، يرجى:
+• اضغط /start للعودة للقائمة الرئيسية
+• أو استخدم الأزرار من أحدث رسالة
+
+🆔 إذا كنت تواجه مشاكل، تواصل مع الدعم مع ذكر الكود: {data}
+            """.format(data=data[:20])  # Show only first 20 chars for privacy
+            
+            keyboard = [
+                [InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="start_bot")],
+                [InlineKeyboardButton("🛒 بدء الطلبات", callback_data="start_ordering")]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await query.edit_message_text(expired_button_message, reply_markup=reply_markup)
+            
+        except Exception as e:
+            logger.error(f"Error in handle_unknown_button: {e}")
+            try:
+                await query.answer("هذا الزر غير متاح. استخدم /start للعودة للقائمة الرئيسية", show_alert=True)
+            except:
+                pass
     
     async def show_request_details(self, query, user, data):
         """Show detailed view of a specific request"""
@@ -307,6 +446,9 @@ class TelegramBot:
                 'cancelled': '❌ ملغي'
             }
             
+            # Get parts description
+            parts_description = await self.get_request_parts_description(request)
+            
             message = f"""
 📋 تفاصيل الطلب
 
@@ -314,7 +456,8 @@ class TelegramBot:
 📊 الحالة: {status_map.get(request.status, request.status)}
 🏙️ المدينة: {request.city.name}
 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
-🔧 القطع المطلوبة: {request.parts}
+📦 القطع المطلوبة:
+{parts_description}
 📅 تاريخ الإنشاء: {request.created_at.strftime('%Y-%m-%d %H:%M')}
 ⏰ ينتهي في: {request.expires_at.strftime('%Y-%m-%d %H:%M')}
 
@@ -425,7 +568,7 @@ class TelegramBot:
         # عرض أول 10 ماركات فقط
         display_brands = sorted_brands[:10]
         
-        message = f"🚗 اختر ماركة السيارة (أشهر {len(display_brands)} ماركات):"
+        message = f"🚗 اختر وكالة السيارة (أشهر {len(display_brands)} وكالة):"
         keyboard = []
         
         # تجميع الماركات في صفوف من اثنين لتوفير مساحة
@@ -439,7 +582,7 @@ class TelegramBot:
         # إضافة زر "عرض المزيد" إذا كان هناك ماركات أخرى
         if len(brands) > 10:
             remaining = len(brands) - 10
-            keyboard.append([InlineKeyboardButton(f"📄 عرض المزيد ({remaining} ماركة)", callback_data="show_more_brands")])
+            keyboard.append([InlineKeyboardButton(f"📄 عرض المزيد ({remaining} وكالة)", callback_data="show_more_brands")])
         
         # Add navigation button
         keyboard.append([InlineKeyboardButton("🔙 القائمة الرئيسية", callback_data="user_type_client")])
@@ -454,7 +597,7 @@ class TelegramBot:
         # تسجيل عدد الماركات
         logger.info(f"Showing all {len(brands)} active brands")
         
-        message = f"🚗 جميع الماركات المتاحة ({len(brands)} ماركة):\n\n"
+        message = f"🚗 جميع الماركات المتاحة ({len(brands)} وكالة):\n\n"
         keyboard = []
         
         # تجميع الماركات في صفوف من اثنين
@@ -533,8 +676,8 @@ class TelegramBot:
                     
                     step_name = {
                         "select_city": "اختيار المدينة",
-                        "select_brand": "اختيار الماركة", 
-                        "select_model": "اختيار الموديل",
+                        "select_brand": "اختيار الوكالة", 
+                        "select_model": "اختيار الاسم السيارة",
                         "select_year_range": "اختيار العقد",
                         "select_year": "اختيار السنة",
                         "enter_parts": "وصف القطع",
@@ -696,12 +839,15 @@ class TelegramBot:
         # عرض أول 10 ماركات فقط مع زر "المزيد"
         display_brands = sorted_brands[:10]
         
+        # Get city name safely
+        city_name = await sync_to_async(lambda: city.name)()
+        
         message = f"""
 📝 **{current_draft['name']}**
 
-✅ تم اختيار: {city.name}
+✅ تم اختيار: {city_name}
 
-🚗 اختر ماركة السيارة (أشهر {len(display_brands)} ماركات):
+🚗 اختر وكالة السيارة (أشهر {len(display_brands)} ماركات):
         """
         keyboard = []
         
@@ -716,7 +862,7 @@ class TelegramBot:
         # إضافة زر "عرض المزيد" إذا كان هناك ماركات أخرى
         if len(brands) > 10:
             remaining = len(brands) - 10
-            keyboard.append([InlineKeyboardButton(f"📄 عرض المزيد ({remaining} ماركة)", callback_data="show_more_brands")])
+            keyboard.append([InlineKeyboardButton(f"📄 عرض المزيد ({remaining} وكالة)", callback_data="show_more_brands")])
         
         # Add navigation buttons
         keyboard.append([
@@ -748,33 +894,36 @@ class TelegramBot:
         
         # Check if brand has models
         if not models:
-            # إذا لم تكن هناك موديلات محددة، انتقل مباشرة لاختيار نطاق السنوات
+            # إذا لم تكن هناك اسم السيارةات محددة، انتقل مباشرة لاختيار نطاق السنوات
             current_draft["request_data"]["brand_id"] = brand_id
-            current_draft["request_data"]["model_id"] = None  # لا يوجد موديل محدد
+            current_draft["request_data"]["model_id"] = None  # لا يوجد اسم السيارة محدد
             current_draft["step"] = "select_year_range"
+            
+            # Get brand name safely
+            brand_name = await sync_to_async(lambda: brand.name)()
             
             message = f"""
 📝 **{current_draft['name']}**
 
-✅ تم اختيار: {brand.name}
-⚠️ لا توجد موديلات محددة لهذه الماركة
+✅ تم اختيار: {brand_name}
+⚠️ لا توجد اسم السيارةات محددة لهذه الوكالة
 
 📅 اختر نطاق سنة الصنع:
             """
             
             keyboard = [
-                [InlineKeyboardButton("2020 - 2024", callback_data="year_range_2020-2024")],
-                [InlineKeyboardButton("2015 - 2019", callback_data="year_range_2015-2019")],
-                [InlineKeyboardButton("2010 - 2014", callback_data="year_range_2010-2014")],
-                [InlineKeyboardButton("2005 - 2009", callback_data="year_range_2005-2009")],
-                [InlineKeyboardButton("2000 - 2004", callback_data="year_range_2000-2004")],
-                [InlineKeyboardButton("1995 - 1999", callback_data="year_range_1995-1999")],
+                [InlineKeyboardButton("2020 - 2024", callback_data="year_range_2020_2024")],
+                [InlineKeyboardButton("2015 - 2019", callback_data="year_range_2015_2019")],
+                [InlineKeyboardButton("2010 - 2014", callback_data="year_range_2010_2014")],
+                [InlineKeyboardButton("2005 - 2009", callback_data="year_range_2005_2009")],
+                [InlineKeyboardButton("2000 - 2004", callback_data="year_range_2000_2004")],
+                [InlineKeyboardButton("1995 - 1999", callback_data="year_range_1995_1999")],
                 [InlineKeyboardButton("أقدم من 1995", callback_data="year_range_older")]
             ]
             
             # Add navigation buttons
             keyboard.append([
-                InlineKeyboardButton("🔙 اختيار ماركة أخرى", callback_data="select_brand_again"),
+                InlineKeyboardButton("🔙 اختيار وكالة أخرى", callback_data="select_brand_again"),
                 InlineKeyboardButton("📋 طلباتي", callback_data="my_requests")
             ])
             
@@ -782,12 +931,16 @@ class TelegramBot:
             await query.edit_message_text(message, reply_markup=reply_markup)
             return
         
+        # Get brand name safely (reuse if already got)
+        if 'brand_name' not in locals():
+            brand_name = await sync_to_async(lambda: brand.name)()
+        
         message = f"""
 📝 **{current_draft['name']}**
 
-✅ تم اختيار: {brand.name}
+✅ تم اختيار: {brand_name}
 
-🚙 اختر موديل السيارة:
+🚙 اختر اسم السيارة السيارة:
         """
         keyboard = []
         
@@ -831,12 +984,15 @@ class TelegramBot:
                 end_year = current_year
             year_ranges.append((start_year, end_year))
         
+        # Get model name safely
+        model_name = await sync_to_async(lambda: model.name)()
+        
         message = f"""
 📝 **{current_draft['name']}**
 
-✅ تم اختيار: {model.name}
+✅ تم اختيار: {model_name}
 
-📅 اختر نطاق سنوات الصنع:
+📅 اختر نطاق الموديل:
         """
         keyboard = []
         
@@ -957,6 +1113,12 @@ class TelegramBot:
             if step == "enter_parts":
                 await self.handle_parts_input(update, user, update.message.text)
                 return
+            elif step == "enter_item_name":
+                await self.handle_item_name_input(update, user, update.message.text)
+                return
+            elif step == "enter_item_unit_price":
+                await self.handle_item_name_input(update, user, update.message.text)
+                return
         
         # Handle user input steps
         step = user_state.get("step")
@@ -968,7 +1130,7 @@ class TelegramBot:
             await update.message.reply_text("لم أفهم. يرجى استخدام الأزرار المتاحة أو العودة إلى القائمة الرئيسية.")
     
     async def handle_parts_input(self, update, user, parts_text):
-        """Handle parts description input"""
+        """Handle parts description input - now follows the same flow as adding new items"""
         # Get current draft
         user_state = self.user_states.get(user.telegram_id, {})
         current_draft_id = user_state.get("current_draft")
@@ -978,26 +1140,176 @@ class TelegramBot:
             return
         
         current_draft = user_state["drafts"][current_draft_id]
-        current_draft["request_data"]["parts"] = parts_text
-        current_draft["step"] = "add_media"
+        
+        # Initialize items list if not exists
+        if "items" not in current_draft["request_data"]:
+            current_draft["request_data"]["items"] = []
+        
+        current_draft["request_data"]["items"].append({
+            "name": parts_text,
+            "description": "",
+            "quantity": 1,  # Fixed to 1
+            "unit_price": 0,  # No price from customer
+            "currency": "SAR",
+            "media_files": []
+        })
+        
+        current_draft["step"] = "manage_items"
         
         message = f"""
+✅ تم إضافة القطعة بنجاح!
+
 📝 **{current_draft['name']}**
 
-✅ تم حفظ وصف القطع: {parts_text}
-
-📸 يمكنك الآن إرسال صور أو فيديو للقطع المطلوبة (اختياري)
-
-أو اضغط "تأكيد الطلب" للمتابعة بدون صور:
+✅ اسم القطعة: {parts_text}
         """
         
         keyboard = [
+            [InlineKeyboardButton("➕ إضافة قطعة أخرى", callback_data=f"add_item_{current_draft_id}")],
+            [InlineKeyboardButton("📋 عرض القطع", callback_data=f"view_items_{current_draft_id}")],
             [InlineKeyboardButton("✅ تأكيد الطلب", callback_data=f"confirm_request_{current_draft_id}")],
-            [InlineKeyboardButton("📋 طلباتي", callback_data="my_requests")]
+            [InlineKeyboardButton("🔙 رجوع", callback_data=f"manage_items_{current_draft_id}")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
         await update.message.reply_text(message, reply_markup=reply_markup)
+    
+    async def show_items_management(self, update, user, draft_id):
+        """Show current items and management options"""
+        user_state = self.user_states.get(user.telegram_id, {})
+        
+        # Check if drafts exist
+        if "drafts" not in user_state or draft_id not in user_state["drafts"]:
+            error_msg = "❌ خطأ: انتهت الجلسة. يرجى بدء طلب جديد بالضغط على /start"
+            if hasattr(update, 'callback_query') and update.callback_query:
+                await update.callback_query.edit_message_text(error_msg)
+            else:
+                await update.message.reply_text(error_msg)
+            return
+        
+        current_draft = user_state["drafts"][draft_id]
+        items = current_draft["request_data"].get("items", [])
+        
+        message = f"📝 **{current_draft['name']}**\n\n"
+        
+        if items:
+            message += "📦 **القطع المطلوبة:**\n"
+            for i, item in enumerate(items, 1):
+                message += f"{i}️⃣ {item['name']}\n"
+            message += "\n"
+        else:
+            message += "❌ لا توجد قطع مضافة بعد\n\n"
+        
+        message += "اختر ما تريد فعله:"
+        
+        keyboard = []
+        keyboard.append([InlineKeyboardButton("➕ إضافة قطعة جديدة", callback_data=f"add_item_{draft_id}")])
+        
+        if items:
+            keyboard.append([InlineKeyboardButton("✏️ تعديل قطعة", callback_data=f"edit_item_menu_{draft_id}")])
+            keyboard.append([InlineKeyboardButton("🗑️ حذف قطعة", callback_data=f"delete_item_menu_{draft_id}")])
+            keyboard.append([InlineKeyboardButton("📸 إضافة صور/فيديو", callback_data=f"add_media_{draft_id}")])
+            keyboard.append([InlineKeyboardButton("✅ تأكيد الطلب", callback_data=f"confirm_request_{draft_id}")])
+        
+        keyboard.append([InlineKeyboardButton("📋 طلباتي", callback_data="my_requests")])
+        
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        if hasattr(update, 'callback_query') and update.callback_query:
+            await update.callback_query.edit_message_text(message, reply_markup=reply_markup)
+        else:
+            await update.message.reply_text(message, reply_markup=reply_markup)
+    
+    async def handle_item_name_input(self, update, user, item_name):
+        """Handle item name input"""
+        user_state = self.user_states.get(user.telegram_id, {})
+        current_draft_id = user_state.get("current_draft")
+        
+        if not current_draft_id or current_draft_id not in user_state.get("drafts", {}):
+            await update.message.reply_text("❌ خطأ: لم يتم العثور على المسودة.")
+            return
+        
+        current_draft = user_state["drafts"][current_draft_id]
+        
+        # Initialize items list if not exists
+        if "items" not in current_draft["request_data"]:
+            current_draft["request_data"]["items"] = []
+        
+        current_draft["request_data"]["items"].append({
+            "name": item_name,
+            "description": "",
+            "quantity": 1,  # Fixed to 1
+            "unit_price": 0,  # No price from customer
+            "currency": "SAR",
+            "media_files": []
+        })
+        
+        current_draft["step"] = "manage_items"
+        
+        message = f"""
+✅ تم إضافة القطعة بنجاح!
+
+📝 **{current_draft['name']}**
+
+✅ اسم القطعة: {item_name}
+        """
+        
+        keyboard = [
+            [InlineKeyboardButton("➕ إضافة قطعة أخرى", callback_data=f"add_item_{current_draft_id}")],
+            [InlineKeyboardButton("📋 عرض القطع", callback_data=f"view_items_{current_draft_id}")],
+            [InlineKeyboardButton("✅ تأكيد الطلب", callback_data=f"confirm_request_{current_draft_id}")],
+            [InlineKeyboardButton("🔙 رجوع", callback_data=f"manage_items_{current_draft_id}")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await update.message.reply_text(message, reply_markup=reply_markup)
+    
+    
+    async def handle_item_unit_price_input(self, update, user, price_text):
+        """Handle item name input - now directly adds item without price"""
+        user_state = self.user_states.get(user.telegram_id, {})
+        current_draft_id = user_state.get("current_draft")
+        
+        if not current_draft_id or current_draft_id not in user_state.get("drafts", {}):
+            await update.message.reply_text("❌ خطأ: لم يتم العثور على المسودة.")
+            return
+        
+        current_draft = user_state["drafts"][current_draft_id]
+        
+        # Add the item to the list without price
+        if "items" not in current_draft["request_data"]:
+            current_draft["request_data"]["items"] = []
+        
+        current_draft["request_data"]["items"].append({
+            "name": current_draft["temp_item"]["name"],
+            "description": current_draft["temp_item"].get("description", ""),
+            "quantity": 1,  # Fixed to 1
+            "unit_price": 0,  # No price from customer
+            "currency": "SAR",
+            "media_files": []
+        })
+        
+        # Clear temp item
+        current_draft["temp_item"] = {}
+        current_draft["step"] = "manage_items"
+        
+        message = f"""
+        ✅ تم إضافة القطعة بنجاح!
+        
+        📝 **{current_draft['name']}**
+        
+        ✅ اسم القطعة: {current_draft["request_data"]["items"][-1]["name"]}
+        """
+        
+        keyboard = [
+            [InlineKeyboardButton("➕ إضافة قطعة أخرى", callback_data=f"add_item_{current_draft_id}")],
+            [InlineKeyboardButton("📋 عرض القطع", callback_data=f"view_items_{current_draft_id}")],
+            [InlineKeyboardButton("✅ تأكيد الطلب", callback_data=f"confirm_request_{current_draft_id}")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await update.message.reply_text(message, reply_markup=reply_markup)
+    
     
     async def handle_media(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle photo/video uploads"""
@@ -1039,10 +1351,15 @@ class TelegramBot:
 
 ✅ تم إضافة الملف ({len(current_draft["request_data"]["media_files"])} ملف)
 
-يمكنك إضافة المزيد من الصور/الفيديو أو تأكيد الطلب:
+يمكنك:
+• ➕ إضافة قطعة جديدة
+• 📸 إضافة المزيد من الصور/الفيديو
+• 📤 تأكيد الطلب
         """
         
         keyboard = [
+            [InlineKeyboardButton("➕ إضافة قطعة جديدة", callback_data=f"add_item_{current_draft_id}")],
+            [InlineKeyboardButton("📸 إضافة المزيد من الصور/الفيديو", callback_data=f"add_media_{current_draft_id}")],
             [InlineKeyboardButton("✅ تأكيد الطلب", callback_data=f"confirm_request_{current_draft_id}")],
             [InlineKeyboardButton("📋 طلباتي", callback_data="my_requests")]
         ]
@@ -1065,32 +1382,85 @@ class TelegramBot:
         request_data = current_draft["request_data"]
         
         # Validate required fields
-        required_fields = ["city_id", "brand_id", "model_id", "year", "parts"]
+        required_fields = ["city_id", "brand_id", "model_id", "year"]
         for field in required_fields:
             if field not in request_data:
                 await query.edit_message_text(f"❌ خطأ: حقل {field} مفقود. يرجى إكمال جميع البيانات المطلوبة.")
                 return
         
+        # Validate that there are items
+        items = request_data.get("items", [])
+        if not items:
+            await query.edit_message_text("❌ خطأ: يجب إضافة قطعة واحدة على الأقل.")
+            return
+        
         # Create the request
         try:
-            city = await sync_to_async(City.objects.get)(id=request_data["city_id"])
-            brand = await sync_to_async(Brand.objects.get)(id=request_data["brand_id"])
-            model = await sync_to_async(Model.objects.get)(id=request_data["model_id"])
+            # Validate that the referenced objects exist before creating the request
+            try:
+                city = await sync_to_async(City.objects.get)(id=request_data["city_id"])
+            except City.DoesNotExist:
+                await query.edit_message_text("""
+❌ خطأ في بيانات المدينة
+
+المدينة المحددة غير موجودة في النظام.
+يرجى بدء طلب جديد واختيار مدينة صحيحة.
+                """)
+                return
             
+            try:
+                brand = await sync_to_async(Brand.objects.get)(id=request_data["brand_id"])
+            except Brand.DoesNotExist:
+                await query.edit_message_text("""
+❌ خطأ في بيانات الوكالة
+
+الوكالة المحددة غير موجودة في النظام.
+يرجى بدء طلب جديد واختيار وكالة صحيحة.
+                """)
+                return
+            
+            try:
+                model = await sync_to_async(Model.objects.get)(id=request_data["model_id"])
+            except Model.DoesNotExist:
+                await query.edit_message_text("""
+❌ خطأ في بيانات اسم السيارة
+
+اسم السيارة المحدد غير موجود في النظام.
+يرجى بدء طلب جديد واختيار اسم سيارة صحيح.
+                """)
+                return
+            
+            # Create request with empty parts field (legacy)
             request = await sync_to_async(Request.objects.create)(
                 user=user,
                 city=city,
                 brand=brand,
                 model=model,
                 year=request_data["year"],
-                parts=request_data["parts"],
+                parts="",  # Will be populated by items
                 media_files=request_data.get("media_files", [])
             )
+            
+            # Create individual RequestItem objects
+            from .models import RequestItem
+            for item_data in items:
+                await sync_to_async(RequestItem.objects.create)(
+                    request=request,
+                    name=item_data["name"],
+                    description=item_data.get("description", ""),
+                    quantity=item_data.get("quantity", 1),
+                    media_files=item_data.get("media_files", [])
+                )
             
             # Remove the draft from user states (it's now a real request)
             del user_state["drafts"][draft_id]
             if user_state.get("current_draft") == draft_id:
                 user_state["current_draft"] = None
+            
+            # Build items list for display
+            items_text = ""
+            for i, item in enumerate(items, 1):
+                items_text += f"{i}️⃣ {item['name']}\n"
             
             # Send confirmation to user
             message = f"""
@@ -1099,7 +1469,9 @@ class TelegramBot:
 🆔 رقم الطلب: {request.order_id}
 🏙️ المدينة: {city.name}  
 🚗 السيارة: {brand.name} {model.name} {request_data["year"]}
-🔧 القطع: {request_data["parts"]}
+
+📦 القطع المطلوبة:
+{items_text}
 ⏰ ينتهي الطلب في: {request.expires_at.strftime('%Y-%m-%d %H:%M')}
 
 📤 تم إرسال طلبك إلى التشاليح المسجّلة في منطقتك.
@@ -1117,34 +1489,124 @@ class TelegramBot:
             
             await query.edit_message_text(message, reply_markup=reply_markup)
             
-            # Notify junkyards in the same city
-            await self.notify_junkyards(request)
+            # Use workflow service to process confirmed order
+            try:
+                from .services import workflow_service
+                workflow_service.set_telegram_bot(self)
+                await workflow_service.process_confirmed_order(request)
+                logger.info(f"✅ Successfully processed workflow for request {request.order_id}")
+                
+            except Exception as workflow_error:
+                # Log the workflow error but don't fail the request creation
+                logger.error(f"⚠️ Error in workflow processing for request {request.order_id}: {workflow_error}")
+                
+                # Send additional message to user about potential notification issues
+                notification_message = f"""
+ℹ️ تنبيه: تم إنشاء طلبك بنجاح برقم {request.order_id}
+
+⚠️ لكن قد تكون هناك مشكلة في إرسال الإشعارات للتشاليح.
+
+📞 يرجى التواصل مع الدعم إذا لم تصل عروض خلال ساعة.
+
+🔄 يمكنك مراجعة حالة طلبك من "📋 طلباتي"
+                """
+                
+                try:
+                    await query.message.reply_text(notification_message.strip())
+                except:
+                    pass  # Don't fail if we can't send this notification
             
         except Exception as e:
-            logger.error(f"Error creating request: {e}")
-            await query.edit_message_text("حدث خطأ أثناء إنشاء الطلب. يرجى المحاولة مرة أخرى.")
+            logger.error(f"❌ Error creating request: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            
+            # More specific error messages
+            error_msg = str(e).lower()
+            
+            if "city" in error_msg and "does not exist" in error_msg:
+                await query.edit_message_text("""
+❌ خطأ في بيانات المدينة
+
+المدينة المحددة غير موجودة في النظام.
+يرجى بدء طلب جديد واختيار مدينة صحيحة.
+                """)
+            elif "brand" in error_msg and "does not exist" in error_msg:
+                await query.edit_message_text("""
+❌ خطأ في بيانات الوكالة
+
+الوكالة المحددة غير موجودة في النظام.
+يرجى بدء طلب جديد واختيار وكالة صحيحة.
+                """)
+            elif "model" in error_msg and "does not exist" in error_msg:
+                await query.edit_message_text("""
+❌ خطأ في بيانات الاسم السيارة
+
+الاسم السيارة المحدد غير موجود في النظام.
+يرجى بدء طلب جديد واختيار اسم السيارة صحيح.
+                """)
+            elif "database" in error_msg or "connection" in error_msg:
+                await query.edit_message_text("""
+❌ مشكلة في قاعدة البيانات
+
+يرجى المحاولة مرة أخرى بعد دقائق قليلة.
+إذا استمرت المشكلة، يرجى التواصل مع الدعم الفني.
+                """)
+            else:
+                await query.edit_message_text(f"""
+❌ حدث خطأ أثناء إنشاء الطلب
+
+تفاصيل الخطأ: خطأ في النظام
+
+يرجى المحاولة مرة أخرى، وإذا استمرت المشكلة، يرجى التواصل مع الدعم الفني.
+                """)
     
     async def notify_junkyards(self, request):
-        """Notify junkyards about new request"""
+        """DEPRECATED: Notify junkyards about new request - now handled by workflow service"""
+        logger.warning(f"🚨 DEPRECATED: notify_junkyards called for request {request.order_id}. This should now be handled by workflow service.")
+        return  # Don't execute the old logic
         from bot.models import JunkyardStaff
+        
+        logger.info(f"Starting to notify junkyards for request {request.order_id} in city {request.city.name}")
         
         junkyards = await sync_to_async(list)(
             Junkyard.objects.filter(city=request.city, is_active=True)
         )
         
+        logger.info(f"Found {len(junkyards)} active junkyards in {request.city.name}")
+        
+        if not junkyards:
+            logger.warning(f"No active junkyards found in city {request.city.name} for request {request.order_id}")
+            return
+        
+        notifications_sent = 0
+        notifications_failed = 0
+        
         for junkyard in junkyards:
             try:
+                logger.info(f"Processing junkyard: {junkyard.user.first_name} (ID: {junkyard.id})")
+                # Get parts description safely in async context
+                parts_description = await self.get_request_parts_description(request)
+                
                 message = f"""
 🆕 طلب جديد في منطقتك!
 
 🆔 رقم الطلب: {request.order_id}
 👤 العميل: {request.user.first_name}
 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
-🔧 القطع المطلوبة: {request.parts}
+
+📦 القطع المطلوبة:
+{parts_description}
+
 ⏰ ينتهي في: {request.expires_at.strftime('%Y-%m-%d %H:%M')}
+
+💡 يرجى إرسال عرضك موضحًا سعر كل قطعة ومدة التوريد:
+{self._format_parts_for_pricing(parts_description)}
+
+⏱️ مدة التوريد المتوقعة: ___ يوم
                 """
                 
-                keyboard = [[InlineKeyboardButton("💰 إضافة سعر", callback_data=f"offer_add_{request.id}")]]
+                keyboard = []
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 
                 # Get all users associated with this junkyard (owner + staff)
@@ -1177,16 +1639,24 @@ class TelegramBot:
                     logger.warning(f"Junkyard {junkyard.id} ({junkyard.user.first_name}) has no users with telegram_id - skipping notification")
                     continue
                 
+                logger.info(f"Found {len(users_to_notify)} users to notify for junkyard {junkyard.id}")
+                
                 for user_info in users_to_notify:
                     user = user_info['user']
                     role = user_info['role']
                     
-                    logger.info(f"Sending notification to {role} {user.first_name} (telegram_id: {user.telegram_id}) for junkyard {junkyard.id}")
-                    await self.application.bot.send_message(
-                        chat_id=user.telegram_id,
-                        text=message,
-                        reply_markup=reply_markup
-                    )
+                    try:
+                        logger.info(f"Sending notification to {role} {user.first_name} (telegram_id: {user.telegram_id}) for junkyard {junkyard.id}")
+                        await self.application.bot.send_message(
+                            chat_id=user.telegram_id,
+                            text=message,
+                            reply_markup=reply_markup
+                        )
+                        notifications_sent += 1
+                        logger.info(f"✅ Successfully sent notification to {user.first_name}")
+                    except Exception as e:
+                        notifications_failed += 1
+                        logger.error(f"❌ Failed to send notification to {user.first_name} (telegram_id: {user.telegram_id}): {e}")
                 
                 # Send media files to all users if any
                 for media in request.media_files:
@@ -1207,7 +1677,10 @@ class TelegramBot:
                             logger.error(f"Error sending media to {user.first_name}: {e}")
                 
             except Exception as e:
-                logger.error(f"Error notifying junkyard {junkyard.id}: {e}")
+                notifications_failed += 1
+                logger.error(f"Error notifying junkyard {junkyard.id} ({junkyard.user.first_name}): {e}")
+        
+        logger.info(f"Notification summary for request {request.order_id}: {notifications_sent} sent, {notifications_failed} failed")
     
     async def handle_draft_action(self, query, user, data):
         """Handle draft management actions"""
@@ -1366,9 +1839,9 @@ class TelegramBot:
                 return
             
             # Validate offer has mandatory fields
-            if not offer.price or not offer.delivery_time:
+            if not offer.price:
                 message = """
-❌ هذا العرض غير مكتمل (يفتقر للسعر أو مدة التوريد).
+❌ هذا العرض غير مكتمل (يفتقر للسعر).
 
 يرجى التواصل مع التشليح لتحديث العرض.
                 """
@@ -1380,19 +1853,12 @@ class TelegramBot:
                 await query.edit_message_text(message, reply_markup=reply_markup)
                 return
             
-            # Accept the offer and lock other offers
-            offer.status = 'accepted'
-            await sync_to_async(offer.save)()
+            # Use workflow service to process the decision
+            from .services import workflow_service
+            workflow_service.set_telegram_bot(self)
+            await workflow_service.process_customer_offer_decision(offer, 'accept', user)
             
-            # Update request status
-            request.status = 'accepted'
-            await sync_to_async(request.save)()
-            
-            # Lock all other offers for this request
-            await sync_to_async(
-                request.offers.exclude(id=offer_id).update
-            )(status='locked')
-            
+            # Show acceptance confirmation with offer details
             message = f"""
 ✅ تم قبول العرض!
 
@@ -1414,9 +1880,6 @@ class TelegramBot:
             
             await query.edit_message_text(message, reply_markup=reply_markup)
             
-            # Notify the junkyard about acceptance
-            await self.notify_junkyard_acceptance(offer)
-            
         except Exception as e:
             logger.error(f"Error accepting offer: {e}")
             await query.edit_message_text("حدث خطأ أثناء قبول العرض. يرجى المحاولة مرة أخرى.")
@@ -1426,23 +1889,13 @@ class TelegramBot:
         try:
             offer = await sync_to_async(Offer.objects.get)(id=offer_id, request__user=user)
             
-            # Update offer status
-            offer.status = 'rejected'
-            await sync_to_async(offer.save)()
+            # Use workflow service to process the decision
+            from .services import workflow_service
+            workflow_service.set_telegram_bot(self)
+            await workflow_service.process_customer_offer_decision(offer, 'reject', user)
             
-            message = """
-❌ تم رفض العرض
-
-يمكنك مراجعة العروض الأخرى أو إنشاء طلب جديد
-            """
-            
-            keyboard = [
-                [InlineKeyboardButton("🆕 طلب جديد", callback_data="new_request")],
-                [InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="user_type_client")]
-            ]
-            reply_markup = InlineKeyboardMarkup(keyboard)
-            
-            await query.edit_message_text(message, reply_markup=reply_markup)
+            # Edit the message to show rejection confirmation
+            await query.edit_message_text("❌ تم رفض العرض. سيتم إشعار التشليح.")
             
         except Exception as e:
             logger.error(f"Error rejecting offer: {e}")
@@ -1466,8 +1919,39 @@ class TelegramBot:
     async def start_offer_process(self, query, user, request_id):
         """Start the offer creation process with mandatory price and delivery time"""
         try:
-            request = await sync_to_async(Request.objects.get)(id=request_id)
-            junkyard = await sync_to_async(Junkyard.objects.get)(user=user)
+            # Check if request exists - load related fields to avoid async issues
+            try:
+                request = await sync_to_async(
+                    Request.objects.select_related('brand', 'model', 'city', 'user').get
+                )(id=request_id)
+            except Request.DoesNotExist:
+                logger.error(f"Request {request_id} not found for user {user.telegram_id}")
+                await query.edit_message_text("❌ الطلب غير موجود أو انتهت صلاحيته.")
+                return
+            
+            # Check if user is a junkyard
+            try:
+                junkyard = await sync_to_async(Junkyard.objects.get)(user=user)
+            except Junkyard.DoesNotExist:
+                logger.error(f"User {user.telegram_id} ({user.first_name}) is not a junkyard but trying to add offer")
+                await query.edit_message_text("""
+❌ عذراً، لا يمكنك تقديم عروض.
+
+هذا الحساب غير مُسجل كتشليح في النظام.
+
+للحصول على حساب تشليح، يرجى التواصل مع الإدارة.
+                """)
+                return
+            
+            # Check if junkyard is active
+            if not junkyard.is_active:
+                logger.warning(f"Inactive junkyard {junkyard.id} trying to add offer")
+                await query.edit_message_text("""
+❌ حسابك غير مُفعل حالياً.
+
+يرجى التواصل مع الإدارة لتفعيل حسابك.
+                """)
+                return
             
             # Check if request is still accepting offers
             if request.status == 'accepted':
@@ -1479,17 +1963,34 @@ class TelegramBot:
                 await query.edit_message_text(message)
                 return
             
+            # Check if junkyard already has an offer for this request
+            existing_offer = await sync_to_async(
+                lambda: Offer.objects.filter(request=request, junkyard=junkyard).exists()
+            )()
+            
+            if existing_offer:
+                await query.edit_message_text("""
+❌ لديك عرض مُسبق لهذا الطلب.
+
+لا يمكن إضافة أكثر من عرض واحد للطلب الواحد.
+                """)
+                return
+            
             self.user_states[user.telegram_id] = {
                 "step": "enter_offer_price",
                 "request_id": request_id,
                 "offer_data": {}
             }
             
+            # Get parts description safely in async context
+            parts_description = await self.get_request_parts_description(request)
+            
             message = f"""
 💰 إضافة عرض سعر للطلب: {request.order_id}
 
 🚗 السيارة: {request.brand.name} {request.model.name} {request.year}
-🔧 القطع: {request.parts}
+📦 القطع المطلوبة:
+{parts_description}
 
 📝 **خطوة 1 من 2:**
 أرسل السعر المطلوب (بالريال السعودي فقط):
@@ -1498,10 +1999,65 @@ class TelegramBot:
             """
             
             await query.edit_message_text(message)
+            logger.info(f"✅ Started offer process for junkyard {junkyard.id} on request {request_id}")
             
         except Exception as e:
-            logger.error(f"Error starting offer process: {e}")
-            await query.edit_message_text("حدث خطأ. يرجى المحاولة مرة أخرى.")
+            logger.error(f"❌ Error starting offer process for user {user.telegram_id}: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            
+            # More specific error handling
+            error_str = str(e).lower()
+            
+            if "does not exist" in error_str and "junkyard" in error_str:
+                error_message = """
+❌ حسابك غير مُسجل كتشليح في النظام
+
+يرجى التواصل مع الإدارة لتسجيل حسابك.
+
+📞 خدمة العملاء متاحة لمساعدتك.
+                """
+            elif "not active" in error_str or "inactive" in error_str:
+                error_message = """
+⚠️ حسابك غير مُفعل حالياً
+
+يرجى التواصل مع الإدارة لتفعيل حسابك.
+
+📞 سيتم تفعيلك خلال دقائق قليلة.
+                """
+            elif "telegram_id" in error_str or "chat" in error_str:
+                error_message = """
+🔧 مشكلة في إعدادات حسابك
+
+الحل السريع:
+1. اضغط /start مرة أخرى
+2. جرب الضغط على "إضافة عرض" مرة أخرى
+
+إذا لم يعمل، يرجى التواصل مع الدعم.
+                """
+            else:
+                error_message = f"""
+⚠️ حدث خطأ مؤقت في النظام
+
+الحل السريع:
+1. اضغط /start 
+2. جرب مرة أخرى
+
+إذا استمر الخطأ، يرجى التواصل مع الدعم الفني.
+
+🔧 كود الخطأ: {str(e)[:50]}...
+                """
+            
+            # Only edit message if it's different from current content
+            try:
+                await query.edit_message_text(error_message.strip())
+            except Exception as edit_error:
+                if "Message is not modified" in str(edit_error):
+                    # Message is already the same, just answer the callback
+                    await query.answer("حدث خطأ، يرجى المحاولة مرة أخرى")
+                else:
+                    # Different error, re-raise it
+                    raise edit_error
     
     async def handle_offer_price_input(self, update, user, price_text):
         """Handle offer price input"""
@@ -1528,11 +2084,11 @@ class TelegramBot:
 ✅ السعر: {price} ريال
 
 📝 **خطوة 2 من 2:**
-أرسل مدة التوريد المتوقعة:
+أرسل ملاحظات إضافية (اختياري):
 
-مثال: يومين
-مثال: 3 أيام
-مثال: أسبوع واحد
+        مثال: القطعة في حالة ممتازة
+        مثال: متوفر فوراً
+        مثال: يحتاج إصلاح بسيط
         """
         
         await update.message.reply_text(message)
@@ -1551,17 +2107,25 @@ class TelegramBot:
         offer_data["delivery_time"] = delivery_time
         
         try:
-            request = await sync_to_async(Request.objects.get)(id=request_id)
-            junkyard = await sync_to_async(Junkyard.objects.get)(user=user)
+            # Load related fields to avoid async issues
+            request = await sync_to_async(
+                Request.objects.select_related('brand', 'model', 'city', 'user').get
+            )(id=request_id)
+            junkyard = await sync_to_async(
+                Junkyard.objects.select_related('user').get
+            )(user=user)
             
-            # Create the offer
-            offer = await sync_to_async(Offer.objects.create)(
-                request=request,
-                junkyard=junkyard,
-                price=offer_data["price"],
-                delivery_time=delivery_time,
-                status='pending'
-            )
+            # Create the offer using a proper async function
+            def create_offer():
+                return Offer.objects.create(
+                    request=request,
+                    junkyard=junkyard,
+                    price=offer_data["price"],
+                    delivery_time=delivery_time,
+                    status='pending'
+                )
+            
+            offer = await sync_to_async(create_offer)()
             
             # Clear user state
             del self.user_states[user.telegram_id]
@@ -1578,8 +2142,10 @@ class TelegramBot:
             
             await update.message.reply_text(message)
             
-            # Notify customer about new offer
-            await self.notify_customer_new_offer(offer)
+            # Use workflow service to process new offer
+            from .services import workflow_service
+            workflow_service.set_telegram_bot(self)
+            await workflow_service.process_junkyard_offer(offer)
             
         except Exception as e:
             logger.error(f"Error creating offer: {e}")
@@ -1829,6 +2395,410 @@ class TelegramBot:
                 await update.message.reply_text("❌ لديك مخزن مسجل بالفعل! استخدم /start للعودة للقائمة الرئيسية.")
             else:
                 await update.message.reply_text("حدث خطأ أثناء التسجيل. يرجى المحاولة مرة أخرى لاحقاً.")
+
+    # New Item Management Callback Handlers
+    async def handle_add_item(self, query, user, data):
+        """Handle add item button"""
+        draft_id = data.split("_")[2]
+        user_state = self.user_states.get(user.telegram_id, {})
+        
+        if draft_id not in user_state.get("drafts", {}):
+            await query.edit_message_text("❌ خطأ: لم يتم العثور على المسودة.")
+            return
+        
+        current_draft = user_state["drafts"][draft_id]
+        current_draft["step"] = "enter_item_name"
+        
+        message = f"""
+📝 **{current_draft['name']}**
+
+➕ إضافة قطعة جديدة
+
+📝 أدخل اسم القطعة المطلوبة:
+مثال: "مقص شباك الواصل", "فلتر زيت", "كفر شنطة"
+        """
+        
+        keyboard = [
+            [InlineKeyboardButton("🔙 رجوع", callback_data=f"manage_items_{draft_id}")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.edit_message_text(message, reply_markup=reply_markup)
+    
+    async def handle_manage_items(self, query, user, data):
+        """Handle manage items callback"""
+        draft_id = data.split("_")[2]
+        await self.show_items_management(query, user, draft_id)
+    
+    async def handle_view_items(self, query, user, data):
+        """Handle view items callback"""
+        draft_id = data.split("_")[2]
+        user_state = self.user_states.get(user.telegram_id, {})
+        
+        if draft_id not in user_state.get("drafts", {}):
+            await query.edit_message_text("❌ خطأ: لم يتم العثور على المسودة.")
+            return
+        
+        draft = user_state["drafts"][draft_id]
+        items = draft.get("request_data", {}).get("items", [])
+        
+        if not items:
+            message = """
+            📋 **عرض القطع**
+            
+            لا توجد قطع مضافة بعد.
+            """
+            keyboard = [
+                [InlineKeyboardButton("➕ إضافة قطعة", callback_data=f"add_item_{draft_id}")],
+                [InlineKeyboardButton("🔙 رجوع", callback_data=f"manage_items_{draft_id}")]
+            ]
+        else:
+            message = f"""
+            📋 **عرض القطع ({len(items)} قطعة)**
+            
+            """
+            
+            for i, item in enumerate(items, 1):
+                message += f"""
+            **{i}. {item['name']}**
+            """
+                if item.get("description"):
+                    message += f"📝 الوصف: {item['description']}\n"
+                message += "\n"
+            
+            
+            keyboard = [
+                [InlineKeyboardButton("➕ إضافة قطعة أخرى", callback_data=f"add_item_{draft_id}")],
+                [InlineKeyboardButton("✏️ تعديل القطع", callback_data=f"manage_items_{draft_id}")],
+                [InlineKeyboardButton("✅ تأكيد الطلب", callback_data=f"confirm_request_{draft_id}")],
+                [InlineKeyboardButton("🔙 رجوع", callback_data=f"manage_items_{draft_id}")]
+            ]
+        
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(message, reply_markup=reply_markup)
+    
+    async def handle_skip_description(self, query, user, data):
+        """Handle skip description callback"""
+        draft_id = data.split("_")[2]
+        user_state = self.user_states.get(user.telegram_id, {})
+        
+        # Check if drafts exist
+        if "drafts" not in user_state or draft_id not in user_state["drafts"]:
+            await query.edit_message_text("❌ خطأ: انتهت الجلسة. يرجى بدء طلب جديد بالضغط على /start")
+            return
+        
+        current_draft = user_state["drafts"][draft_id]
+        
+        # Check if temp_item exists
+        if "temp_item" not in current_draft:
+            await query.edit_message_text("❌ خطأ: بيانات القطعة مفقودة. يرجى بدء إضافة قطعة جديدة.")
+            return
+        
+        current_draft["temp_item"]["description"] = ""
+        current_draft["step"] = "enter_item_quantity"
+        
+        message = f"""
+📝 **{current_draft['name']}**
+
+✅ اسم القطعة: {current_draft["temp_item"]["name"]}
+
+🔢 الكمية محددة على 1 قطعة (لا يمكن تغييرها):
+        """
+        
+        keyboard = [
+            [InlineKeyboardButton("1️⃣", callback_data=f"set_quantity_1_{draft_id}")],
+            [InlineKeyboardButton("2️⃣", callback_data=f"set_quantity_2_{draft_id}")],
+            [InlineKeyboardButton("3️⃣", callback_data=f"set_quantity_3_{draft_id}")],
+            [InlineKeyboardButton("🔙 رجوع", callback_data=f"manage_items_{draft_id}")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.edit_message_text(message, reply_markup=reply_markup)
+    
+    async def handle_set_quantity(self, query, user, data):
+        """Handle quantity button callbacks"""
+        parts = data.split("_")
+        quantity = int(parts[2])
+        draft_id = parts[3]
+        
+        user_state = self.user_states.get(user.telegram_id, {})
+        
+        # Check if drafts exist
+        if "drafts" not in user_state or draft_id not in user_state["drafts"]:
+            await query.edit_message_text("❌ خطأ: انتهت الجلسة. يرجى بدء طلب جديد بالضغط على /start")
+            return
+        
+        current_draft = user_state["drafts"][draft_id]
+        
+        # Check if temp_item exists
+        if "temp_item" not in current_draft:
+            await query.edit_message_text("❌ خطأ: بيانات القطعة مفقودة. يرجى بدء إضافة قطعة جديدة.")
+            return
+        
+        # Add the item to the list
+        if "items" not in current_draft["request_data"]:
+            current_draft["request_data"]["items"] = []
+        
+        current_draft["request_data"]["items"].append({
+            "name": current_draft["temp_item"]["name"],
+            "description": current_draft["temp_item"].get("description", ""),
+            "quantity": quantity,
+            "media_files": []
+        })
+        
+        # Clean up temporary item data
+        del current_draft["temp_item"]
+        current_draft["step"] = "manage_items"
+        
+        await query.answer("✅ تم إضافة القطعة بنجاح!")
+        await self.show_items_management(query, user, draft_id)
+    
+    async def handle_edit_item_menu(self, query, user, data):
+        """Show edit item menu"""
+        draft_id = data.split("_")[3]
+        user_state = self.user_states.get(user.telegram_id, {})
+        current_draft = user_state["drafts"][draft_id]
+        items = current_draft["request_data"].get("items", [])
+        
+        if not items:
+            await query.answer("❌ لا توجد قطع لتعديلها")
+            return
+        
+        message = f"📝 **{current_draft['name']}**\n\n"
+        message += "✏️ **اختر القطعة المراد تعديلها:**\n\n"
+        
+        keyboard = []
+        for i, item in enumerate(items):
+            quantity_text = f" (x{item['quantity']})" if item.get('quantity', 1) > 1 else ""
+            button_text = f"{i+1}. {item['name']}{quantity_text}"
+            keyboard.append([InlineKeyboardButton(button_text, callback_data=f"edit_item_{draft_id}_{i}")])
+        
+        keyboard.append([InlineKeyboardButton("🔙 رجوع", callback_data=f"manage_items_{draft_id}")])
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.edit_message_text(message, reply_markup=reply_markup)
+    
+    async def handle_delete_item_menu(self, query, user, data):
+        """Show delete item menu"""
+        draft_id = data.split("_")[3]
+        user_state = self.user_states.get(user.telegram_id, {})
+        current_draft = user_state["drafts"][draft_id]
+        items = current_draft["request_data"].get("items", [])
+        
+        if not items:
+            await query.answer("❌ لا توجد قطع لحذفها")
+            return
+        
+        message = f"📝 **{current_draft['name']}**\n\n"
+        message += "🗑️ **اختر القطعة المراد حذفها:**\n\n"
+        
+        keyboard = []
+        for i, item in enumerate(items):
+            quantity_text = f" (x{item['quantity']})" if item.get('quantity', 1) > 1 else ""
+            button_text = f"❌ {i+1}. {item['name']}{quantity_text}"
+            keyboard.append([InlineKeyboardButton(button_text, callback_data=f"delete_item_{draft_id}_{i}")])
+        
+        keyboard.append([InlineKeyboardButton("🔙 رجوع", callback_data=f"manage_items_{draft_id}")])
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.edit_message_text(message, reply_markup=reply_markup)
+    
+    async def handle_edit_item(self, query, user, data):
+        """Handle edit specific item"""
+        parts = data.split("_")
+        draft_id = parts[2]
+        item_index = int(parts[3])
+        
+        user_state = self.user_states.get(user.telegram_id, {})
+        current_draft = user_state["drafts"][draft_id]
+        items = current_draft["request_data"].get("items", [])
+        
+        if item_index >= len(items):
+            await query.answer("❌ القطعة غير موجودة")
+            return
+        
+        item = items[item_index]
+        
+        message = f"""
+📝 **{current_draft['name']}**
+
+✏️ **تعديل القطعة:**
+🔧 الاسم: {item['name']}
+💭 الوصف: {item.get('description', 'لا يوجد')}
+🔢 الكمية: {item.get('quantity', 1)}
+
+ماذا تريد تعديل؟
+        """
+        
+        keyboard = [
+            [InlineKeyboardButton("📝 تعديل الاسم", callback_data=f"edit_name_{draft_id}_{item_index}")],
+            [InlineKeyboardButton("💭 تعديل الوصف", callback_data=f"edit_desc_{draft_id}_{item_index}")],
+            [InlineKeyboardButton("🔢 تعديل الكمية", callback_data=f"edit_qty_{draft_id}_{item_index}")],
+            [InlineKeyboardButton("🔙 رجوع", callback_data=f"edit_item_menu_{draft_id}")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.edit_message_text(message, reply_markup=reply_markup)
+    
+    async def handle_delete_item(self, query, user, data):
+        """Handle delete specific item"""
+        parts = data.split("_")
+        draft_id = parts[2]
+        item_index = int(parts[3])
+        
+        user_state = self.user_states.get(user.telegram_id, {})
+        current_draft = user_state["drafts"][draft_id]
+        items = current_draft["request_data"].get("items", [])
+        
+        if item_index >= len(items):
+            await query.answer("❌ القطعة غير موجودة")
+            return
+        
+        # Remove the item
+        deleted_item = items.pop(item_index)
+        
+        await query.answer(f"✅ تم حذف '{deleted_item['name']}' بنجاح")
+        await self.show_items_management(query, user, draft_id)
+    
+    async def handle_add_media_callback(self, query, user, data):
+        """Handle add media callback"""
+        draft_id = data.split("_")[2]
+        user_state = self.user_states.get(user.telegram_id, {})
+        current_draft = user_state["drafts"][draft_id]
+        current_draft["step"] = "add_media"
+        
+        message = f"""
+📝 **{current_draft['name']}**
+
+📸 أرسل صور أو فيديو للقطع المطلوبة (اختياري)
+
+يمكنك إرسال:
+• صور للقطع المطلوبة
+• فيديو يوضح القطع
+• عدة صور/فيديوهات
+
+عند الانتهاء، اختر:
+• ➕ إضافة قطعة جديدة
+• 📤 تأكيد الطلب
+        """
+        
+        keyboard = [
+            [InlineKeyboardButton("➕ إضافة قطعة جديدة", callback_data=f"add_item_{draft_id}")],
+            [InlineKeyboardButton("📸 إضافة المزيد من الصور/الفيديو", callback_data=f"add_media_{draft_id}")],
+            [InlineKeyboardButton("✅ تأكيد الطلب", callback_data=f"confirm_request_{draft_id}")],
+            [InlineKeyboardButton("🔙 رجوع", callback_data=f"manage_items_{draft_id}")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.edit_message_text(message, reply_markup=reply_markup)
+
+    async def handle_chat_with_customer(self, query, user, data):
+        """Handle chat with customer button for junkyards"""
+        try:
+            # Extract customer_id and request_id from callback data
+            parts = data.split("_")
+            customer_id = int(parts[3])
+            request_id = int(parts[4])
+            
+            # Get customer and request details safely
+            customer = await sync_to_async(User.objects.get)(id=customer_id)
+            request = await sync_to_async(Request.objects.select_related('brand', 'model', 'city').get)(id=request_id)
+            
+            # Get customer details safely
+            customer_name = await sync_to_async(lambda: customer.first_name)()
+            customer_phone = await sync_to_async(lambda: customer.phone_number)()
+            
+            # Get request details safely
+            order_id = await sync_to_async(lambda: request.order_id)()
+            brand_name = await sync_to_async(lambda: request.brand.name)()
+            model_name = await sync_to_async(lambda: request.model.name)()
+            year = await sync_to_async(lambda: request.year)()
+            city_name = await sync_to_async(lambda: request.city.name)()
+            
+            message = f"""
+💬 **معلومات التواصل مع العميل**
+
+👤 **اسم العميل**: {customer_name}
+📱 **رقم الهاتف**: {customer_phone if customer_phone else 'غير متوفر'}
+🆔 **رقم الطلب**: {order_id}
+🚗 **السيارة**: {brand_name} {model_name} {year}
+🏙️ **المدينة**: {city_name}
+
+📞 **يمكنك التواصل مع العميل مباشرة عبر:**
+• رقم الهاتف: {customer_phone if customer_phone else 'غير متوفر'}
+• أو انتظار رسالة من العميل
+
+💡 **نصيحة**: تأكد من التواصل مع العميل لتنسيق موعد التسليم
+            """
+            
+            keyboard = [
+                [InlineKeyboardButton("🔙 رجوع", callback_data="back_to_main")]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await query.edit_message_text(message, reply_markup=reply_markup, parse_mode='Markdown')
+            
+        except Exception as e:
+            logger.error(f"Error in handle_chat_with_customer: {e}")
+            await query.edit_message_text("❌ حدث خطأ في عرض معلومات العميل")
+
+    async def handle_view_all_offers(self, query, user, data):
+        """Handle view all offers button for customers"""
+        try:
+            # Extract request_id from callback data
+            request_id = int(data.split("_")[3])
+            
+            # Get request and all offers
+            request = await sync_to_async(Request.objects.select_related('brand', 'model', 'city').get)(id=request_id, user=user)
+            offers = await sync_to_async(list)(
+                request.offers.select_related('junkyard__user').order_by('-created_at')
+            )
+            
+            if not offers:
+                message = "❌ لا توجد عروض متاحة لهذا الطلب"
+                keyboard = [[InlineKeyboardButton("🔙 رجوع", callback_data="back_to_main")]]
+            else:
+                # Get request details safely
+                order_id = await sync_to_async(lambda: request.order_id)()
+                brand_name = await sync_to_async(lambda: request.brand.name)()
+                model_name = await sync_to_async(lambda: request.model.name)()
+                year = await sync_to_async(lambda: request.year)()
+                
+                message = f"💰 **جميع العروض لطلبك**\n\n"
+                message += f"🆔 رقم الطلب: {order_id}\n"
+                message += f"🚗 السيارة: {brand_name} {model_name} {year}\n\n"
+                
+                for i, offer in enumerate(offers, 1):
+                    # Get offer details safely
+                    offer_status = await sync_to_async(lambda: offer.status)()
+                    junkyard_name = await sync_to_async(lambda: offer.junkyard.user.first_name)()
+                    offer_price = await sync_to_async(lambda: offer.price)()
+                    average_rating = await sync_to_async(lambda: offer.junkyard.average_rating)()
+                    location = await sync_to_async(lambda: offer.junkyard.location)()
+                    delivery_time = await sync_to_async(lambda: offer.delivery_time)()
+                    created_at = await sync_to_async(lambda: offer.created_at)()
+                    
+                    status_emoji = "✅" if offer_status == "accepted" else "⏳" if offer_status == "pending" else "❌"
+                    message += f"{status_emoji} **العرض {i}**\n"
+                    message += f"🏪 التشليح: {junkyard_name}\n"
+                    message += f"💰 السعر: {offer_price} ريال\n"
+                    message += f"⭐ التقييم: {average_rating:.1f}/5\n"
+                    message += f"📍 الموقع: {location}\n"
+                    if delivery_time:
+                        message += f"🚚 مدة التوريد: {delivery_time}\n"
+                    message += f"📅 تاريخ العرض: {created_at.strftime('%Y-%m-%d %H:%M')}\n\n"
+                
+                keyboard = [
+                    [InlineKeyboardButton("🔙 رجوع", callback_data="back_to_main")]
+                ]
+            
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            await query.edit_message_text(message, reply_markup=reply_markup, parse_mode='Markdown')
+            
+        except Exception as e:
+            logger.error(f"Error in handle_view_all_offers: {e}")
+            await query.edit_message_text("❌ حدث خطأ في عرض العروض")
+
 
 # Initialize bot instance
 telegram_bot = TelegramBot()

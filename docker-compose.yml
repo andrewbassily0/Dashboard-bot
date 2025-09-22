@@ -35,7 +35,7 @@ services:
       - DJANGO_SECRET_KEY=your-secret-key-change-this-in-production
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - N8N_WEBHOOK_URL=http://n8n:5678
-      - DEBUG=True
+      - DEBUG=False
     networks:
       - app_network
     restart: unless-stopped

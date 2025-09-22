@@ -106,7 +106,7 @@ class Request(models.Model):
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     model = models.ForeignKey(Model, on_delete=models.CASCADE)
     year = models.PositiveIntegerField()
-    parts = models.TextField(help_text="Required parts description")
+    parts = models.TextField(help_text="Required parts description (legacy field)", blank=True)
     media_files = models.JSONField(default=list, blank=True, help_text="Telegram file IDs for photos/videos")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -143,8 +143,67 @@ class Request(models.Model):
     def is_expired(self):
         return timezone.now() > self.expires_at
     
+    @property
+    def has_items(self):
+        """Check if request has individual items"""
+        return self.items.exists()
+    
+    @property
+    def items_count(self):
+        """Get count of individual items"""
+        return self.items.count()
+    
+    @property
+    def all_parts_description(self):
+        """Get all parts as a combined description"""
+        if self.has_items:
+            items = self.items.all()
+            parts_list = []
+            for item in items:
+                parts_list.append(f"• {item.name}" + (f" - {item.description}" if item.description else ""))
+            return "\n".join(parts_list)
+        return self.parts
+    
+    def add_item(self, name, description="", quantity=1, unit_price=0.00):
+        """Add a new item to this request"""
+        return RequestItem.objects.create(
+            request=self,
+            name=name,
+            description=description,
+            quantity=quantity,
+            unit_price=unit_price
+        )
+    
+    def calculate_total_price(self):
+        """Calculate total price for all items in this request"""
+        return sum(item.calculate_line_total() for item in self.items.all())
+    
     def __str__(self):
-        return f"{self.order_id} - {self.user.first_name} - {self.parts[:50]}"
+        parts_preview = self.all_parts_description[:50] if self.all_parts_description else "No items"
+        return f"{self.order_id} - {self.user.first_name} - {parts_preview}"
+
+
+class RequestItem(models.Model):
+    """Individual items/parts within a request"""
+    request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='items')
+    name = models.CharField(max_length=200, help_text="Name of the part/item")
+    description = models.TextField(blank=True, help_text="Additional description of the item (DEPRECATED)")
+    quantity = models.PositiveIntegerField(default=1, help_text="Quantity needed (DEPRECATED - fixed to 1)")
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, help_text="Unit price per item", null=True, blank=True)
+    currency = models.CharField(max_length=3, default='SAR', blank=True, help_text="Currency code", null=True)
+    media_files = models.JSONField(default=list, blank=True, help_text="Telegram file IDs for photos/videos of this specific item")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['created_at']
+    
+    def calculate_line_total(self):
+        """Calculate line total for this item (unit_price * quantity)"""
+        unit_price = self.unit_price or 0
+        return unit_price * self.quantity
+    
+    def __str__(self):
+        return f"{self.request.order_id} - {self.name}" + (f" (x{self.quantity})" if self.quantity > 1 else "")
 
 
 class Offer(models.Model):
@@ -157,7 +216,8 @@ class Offer(models.Model):
     
     request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='offers')
     junkyard = models.ForeignKey(Junkyard, on_delete=models.CASCADE, related_name='offers')
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Total offer price")
+    delivery_time = models.CharField(max_length=100, blank=True, help_text="Expected delivery time (DEPRECATED)")
     notes = models.TextField(blank=True, help_text="Additional notes from junkyard")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -167,6 +227,20 @@ class Offer(models.Model):
     
     def __str__(self):
         return f"{self.request.order_id} - {self.junkyard.user.first_name} - {self.price}"
+
+
+class OfferItem(models.Model):
+    """Individual item prices in an offer"""
+    offer = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name='items')
+    request_item = models.ForeignKey(RequestItem, on_delete=models.CASCADE, related_name='offer_items')
+    price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Price for this specific item")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('offer', 'request_item')
+    
+    def __str__(self):
+        return f"{self.offer} - {self.request_item.name} - {self.price}"
 
 
 class Conversation(models.Model):

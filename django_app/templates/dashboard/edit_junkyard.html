@@ -1,0 +1,233 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}تعديل التشليح{% endblock %}
+
+{% block page_title %}تعديل التشليح{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="glass-card p-6 rounded-xl animate-fade-up">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-white text-xl font-bold">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                        تعديل التشليح: {{ junkyard.user.first_name }}
+                    </h1>
+                    <p class="text-slate-600 dark:text-slate-400">
+                        تحديث معلومات التشليح في النظام
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                <a href="{% url 'dashboard:junkyard_detail' junkyard.id %}" class="btn-secondary">
+                    <i class="fas fa-arrow-right mr-2"></i>
+                    العودة للتفاصيل
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Form -->
+    <div class="glass-card rounded-xl p-6 animate-fade-up" style="animation-delay: 0.1s">
+        <div class="flex items-center mb-6">
+            <svg class="w-6 h-6 ml-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+            <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100">تعديل بيانات التشليح</h3>
+        </div>
+
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- First Name -->
+                <div>
+                    <label for="first_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                        الاسم الأول <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="first_name" id="first_name" required 
+                           value="{{ junkyard.user.first_name }}"
+                           class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                </div>
+
+                <!-- Last Name -->
+                <div>
+                    <label for="last_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                        الاسم الأخير
+                    </label>
+                    <input type="text" name="last_name" id="last_name" 
+                           value="{{ junkyard.user.last_name }}"
+                           class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                </div>
+
+                <!-- Username -->
+                <div>
+                    <label for="username" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                        اسم المستخدم <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="username" id="username" required 
+                           value="{{ junkyard.user.username }}"
+                           class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                        اسم مستخدم فريد للدخول للنظام
+                    </p>
+                </div>
+
+                <!-- Phone -->
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                        رقم الهاتف <span class="text-red-500">*</span>
+                    </label>
+                    <input type="tel" name="phone" id="phone" required 
+                           value="{{ junkyard.phone }}"
+                           class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                </div>
+
+                <!-- City -->
+                <div>
+                    <label for="city" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                        المدينة <span class="text-red-500">*</span>
+                    </label>
+                    <select name="city" id="city" required 
+                            class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                        <option value="">-- اختر مدينة --</option>
+                        {% for city in cities %}
+                        <option value="{{ city.id }}" {% if city.id == junkyard.city.id %}selected{% endif %}>
+                            {{ city.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Telegram ID -->
+                <div>
+                    <label for="telegram_id" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                        معرف التليجرام
+                    </label>
+                    <input type="number" name="telegram_id" id="telegram_id" 
+                           value="{{ junkyard.user.telegram_id|default:'' }}"
+                           class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                        معرف التليجرام الرقمي (اختياري لكن مهم للإشعارات)
+                    </p>
+                </div>
+            </div>
+
+            <!-- Location -->
+            <div>
+                <label for="location" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    الموقع/العنوان <span class="text-red-500">*</span>
+                </label>
+                <textarea name="location" id="location" rows="3" required 
+                          class="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent">{{ junkyard.location }}</textarea>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    وصف الموقع أو رابط خرائط جوجل
+                </p>
+            </div>
+
+            <!-- Status and Verification -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Active Status -->
+                <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                    <input type="checkbox" name="is_active" id="is_active" 
+                           {% if junkyard.is_active %}checked{% endif %}
+                           class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                    <label for="is_active" class="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        التشليح نشط
+                    </label>
+                </div>
+
+                <!-- Verified Status -->
+                <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                    <input type="checkbox" name="is_verified" id="is_verified" 
+                           {% if junkyard.is_verified %}checked{% endif %}
+                           class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                    <label for="is_verified" class="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        تشليح معتمد
+                    </label>
+                </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="flex justify-end space-x-4 rtl:space-x-reverse pt-6 border-t border-slate-200 dark:border-slate-700">
+                <a href="{% url 'dashboard:junkyard_detail' junkyard.id %}" class="btn-secondary">
+                    <i class="fas fa-times mr-2"></i>
+                    إلغاء
+                </a>
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-save mr-2"></i>
+                    حفظ التغييرات
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Current Info Summary -->
+    <div class="glass-card rounded-xl p-6 animate-fade-up" style="animation-delay: 0.2s">
+        <div class="flex items-center mb-4">
+            <svg class="w-6 h-6 ml-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">المعلومات الحالية</h3>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                <div class="font-semibold text-slate-700 dark:text-slate-300 text-sm">معرف التشليح</div>
+                <div class="text-slate-600 dark:text-slate-400">{{ junkyard.id }}</div>
+            </div>
+            
+            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                <div class="font-semibold text-slate-700 dark:text-slate-300 text-sm">تاريخ الإنشاء</div>
+                <div class="text-slate-600 dark:text-slate-400">{{ junkyard.created_at|date:"Y/m/d" }}</div>
+            </div>
+            
+            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                <div class="font-semibold text-slate-700 dark:text-slate-300 text-sm">إجمالي العروض</div>
+                <div class="text-slate-600 dark:text-slate-400">{{ junkyard.offers.count }}</div>
+            </div>
+            
+            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                <div class="font-semibold text-slate-700 dark:text-slate-300 text-sm">التقييم</div>
+                <div class="text-slate-600 dark:text-slate-400">{{ junkyard.average_rating|floatformat:1 }}/5.0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Helpful Tips -->
+    <div class="glass-card rounded-xl p-6 animate-fade-up" style="animation-delay: 0.3s">
+        <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border-r-4 border-blue-500">
+            <h4 class="font-semibold text-blue-800 dark:text-blue-300 mb-2">💡 نصائح مهمة:</h4>
+            <ul class="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                <li>• تأكد من صحة معرف التليجرام قبل الحفظ</li>
+                <li>• إذا غيرت معرف التليجرام، يجب على التشليح إرسال /start للبوت مرة أخرى</li>
+                <li>• التشليح غير النشط لن يستقبل إشعارات الطلبات الجديدة</li>
+                <li>• التشليح المعتمد يحصل على أولوية في عرض العروض للعملاء</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    
+    form.addEventListener('submit', function(e) {
+        const telegramId = document.getElementById('telegram_id').value;
+        
+        if (telegramId && telegramId.length < 8) {
+            e.preventDefault();
+            alert('معرف التليجرام يجب أن يكون مكوناً من 8 أرقام على الأقل');
+            return false;
+        }
+        
+        return confirm('هل تريد حفظ التغييرات؟');
+    });
+});
+</script>
+{% endblock %}

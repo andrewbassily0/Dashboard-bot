@@ -241,8 +241,14 @@
                                 <div class="text-xs text-slate-500 dark:text-slate-400">موديل {{ req.year }}</div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="text-sm text-slate-600 dark:text-slate-400 max-w-xs truncate" title="{{ req.parts }}">
-                                    {{ req.parts }}
+                                <div class="text-sm text-slate-600 dark:text-slate-400 max-w-xs truncate" title="{{ req.all_parts_description }}">
+                                    {% if req.items.all %}
+                                        {% for item in req.items.all %}
+                                            {{ item.name }}{% if item.quantity > 1 %} ({{ item.quantity }}){% endif %}{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        {{ req.parts|default:"لا توجد تفاصيل" }}
+                                    {% endif %}
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">

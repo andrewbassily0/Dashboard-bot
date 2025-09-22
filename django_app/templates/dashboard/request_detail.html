@@ -73,21 +73,21 @@
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">الماركة</label>
+                        <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">الوكالة</label>
                         <p class="text-lg font-medium text-slate-900 dark:text-slate-100">
                             {{ request.brand.name }}
                         </p>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">الموديل</label>
+                        <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">اسم السيارة</label>
                         <p class="text-lg font-medium text-slate-900 dark:text-slate-100">
                             {% if request.model %}{{ request.model.name }}{% else %}غير محدد{% endif %}
                         </p>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">سنة الصنع</label>
+                        <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">الموديل</label>
                         <p class="text-lg font-medium text-slate-900 dark:text-slate-100">
                             {{ request.year }}
                         </p>
@@ -116,10 +116,65 @@
                 </div>
                 
                 <div class="mt-6">
-                    <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">وصف قطعة الغيار المطلوبة</label>
-                    <p class="text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 p-4 rounded-lg">
-                        {{ request.parts }}
-                    </p>
+                    <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-4">
+                        <i class="fas fa-cogs ml-2 text-primary-500"></i>
+                        قطع الغيار المطلوبة
+                    </label>
+                    
+                    {% if request.items.all %}
+                        <!-- Individual Items Display -->
+                        <div class="space-y-3">
+                            {% for item in request.items.all %}
+                            <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg border-l-4 border-primary-500">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">
+                                            <i class="fas fa-wrench text-primary-500 ml-2"></i>
+                                            {{ item.name }}
+                                            <!-- Quantity display removed as it's fixed to 1 -->
+                                        </h4>
+                        {% if item.unit_price and item.unit_price > 0 %}
+                        <div class="flex items-center justify-between mt-2">
+                            <span class="text-sm text-slate-600 dark:text-slate-400">سعر الوحدة:</span>
+                            <span class="font-semibold text-green-600 dark:text-green-400">{{ item.unit_price }} {{ item.currency|default:"SAR" }}</span>
+                        </div>
+                        {% endif %}
+                                        <!-- Description field removed as deprecated -->
+                                    </div>
+                                    <span class="text-xs text-slate-500 bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded">
+                                        #{{ forloop.counter }}
+                                    </span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Summary -->
+                        <div class="mt-4 p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg border border-primary-200 dark:border-primary-800">
+                            <div class="flex items-center justify-between text-sm text-primary-700 dark:text-primary-300">
+                                <div class="flex items-center">
+                                    <i class="fas fa-list-ul ml-2"></i>
+                                    إجمالي القطع: {{ request.items.count }} قطعة
+                                </div>
+                    {% if request.calculate_total_price and request.calculate_total_price > 0 %}
+                    <div class="font-semibold">
+                        إجمالي السعر: {{ request.calculate_total_price }} SAR
+                    </div>
+                    {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Legacy Parts Display -->
+                        <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg">
+                            <p class="text-slate-900 dark:text-slate-100">
+                                {% if request.parts %}
+                                    {{ request.parts }}
+                                {% else %}
+                                    <span class="text-slate-500 italic">لا توجد تفاصيل محددة للقطع</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    {% endif %}
                 </div>
                 
                 <!-- Media Files Section -->
@@ -248,6 +303,7 @@
                                                 {{ offer.notes }}
                                             </p>
                                             {% endif %}
+                                            <!-- Delivery time removed as deprecated -->
                                             <div class="flex items-center space-x-4 rtl:space-x-reverse text-xs text-slate-500 dark:text-slate-400">
                                                 <span>{{ offer.created_at|date:"Y/m/d H:i" }}</span>
                                                 <span>{{ offer.junkyard.city.name }}</span>
@@ -395,7 +451,7 @@
                     </a>
                     {% endif %}
                     
-                    <button class="btn-glass w-full" onclick="copyToClipboard('طلب #{{ request.order_id }}: {{ request.brand.name }} {{ request.model.name }} {{ request.year }} - {{ request.parts }}')">
+                    <button class="btn-glass w-full" onclick="copyToClipboard('طلب #{{ request.order_id }}: {{ request.brand.name }} {{ request.model.name }} {{ request.year }}\n{{ request.all_parts_description }}')">
                         <i class="fas fa-copy mr-2"></i>
                         نسخ تفاصيل الطلب
                     </button>

@@ -150,21 +150,7 @@ html, body {
     align-items: center;
 }
 
-.theme-toggle {
-  background: var(--bg-glass);
-  backdrop-filter: var(--backdrop-blur);
-  border: 1px solid var(--border-glass);
-  border-radius: 10px;
-  padding: 8px 12px;
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.theme-toggle:hover {
-  background: var(--bg-glass-hover);
-  transform: scale(1.05);
-}
+/* Theme toggle removed - Dark mode only */
 
 .nav-logout {
   display: flex;
@@ -564,14 +550,7 @@ html, body {
   background: var(--primary-600);
 }
 
-/* Dark mode toggle animation */
-.theme-toggle i {
-  transition: transform 0.3s ease;
-}
-
-.theme-toggle:hover i {
-  transform: rotate(15deg);
-}
+/* Dark mode only - no toggle animations needed */
 
 /* Focus states for accessibility */
 *:focus {
@@ -1049,7 +1028,6 @@ html, body {
 /* Print styles */
 @media print {
   .admin-nav-global,
-  .theme-toggle,
   .nav-logout,
   .admin-footer {
         display: none !important;

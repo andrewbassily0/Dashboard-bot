@@ -88,6 +88,7 @@ certificates/
 *.key
 *.crt
 *.pem
+.git-credentials
 
 # Temporary files
 tmp/

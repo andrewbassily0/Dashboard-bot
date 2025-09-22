@@ -14,30 +14,17 @@ document.addEventListener('DOMContentLoaded', function() {
             this.initTooltips();
         },
         
-        // Initialize theme from localStorage or system preference
+        // Initialize theme - Force dark mode only
         initTheme() {
-            const savedTheme = localStorage.getItem('admin-theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
-            this.darkMode = savedTheme ? savedTheme === 'dark' : prefersDark;
+            this.darkMode = true;
             this.updateTheme();
         },
         
         // Set up event listeners
         initEventListeners() {
-            // Theme toggle button
-            const themeToggle = document.getElementById('theme-toggle');
-            if (themeToggle) {
-                themeToggle.addEventListener('click', () => this.toggleTheme());
-            }
-            
-            // System theme change listener
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-                if (!localStorage.getItem('admin-theme')) {
-                    this.darkMode = e.matches;
-                    this.updateTheme();
-                }
-            });
+            // Force dark mode only - no theme toggle
+            this.darkMode = true;
+            this.updateTheme();
             
             // Smooth scroll for anchor links
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -60,43 +47,21 @@ document.addEventListener('DOMContentLoaded', function() {
             this.initAutoSave();
         },
         
-        // Toggle between light and dark theme
-        toggleTheme() {
-            this.darkMode = !this.darkMode;
-            this.updateTheme();
-            this.showThemeChangeNotification();
-        },
-        
-        // Update theme classes and save to localStorage
+        // Update theme classes - Force dark mode only
         updateTheme() {
             const html = document.documentElement;
             const body = document.body;
-            const themeToggle = document.getElementById('theme-toggle');
             
-            if (this.darkMode) {
-                html.classList.add('dark');
-                body.classList.add('dark');
-                body.setAttribute('data-theme', 'dark');
-                localStorage.setItem('admin-theme', 'dark');
-                
-                if (themeToggle) {
-                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-                    themeToggle.title = 'تبديل للوضع المضيء';
-                }
-            } else {
-                html.classList.remove('dark');
-                body.classList.remove('dark');
-                body.setAttribute('data-theme', 'light');
-                localStorage.setItem('admin-theme', 'light');
-                
-                if (themeToggle) {
-                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-                    themeToggle.title = 'تبديل للوضع المظلم';
-                }
-            }
+            // Always apply dark mode
+            html.classList.add('dark');
+            body.classList.add('dark');
+            body.setAttribute('data-theme', 'dark');
+            html.style.colorScheme = 'dark';
             
-            // Force repaint
-            html.style.colorScheme = this.darkMode ? 'dark' : 'light';
+            // Force dark mode on all elements
+            document.querySelectorAll('*').forEach(el => {
+                el.classList.add('dark');
+            });
         },
         
         // Initialize animations
@@ -264,50 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         },
         
-        // Show theme change notification
-        showThemeChangeNotification() {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: var(--bg-glass);
-                backdrop-filter: var(--backdrop-blur);
-                border: 1px solid var(--border-glass);
-                border-radius: 10px;
-                padding: 15px 20px;
-                color: var(--text-primary);
-                font-family: 'Cairo', sans-serif;
-                font-weight: 500;
-                z-index: 9999;
-                box-shadow: var(--shadow-glass);
-                opacity: 0;
-                transform: translateX(100%);
-                transition: all 0.3s ease;
-            `;
-            
-            notification.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-${this.darkMode ? 'moon' : 'sun'}" style="color: var(--primary-500);"></i>
-                    <span>تم التبديل إلى الوضع ${this.darkMode ? 'المظلم' : 'المضيء'}</span>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // Animate in
-            setTimeout(() => {
-                notification.style.opacity = '1';
-                notification.style.transform = 'translateX(0)';
-            }, 10);
-            
-            // Animate out and remove
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateX(100%)';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        },
+        // Dark mode only - no theme change notifications needed
         
         // Utility function to show custom notifications
         showNotification(message, type = 'info', duration = 3000) {
@@ -645,12 +567,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Keyboard shortcuts
     document.addEventListener('keydown', function(e) {
-        // Ctrl/Cmd + D to toggle dark mode
-        if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
-            e.preventDefault();
-            adminTheme.toggleTheme();
-        }
-        
         // Escape to close modals/notifications
         if (e.key === 'Escape') {
             document.querySelectorAll('.admin-tooltip').forEach(tooltip => tooltip.remove());

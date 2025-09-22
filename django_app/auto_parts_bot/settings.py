@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security settings
 SECRET_KEY = config('DJANGO_SECRET_KEY', default='django-insecure-g&m_ds(8y5c=8@8*jak&4hr_2c8l8c&2-ms%cinzvj-t(cgy%^')
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)  # Production default: False
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0,193.187.129.94,dashboard.tashaleeh.com', cast=lambda v: [s.strip() for s in v.split(',')])
 
 # Application definition
@@ -189,6 +189,10 @@ N8N_WEBHOOK_URL = config('N8N_WEBHOOK_URL', default='http://n8n:5678')
 DEFAULT_COMMISSION_PERCENTAGE = config('DEFAULT_COMMISSION_PERCENTAGE', default=2.0, cast=float)
 DEFAULT_PAYMENT_URL = config('DEFAULT_PAYMENT_URL', default='https://your-payment-gateway.com')
 REQUEST_EXPIRY_HOURS = config('REQUEST_EXPIRY_HOURS', default=6, cast=int)
+
+# Feature flags
+FEATURE_DEPRECATE_OLD_FIELDS = config('FEATURE_DEPRECATE_OLD_FIELDS', default=True, cast=bool)
+FEATURE_UNIT_PRICING = config('FEATURE_UNIT_PRICING', default=True, cast=bool)
 
 # Google Sheets settings (optional)
 GOOGLE_SHEETS_API_KEY = config('GOOGLE_SHEETS_API_KEY', default='')

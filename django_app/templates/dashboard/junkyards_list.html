@@ -22,6 +22,14 @@
                     <i class="fas fa-plus mr-2"></i>
                     إضافة تشليح جديد
                 </a>
+                <a href="{% url 'dashboard:fix_junkyard_user_types' %}" class="btn-danger">
+                    <i class="fas fa-user-cog mr-2"></i>
+                    إصلاح أنواع المستخدمين
+                </a>
+                <a href="{% url 'dashboard:debug_junkyard_edit_issue' %}" class="btn-warning">
+                    <i class="fas fa-bug mr-2"></i>
+                    تشخيص مشكلة التعديل
+                </a>
                 <a href="{% url 'dashboard:home' %}" class="btn-secondary">
                     <i class="fas fa-arrow-right mr-2"></i>
                     العودة للرئيسية
@@ -296,6 +304,10 @@
                                     <a href="{% url 'dashboard:junkyard_detail' junkyard.id %}" 
                                        class="btn-glass px-3 py-1 text-xs" title="عرض التفاصيل">
                                         <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'dashboard:edit_junkyard' junkyard.id %}" 
+                                       class="btn-primary px-3 py-1 text-xs" title="تعديل التشليح">
+                                        <i class="fas fa-edit"></i>
                                     </a>
                                     {% if junkyard.user.telegram_username %}
                                         <a href="https://t.me/{{ junkyard.user.telegram_username }}" 

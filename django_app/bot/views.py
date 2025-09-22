@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.utils import timezone
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -35,100 +36,184 @@ def health_check(request):
     """Health check endpoint for Docker"""
     return JsonResponse({"status": "healthy", "service": "auto_parts_bot"})
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def health_queue(request):
+    """Health check for queue/worker status"""
+    try:
+        # Check if we can access the database
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+        
+        # Check if workflow service is available
+        from .services import workflow_service
+        service_status = "available" if workflow_service else "unavailable"
+        
+        return JsonResponse({
+            "status": "healthy",
+            "database": "connected",
+            "workflow_service": service_status,
+            "timestamp": timezone.now().isoformat()
+        })
+    except Exception as e:
+        return JsonResponse({
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": timezone.now().isoformat()
+        }, status=500)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def health_notifications(request):
+    """Health check for notification system"""
+    try:
+        from django.conf import settings
+        
+        # Check Telegram bot token
+        bot_token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
+        token_status = "configured" if bot_token else "missing"
+        
+        # Check if we can create a test message
+        test_message = "🧪 Test notification from health check"
+        
+        return JsonResponse({
+            "status": "healthy",
+            "telegram_token": token_status,
+            "test_message": test_message,
+            "timestamp": timezone.now().isoformat()
+        })
+    except Exception as e:
+        return JsonResponse({
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": timezone.now().isoformat()
+        }, status=500)
+
 @method_decorator(csrf_exempt, name='dispatch')
 class TelegramWebhookView(View):
-    """Handle Telegram webhook updates"""
+    """Handle Telegram webhook updates - حل جذري لمشكلة التضارب"""
     
     def post(self, request):
         try:
+            logger.info("📡 Webhook received update")
+            
             # Parse the update
             update_data = json.loads(request.body.decode('utf-8'))
+            logger.info(f"📊 Update data: {update_data}")
             
             # Create bot instance
             bot = TelegramBot()
             app = bot.setup_bot()
             
             if not app:
-                logger.error("Failed to setup bot application")
+                logger.error("❌ Failed to setup bot application")
                 return HttpResponse("Bot Error", status=500)
             
-            update = Update.de_json(update_data, app.bot)
+            # Create update object with proper bot instance
+            from telegram import Bot
+            bot_instance = Bot(token=app.bot.token)
             
-            # Process the update asynchronously
-            asyncio.create_task(app.process_update(update))
+            # Handle CallbackQuery creation properly
+            if 'callback_query' in update_data:
+                # Create a proper CallbackQuery object
+                from telegram import CallbackQuery, Message, User, Chat
+                
+                callback_data = update_data['callback_query']
+                from_data = callback_data['from']
+                message_data = callback_data['message']
+                chat_data = message_data['chat']
+                
+                # Create User objects
+                from_user = User(
+                    id=from_data['id'],
+                    is_bot=from_data['is_bot'],
+                    first_name=from_data['first_name'],
+                    last_name=from_data.get('last_name'),
+                    username=from_data.get('username')
+                )
+                
+                # Create Chat object
+                chat = Chat(
+                    id=chat_data['id'],
+                    type=chat_data['type'],
+                    first_name=chat_data.get('first_name'),
+                    last_name=chat_data.get('last_name'),
+                    username=chat_data.get('username')
+                )
+                
+                # Create Message object
+                message = Message(
+                    message_id=message_data['message_id'],
+                    from_user=from_user,
+                    date=message_data['date'],
+                    chat=chat,
+                    text=message_data.get('text', '')
+                )
+                
+                # Create CallbackQuery object
+                callback_query = CallbackQuery(
+                    id=callback_data['id'],
+                    from_user=from_user,
+                    message=message,
+                    data=callback_data.get('data'),
+                    chat_instance=callback_data.get('chat_instance', '')
+                )
+                
+                # Create Update object
+                update = Update(
+                    update_id=update_data['update_id'],
+                    callback_query=callback_query
+                )
+            else:
+                # Regular message update
+                update = Update.de_json(update_data, bot_instance)
+            
+            # Process the update synchronously to avoid conflicts
+            import asyncio
+            
+            async def process_update():
+                try:
+                    await app.initialize()
+                    await app.process_update(update)
+                    logger.info("✅ Update processed successfully")
+                except Exception as e:
+                    logger.error(f"❌ Error processing update: {e}")
+            
+            # Run in new event loop to avoid conflicts
+            try:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                loop.run_until_complete(process_update())
+                loop.close()
+            except Exception as e:
+                logger.error(f"❌ Event loop error: {e}")
+                # Fallback to direct processing
+                asyncio.create_task(process_update())
             
             return HttpResponse("OK")
+            
         except Exception as e:
-            logger.error(f"Error processing webhook: {e}")
+            logger.error(f"❌ Error processing webhook: {e}")
             return HttpResponse("Error", status=500)
+    
+    def get(self, request):
+        """Health check للـ webhook"""
+        return HttpResponse("Telegram Webhook is ready! 🤖", status=200)
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def n8n_webhook_new_request(request):
-    """Webhook for n8n to handle new requests"""
-    try:
-        data = request.data
-        
-        # Create new request from n8n data
-        user = User.objects.get(telegram_id=data['user_telegram_id'])
-        city = City.objects.get(id=data['city_id'])
-        brand = Brand.objects.get(id=data['brand_id'])
-        model = Model.objects.get(id=data['model_id'])
-        
-        new_request = Request.objects.create(
-            user=user,
-            city=city,
-            brand=brand,
-            model=model,
-            year=data['year'],
-            parts=data['parts'],
-            media_files=data.get('media_files', [])
-        )
-        
-        return JsonResponse({
-            'success': True,
-            'request_id': new_request.id,
-            'order_id': new_request.order_id
-        }, status=201)
-        
-    except Exception as e:
-        logger.error(f"Error in n8n webhook: {e}")
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=400)
+# n8n webhooks removed - using direct workflow service instead
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def n8n_webhook_new_offer(request):
-    """Webhook for n8n to handle new offers"""
-    try:
-        data = request.data
-        
-        request_obj = Request.objects.get(id=data['request_id'])
-        junkyard = Junkyard.objects.get(user__telegram_id=data['junkyard_telegram_id'])
-        
-        offer = Offer.objects.create(
-            request=request_obj,
-            junkyard=junkyard,
-            price=data['price'],
-            notes=data.get('notes', '')
-        )
-        
-        # Notify customer about new offer
-        asyncio.create_task(notify_customer_new_offer(offer))
-        
-        return JsonResponse({
-            'success': True,
-            'offer_id': offer.id
-        }, status=201)
-        
-    except Exception as e:
-        logger.error(f"Error in n8n offer webhook: {e}")
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=400)
+# @api_view(['POST'])
+# @permission_classes([AllowAny])
+# def n8n_webhook_new_request(request):
+#     """DEPRECATED: Webhook for n8n to handle new requests - now handled directly by workflow service"""
+#     return JsonResponse({'error': 'This endpoint is deprecated. Use workflow service instead.'}, status=410)
+
+# @api_view(['POST'])
+# @permission_classes([AllowAny])
+# def n8n_webhook_new_offer(request):
+#     """DEPRECATED: Webhook for n8n to handle new offers - now handled directly by workflow service"""
+#     return JsonResponse({'error': 'This endpoint is deprecated. Use workflow service instead.'}, status=410)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -206,31 +291,11 @@ def get_junkyards_by_city(request):
             'error': str(e)
         }, status=400)
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def send_telegram_message(request):
-    """Send message via Telegram for n8n"""
-    try:
-        data = request.data
-        
-        telegram_id = data['telegram_id']
-        message = data['message']
-        keyboard = data.get('keyboard', None)
-        
-        # Send message asynchronously
-        asyncio.create_task(send_message_async(telegram_id, message, keyboard))
-        
-        return JsonResponse({
-            'success': True,
-            'message': 'Message sent'
-        })
-        
-    except Exception as e:
-        logger.error(f"Error sending telegram message: {e}")
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=400)
+# @api_view(['POST'])
+# @permission_classes([AllowAny])
+# def send_telegram_message(request):
+#     """DEPRECATED: Send message via Telegram for n8n - now handled directly by workflow service"""
+#     return JsonResponse({'error': 'This endpoint is deprecated. Use workflow service instead.'}, status=410)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -279,40 +344,10 @@ def get_system_stats(request):
         }, status=400)
 
 # Async helper functions
-async def notify_customer_new_offer(offer):
-    """Notify customer about new offer"""
-    try:
-        message = f"""
-💰 عرض جديد لطلبك!
-
-🆔 رقم الطلب: {offer.request.order_id}
-🏪 المخزن: {offer.junkyard.user.first_name}
-💵 السعر: {offer.price} ريال
-⭐ التقييم: {offer.junkyard.average_rating:.1f} ({offer.junkyard.total_ratings} تقييم)
-📍 الموقع: {offer.junkyard.location}
-
-هل تريد قبول هذا العرض؟
-        """
-        
-        from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-        
-        keyboard = [
-            [InlineKeyboardButton("✅ قبول العرض", callback_data=f"offer_accept_{offer.id}")],
-            [InlineKeyboardButton("❌ رفض العرض", callback_data=f"offer_reject_{offer.id}")]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        
-        bot = TelegramBot()
-        app = bot.setup_bot()
-        if app:
-            await app.bot.send_message(
-                chat_id=offer.request.user.telegram_id,
-                text=message,
-                reply_markup=reply_markup
-            )
-        
-    except Exception as e:
-        logger.error(f"Error notifying customer: {e}")
+# DEPRECATED: This function is now handled by the workflow service
+# async def notify_customer_new_offer(offer):
+#     """DEPRECATED: Notify customer about new offer - now handled by workflow service"""
+#     pass
 
 async def send_message_async(telegram_id, message, keyboard=None):
     """Send message asynchronously"""
@@ -342,3 +377,78 @@ async def send_message_async(telegram_id, message, keyboard=None):
         
     except Exception as e:
         logger.error(f"Error sending async message: {e}")
+
+
+# DEPRECATED: This function is now handled by the workflow service
+async def notify_junkyards_async(request):
+    """DEPRECATED: إرسال إشعارات للتشاليح عن طلب جديد - now handled by workflow service"""
+    logger.warning(f"🚨 DEPRECATED: notify_junkyards_async called for request {request.order_id}. This should now be handled by workflow service.")
+    
+    # Fallback to workflow service if called
+    try:
+        from .services import workflow_service
+        from .telegram_bot import TelegramBot
+        
+        bot = TelegramBot()
+        workflow_service.set_telegram_bot(bot)
+        await workflow_service.notify_all_junkyards(request)
+        
+    except Exception as e:
+        logger.error(f"❌ Error in deprecated notify_junkyards_async fallback: {e}")
+
+# Old implementation completely removed - replaced by workflow service
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def debug_junkyards_in_city(request):
+    """تشخيص التشاليح في مدينة معينة"""
+    try:
+        city_id = request.GET.get('city_id')
+        if not city_id:
+            return JsonResponse({'error': 'city_id parameter required'}, status=400)
+        
+        from .models import Junkyard, City, JunkyardStaff
+        
+        city = City.objects.get(id=city_id)
+        junkyards = Junkyard.objects.filter(city=city).select_related('user')
+        
+        debug_info = {
+            'city_name': city.name,
+            'total_junkyards': junkyards.count(),
+            'active_junkyards': junkyards.filter(is_active=True).count(),
+            'verified_junkyards': junkyards.filter(is_verified=True).count(),
+            'junkyards_with_telegram': junkyards.filter(user__telegram_id__isnull=False).count(),
+            'details': []
+        }
+        
+        for junkyard in junkyards:
+            staff_count = JunkyardStaff.objects.filter(
+                junkyard=junkyard, 
+                is_active=True,
+                user__telegram_id__isnull=False
+            ).count()
+            
+            junkyard_info = {
+                'id': junkyard.id,
+                'name': junkyard.user.first_name,
+                'is_active': junkyard.is_active,
+                'is_verified': junkyard.is_verified,
+                'has_telegram_id': bool(junkyard.user.telegram_id),
+                'telegram_id': junkyard.user.telegram_id,
+                'staff_with_telegram': staff_count,
+                'phone': junkyard.phone,
+                'created_at': junkyard.created_at.strftime('%Y-%m-%d')
+            }
+            debug_info['details'].append(junkyard_info)
+        
+        return JsonResponse({
+            'success': True,
+            'debug_info': debug_info
+        })
+        
+    except City.DoesNotExist:
+        return JsonResponse({'error': 'City not found'}, status=404)
+    except Exception as e:
+        logger.error(f"Error in debug_junkyards_in_city: {e}")
+        return JsonResponse({'error': str(e)}, status=500)

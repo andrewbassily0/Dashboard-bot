@@ -38,7 +38,7 @@ class BrandAdmin(admin.ModelAdmin):
     
     def models_count(self, obj):
         return obj.models.count()
-    models_count.short_description = _('عدد الموديلات')
+    models_count.short_description = _('عدد أسماء السيارات')
 
 
 @admin.register(Model)

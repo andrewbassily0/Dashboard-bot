@@ -29,10 +29,16 @@
                         مخزن معتمد
                     </span>
                 {% endif %}
-                <a href="{% url 'dashboard:junkyards_list' %}" class="btn-secondary">
-                    <i class="fas fa-arrow-right mr-2"></i>
-                    العودة للقائمة
-                </a>
+                <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                    <a href="{% url 'dashboard:edit_junkyard' junkyard.id %}" class="btn-primary">
+                        <i class="fas fa-edit mr-2"></i>
+                        تعديل التشليح
+                    </a>
+                    <a href="{% url 'dashboard:junkyards_list' %}" class="btn-secondary">
+                        <i class="fas fa-arrow-right mr-2"></i>
+                        العودة للقائمة
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -260,6 +266,28 @@
                         <i class="fas fa-copy mr-2"></i>
                         نسخ رقم الهاتف
                     </button>
+                    
+                    <!-- Test Notification Button -->
+                    <form method="post" action="{% url 'dashboard:test_junkyard_notification' junkyard.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-warning w-full" 
+                                onclick="return confirm('هل تريد إرسال رسالة اختبار للتشليح؟')">
+                            <i class="fas fa-bell mr-2"></i>
+                            اختبار الإشعارات
+                        </button>
+                    </form>
+                    
+                    <!-- Quick Fix Button -->
+                    <a href="{% url 'dashboard:quick_fix_junkyard' junkyard.id %}" class="btn-warning w-full text-center">
+                        <i class="fas fa-wrench mr-2"></i>
+                        إصلاح سريع
+                    </a>
+                    
+                    <!-- Diagnose Button -->
+                    <a href="{% url 'dashboard:diagnose_junkyard_issues' junkyard.id %}" class="btn-glass w-full text-center">
+                        <i class="fas fa-stethoscope mr-2"></i>
+                        تشخيص مفصل
+                    </a>
                 </div>
             </div>
         </div>

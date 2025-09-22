@@ -3,30 +3,30 @@
 /* Arabic Font */
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap');
 
-/* Dashboard Color Variables */
+/* Dashboard Color Variables - Dark Mode */
 :root {
-    --primary-color: #4e73df;
-    --primary-hover: #2e59d9;
-    --secondary-color: #858796;
-    --success-color: #1cc88a;
-    --info-color: #36b9cc;
-    --warning-color: #f6c23e;
-    --danger-color: #e74a3b;
-    --light-color: #f8f9fc;
-    --dark-color: #5a5c69;
-    --sidebar-bg: #fff;
-    --body-bg: #f8f9fc;
-    --card-bg: #fff;
-    --border-color: #e3e6f0;
-    --text-color: #5a5c69;
-    --text-muted: #858796;
+    --primary-color: #14b8a6;
+    --primary-hover: #0d9488;
+    --secondary-color: #94a3b8;
+    --success-color: #10b981;
+    --info-color: #06b6d4;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --light-color: #1e293b;
+    --dark-color: #0f172a;
+    --sidebar-bg: #0f172a;
+    --body-bg: #0b1220;
+    --card-bg: #1e293b;
+    --border-color: #334155;
+    --text-color: #e2e8f0;
+    --text-muted: #94a3b8;
 }
 
 /* Global Styles */
 body {
     font-family: 'Cairo', 'Nunito', sans-serif !important;
     direction: rtl;
-    background: var(--body-bg) !important;
+    background: linear-gradient(135deg, #0b1220 0%, #0f172a 100%) !important;
     min-height: 100vh;
     margin: 0;
     padding: 0;

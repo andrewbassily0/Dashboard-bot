@@ -1,0 +1,263 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}إصلاح أنواع المستخدمين{% endblock %}
+
+{% block page_title %}إصلاح أنواع المستخدمين{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="glass-card p-6 rounded-xl animate-fade-up">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                <div class="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-white text-xl font-bold">
+                    <i class="fas fa-user-cog"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                        إصلاح أنواع المستخدمين للتشاليح
+                    </h1>
+                    <p class="text-slate-600 dark:text-slate-400">
+                        تصحيح أنواع المستخدمين الخاطئة للتشاليح (مثل junkyard_owner → junkyard)
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                <a href="{% url 'dashboard:junkyards_list' %}" class="btn-secondary">
+                    <i class="fas fa-arrow-right mr-2"></i>
+                    العودة للتشاليح
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Total Junkyards -->
+        <div class="stats-card animate-fade-up" style="animation-delay: 0.1s">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
+                        إجمالي التشاليح
+                    </p>
+                    <p class="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                        {{ stats.total_junkyards }}
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
+                    <i class="fas fa-warehouse text-blue-500 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Correct Type -->
+        <div class="stats-card animate-fade-up" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
+                        نوع صحيح
+                    </p>
+                    <p class="text-3xl font-bold text-green-600 dark:text-green-400">
+                        {{ stats.correct_type }}
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
+                    <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wrong Type -->
+        <div class="stats-card animate-fade-up" style="animation-delay: 0.3s">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
+                        نوع خاطئ
+                    </p>
+                    <p class="text-3xl font-bold {% if stats.wrong_type > 0 %}text-red-600 dark:text-red-400{% else %}text-slate-600 dark:text-slate-400{% endif %}">
+                        {{ stats.wrong_type }}
+                    </p>
+                </div>
+                <div class="w-12 h-12 {% if stats.wrong_type > 0 %}bg-red-100 dark:bg-red-900/20{% else %}bg-gray-100 dark:bg-gray-900/20{% endif %} rounded-full flex items-center justify-center">
+                    <i class="fas fa-exclamation-triangle {% if stats.wrong_type > 0 %}text-red-500{% else %}text-gray-500{% endif %} text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fix Action -->
+    {% if stats.needs_fix %}
+    <div class="glass-card rounded-xl p-6 animate-fade-up" style="animation-delay: 0.4s">
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white text-sm mr-3">
+                    <i class="fas fa-exclamation"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-red-800 dark:text-red-300">تم العثور على أنواع مستخدمين خاطئة!</h3>
+            </div>
+            
+            <p class="text-red-700 dark:text-red-300 mb-4">
+                يوجد {{ stats.wrong_type }} تشليح بأنواع مستخدمين خاطئة. هذا قد يمنع التشاليح من تلقي الطلبات أو تقديم العروض.
+            </p>
+
+            <form method="post" onsubmit="return confirm('هل تريد إصلاح جميع أنواع المستخدمين الخاطئة؟ سيتم تغيير جميع التشاليح إلى نوع \"junkyard\".');">
+                {% csrf_token %}
+                <button type="submit" class="btn-danger">
+                    <i class="fas fa-wrench mr-2"></i>
+                    إصلاح جميع أنواع المستخدمين الخاطئة
+                </button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="glass-card rounded-xl p-6 animate-fade-up" style="animation-delay: 0.4s">
+        <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6">
+            <div class="flex items-center">
+                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-sm mr-3">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-green-800 dark:text-green-300">جميع التشاليح لها نوع المستخدم الصحيح!</h3>
+            </div>
+            <p class="text-green-700 dark:text-green-300 mt-2">
+                جميع التشاليح في النظام لها نوع المستخدم "junkyard" الصحيح.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Wrong Type Junkyards Details -->
+    {% if wrong_type_junkyards %}
+    <div class="glass-card rounded-xl p-6 animate-fade-up" style="animation-delay: 0.5s">
+        <div class="flex items-center mb-6">
+            <svg class="w-6 h-6 ml-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100">التشاليح التي تحتاج إصلاح</h3>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+                <thead class="bg-slate-50 dark:bg-slate-800">
+                    <tr>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">
+                            التشليح
+                        </th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">
+                            المدينة
+                        </th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">
+                            النوع الحالي
+                        </th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">
+                            الحالة
+                        </th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">
+                            الإجراءات
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-700">
+                    {% for junkyard in wrong_type_junkyards %}
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
+                                        <i class="fas fa-warehouse text-red-500"></i>
+                                    </div>
+                                </div>
+                                <div class="mr-4">
+                                    <div class="text-sm font-medium text-slate-900 dark:text-slate-100">
+                                        {{ junkyard.user.first_name }} {{ junkyard.user.last_name }}
+                                    </div>
+                                    <div class="text-sm text-slate-500 dark:text-slate-400">
+                                        ID: {{ junkyard.id }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100">
+                            {{ junkyard.city.name }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300">
+                                {{ junkyard.user.user_type }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if junkyard.is_active %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300">
+                                    <i class="fas fa-check-circle ml-1"></i>
+                                    نشط
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300">
+                                    <i class="fas fa-pause-circle ml-1"></i>
+                                    غير نشط
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <a href="{% url 'dashboard:junkyard_detail' junkyard.id %}" 
+                               class="btn-glass px-3 py-1 text-xs" title="عرض التفاصيل">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Correct Type Junkyards Summary -->
+    {% if correct_junkyards %}
+    <div class="glass-card rounded-xl p-6 animate-fade-up" style="animation-delay: 0.6s">
+        <div class="flex items-center mb-4">
+            <svg class="w-6 h-6 ml-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100">التشاليح بالنوع الصحيح</h3>
+        </div>
+        
+        <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+            <p class="text-green-700 dark:text-green-300">
+                {{ stats.correct_type }} تشليح لها نوع المستخدم "junkyard" الصحيح ويمكنها استقبال الطلبات وتقديم العروض بشكل طبيعي.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Help Information -->
+    <div class="glass-card rounded-xl p-6 animate-fade-up" style="animation-delay: 0.7s">
+        <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border-r-4 border-blue-500">
+            <h4 class="font-semibold text-blue-800 dark:text-blue-300 mb-2">💡 معلومات مهمة:</h4>
+            <ul class="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                <li>• <strong>النوع الصحيح:</strong> يجب أن يكون نوع المستخدم للتشاليح هو "junkyard"</li>
+                <li>• <strong>الأنواع الخاطئة الشائعة:</strong> junkyard_owner, owner, manager, admin, staff</li>
+                <li>• <strong>تأثير النوع الخاطئ:</strong> قد يمنع التشليح من استقبال الطلبات أو تقديم العروض</li>
+                <li>• <strong>الإصلاح الآمن:</strong> سيتم تغيير جميع الأنواع الخاطئة إلى "junkyard" دون تأثير على البيانات الأخرى</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+// Add confirmation for the fix action
+document.addEventListener('DOMContentLoaded', function() {
+    const fixForm = document.querySelector('form[method="post"]');
+    if (fixForm) {
+        fixForm.addEventListener('submit', function(e) {
+            const wrongCount = {{ stats.wrong_type }};
+            if (wrongCount > 0) {
+                const message = `سيتم إصلاح ${wrongCount} تشليح. هل تريد المتابعة؟`;
+                if (!confirm(message)) {
+                    e.preventDefault();
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

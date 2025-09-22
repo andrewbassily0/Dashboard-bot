@@ -1,4 +1,4 @@
-/* 🌙 Tshaleeh Theme - Dark Mode Only Design System */
+/* 🌙 Tshaleeh Theme - Dark Mode Design System */
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 /* 🔤 Typography System */
@@ -18,27 +18,27 @@ html[dir="ltr"] {
   font-family: 'Inter', system-ui, sans-serif !important;
 }
 
-/* 🎨 Dark Mode Only Variables */
+/* 🎨 Dark Mode Variables - Like the Image */
 :root {
-  /* Primary Colors (Teal/Turquoise) */
+  /* Primary Colors (Teal/Turquoise) - Like the image */
   --primary-50: #f0fdfa;
   --primary-100: #ccfbf1;
   --primary-200: #99f6e4;
   --primary-300: #5eead4;
   --primary-400: #2dd4bf;
-  --primary-500: #14b8a6;  /* Main brand color */
+  --primary-500: #14b8a6;  /* Main brand color - Teal */
   --primary-600: #0d9488;
   --primary-700: #0f766e;
   --primary-800: #115e59;
   --primary-900: #134e4a;
 
-  /* Dark Mode Background */
+  /* Dark Mode Background - Like the image */
   --dark-bg: linear-gradient(135deg, #0b1220 0%, #0f172a 100%);
 
-  /* Text Gradient */
+  /* Text Gradient - Teal like the image */
   --text-gradient: linear-gradient(135deg, #14b8a6, #0d9488);
   
-  /* Glass Colors - Dark Mode Only */
+  /* Glass Colors - Dark Mode */
   --glass-bg: rgba(15, 23, 42, 0.1);
   --glass-bg-hover: rgba(15, 23, 42, 0.2);
   --glass-border: rgba(148, 163, 184, 0.1);
@@ -54,7 +54,7 @@ html[dir="ltr"] {
   --glass-shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.8);
 }
 
-/* 🌈 Background Gradients - Dark Mode Only */
+/* 🌈 Background Gradients - Dark Mode */
 .gradient-bg,
 .gradient-bg-dark {
   background: linear-gradient(135deg, #0b1220 0%, #0f172a 100%);

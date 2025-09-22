@@ -118,7 +118,7 @@ def public_dashboard(request):
 @staff_member_required
 def requests_list(request):
     """List all requests with filtering"""
-    requests = Request.objects.select_related('user', 'city', 'brand', 'model').order_by('-created_at')
+    requests = Request.objects.select_related('user', 'city', 'brand', 'model').prefetch_related('items').order_by('-created_at')
     
     # Filtering
     status_filter = request.GET.get('status')
@@ -166,7 +166,7 @@ def requests_list(request):
 @staff_member_required
 def request_detail(request, request_id):
     """Request detail view"""
-    req = get_object_or_404(Request, id=request_id)
+    req = get_object_or_404(Request.objects.prefetch_related('items'), id=request_id)
     offers = req.offers.select_related('junkyard__user').order_by('-created_at')
     
     context = {
@@ -233,6 +233,680 @@ def junkyard_detail(request, junkyard_id):
     }
     
     return render(request, 'dashboard/junkyard_detail.html', context)
+
+@staff_member_required
+def test_junkyard_notification(request, junkyard_id):
+    """Send test notification to junkyard"""
+    junkyard = get_object_or_404(Junkyard, id=junkyard_id)
+    
+    if request.method == 'POST':
+        try:
+            from bot.telegram_bot import TelegramBot
+            import asyncio
+            from django.utils import timezone
+            
+            # Check if junkyard has telegram_id
+            if not junkyard.user.telegram_id:
+                messages.error(request, 'التشليح ليس لديه معرف تليجرام')
+                return redirect('dashboard:junkyard_detail', junkyard_id=junkyard_id)
+            
+            # Setup bot
+            bot = TelegramBot()
+            app = bot.setup_bot()
+            
+            if not app:
+                messages.error(request, 'فشل في إعداد البوت')
+                return redirect('dashboard:junkyard_detail', junkyard_id=junkyard_id)
+            
+            # Test message
+            test_message = f"""
+🧪 رسالة اختبار من لوحة التحكم
+
+مرحباً {junkyard.user.first_name}!
+
+هذه رسالة اختبار للتأكد من وصول الإشعارات لحسابك.
+
+✅ إذا وصلتك هذه الرسالة، فإن نظام الإشعارات يعمل بشكل صحيح!
+
+تم الإرسال في: {timezone.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+🔔 ستبدأ في استقبال إشعارات الطلبات الجديدة من الآن.
+            """
+            
+            # Send test message
+            async def send_test():
+                await app.bot.send_message(
+                    chat_id=junkyard.user.telegram_id,
+                    text=test_message.strip()
+                )
+            
+            asyncio.run(send_test())
+            
+            messages.success(request, f'تم إرسال رسالة اختبار بنجاح للتشليح {junkyard.user.first_name}')
+            
+        except Exception as e:
+            error_msg = str(e)
+            
+            if "Forbidden" in error_msg:
+                messages.error(request, f'لا يمكن إرسال الرسالة للتشليح. السبب: التشليح لم يبدأ محادثة مع البوت. يجب على {junkyard.user.first_name} إرسال /start للبوت أولاً.')
+            elif "chat not found" in error_msg.lower():
+                messages.error(request, 'معرف التليجرام غير صحيح')
+            else:
+                messages.error(request, f'فشل في إرسال الرسالة: {error_msg}')
+    
+    return redirect('dashboard:junkyard_detail', junkyard_id=junkyard_id)
+
+@staff_member_required
+def diagnose_junkyard_issues(request, junkyard_id):
+    """Diagnose common junkyard issues"""
+    junkyard = get_object_or_404(Junkyard, id=junkyard_id)
+    
+    issues = []
+    warnings = []
+    success_items = []
+    
+    # Check basic junkyard setup
+    if not junkyard.user.telegram_id:
+        issues.append("❌ لا يوجد معرف تليجرام للتشليح")
+    else:
+        success_items.append(f"✅ معرف التليجرام: {junkyard.user.telegram_id}")
+    
+    if not junkyard.is_active:
+        issues.append("❌ التشليح غير مُفعل في النظام")
+    else:
+        success_items.append("✅ التشليح مُفعل")
+        
+    if junkyard.user.user_type != 'junkyard':
+        issues.append(f"❌ نوع المستخدم خاطئ: {junkyard.user.user_type}")
+    else:
+        success_items.append("✅ نوع المستخدم صحيح (junkyard)")
+    
+    # Check city setup
+    if not junkyard.city or not junkyard.city.is_active:
+        issues.append("❌ المدينة غير مُفعلة أو غير موجودة")
+    else:
+        success_items.append(f"✅ المدينة: {junkyard.city.name}")
+    
+    # Check offers history
+    offers_count = junkyard.offers.count()
+    if offers_count == 0:
+        warnings.append(f"⚠️ لم يُقدم أي عروض بعد")
+    else:
+        success_items.append(f"✅ قدم {offers_count} عرض سابق")
+    
+    # Check recent activity
+    from django.utils import timezone
+    from datetime import timedelta
+    last_week = timezone.now() - timedelta(days=7)
+    recent_offers = junkyard.offers.filter(created_at__gte=last_week).count()
+    
+    if recent_offers == 0:
+        warnings.append("⚠️ لا توجد عروض في الأسبوع الماضي")
+    else:
+        success_items.append(f"✅ {recent_offers} عرض في الأسبوع الماضي")
+    
+    # Check if junkyard is in same city as recent requests
+    if junkyard.city:
+        recent_requests = Request.objects.filter(
+            city=junkyard.city,
+            created_at__gte=last_week,
+            status__in=['new', 'active']
+        ).count()
+        
+        if recent_requests == 0:
+            warnings.append(f"⚠️ لا توجد طلبات حديثة في مدينة {junkyard.city.name}")
+        else:
+            success_items.append(f"✅ {recent_requests} طلب حديث في مدينة {junkyard.city.name}")
+    
+    # Determine overall status
+    if issues:
+        overall_status = "critical"
+        status_message = "❌ يوجد مشاكل تحتاج إصلاح"
+        status_class = "bg-red-100 text-red-800 border-red-200"
+    elif warnings:
+        overall_status = "warning"
+        status_message = "⚠️ تحتاج متابعة"
+        status_class = "bg-yellow-100 text-yellow-800 border-yellow-200"
+    else:
+        overall_status = "good"
+        status_message = "✅ كل شيء يعمل بشكل جيد"
+        status_class = "bg-green-100 text-green-800 border-green-200"
+    
+    context = {
+        'junkyard': junkyard,
+        'issues': issues,
+        'warnings': warnings,
+        'success_items': success_items,
+        'overall_status': overall_status,
+        'status_message': status_message,
+        'status_class': status_class,
+    }
+    
+    return render(request, 'dashboard/diagnose_junkyard.html', context)
+
+@staff_member_required
+def test_order_workflow(request):
+    """Test the complete order workflow"""
+    from bot.models import Request, City, Brand, Model, User
+    from bot.services import workflow_service
+    from bot.telegram_bot import TelegramBot
+    import asyncio
+    from django.utils import timezone
+    from datetime import timedelta
+    
+    if request.method == 'POST':
+        try:
+            # Get test parameters
+            city_id = request.POST.get('city_id')
+            
+            if not city_id:
+                messages.error(request, 'يرجى اختيار مدينة للاختبار')
+                return redirect('dashboard:test_order_workflow')
+            
+            city = get_object_or_404(City, id=city_id)
+            
+            # Check if there are active junkyards in this city
+            from bot.models import Junkyard
+            active_junkyards = Junkyard.objects.filter(city=city, is_active=True).count()
+            
+            if active_junkyards == 0:
+                messages.warning(request, f'لا توجد تشاليح نشطة في مدينة {city.name}')
+            
+            # Get first brand and model for testing
+            first_brand = Brand.objects.filter(is_active=True).first()
+            first_model = Model.objects.filter(brand=first_brand, is_active=True).first() if first_brand else None
+            
+            if not first_brand or not first_model:
+                messages.error(request, 'لا توجد وكالات أو أسماء سيارات نشطة للاختبار')
+                return redirect('dashboard:test_order_workflow')
+            
+            # Create a test user if doesn't exist
+            test_user, created = User.objects.get_or_create(
+                username='test_customer',
+                defaults={
+                    'first_name': 'عميل تجريبي',
+                    'user_type': 'client',
+                    'telegram_id': 123456789,  # Fake telegram ID for testing
+                    'is_active': True
+                }
+            )
+            
+            # Create a test request
+            test_request = Request.objects.create(
+                user=test_user,
+                city=city,
+                brand=first_brand,
+                model=first_model,
+                year=2020,
+                parts="قطع اختبار - مصد أمامي، فانوس",
+                status='new'
+            )
+            
+            # Create RequestItems
+            from bot.models import RequestItem
+            RequestItem.objects.create(
+                request=test_request,
+                name="مصد أمامي",
+                description="مصد أمامي أصلي",
+                quantity=1
+            )
+            RequestItem.objects.create(
+                request=test_request,
+                name="فانوس يمين",
+                description="فانوس أمامي يمين",
+                quantity=1
+            )
+            
+            # Test the workflow
+            try:
+                # Setup bot and workflow service
+                bot = TelegramBot()
+                workflow_service.set_telegram_bot(bot)
+                
+                # Process the order
+                async def test_workflow():
+                    await workflow_service.process_confirmed_order(test_request)
+                
+                # Run the async function
+                asyncio.run(test_workflow())
+                
+                messages.success(request, f'تم إنشاء طلب اختبار بنجاح! رقم الطلب: {test_request.order_id} في مدينة {city.name}. تم إرسال الإشعارات للتشاليح ({active_junkyards} تشليح).')
+                
+            except Exception as workflow_error:
+                messages.warning(request, f'تم إنشاء الطلب لكن فشل في إرسال الإشعارات: {str(workflow_error)}')
+            
+            # Redirect to request detail
+            return redirect('dashboard:request_detail', request_id=test_request.id)
+            
+        except Exception as e:
+            messages.error(request, f'فشل في إنشاء طلب الاختبار: {str(e)}')
+    
+    # GET request - show form
+    cities = City.objects.filter(is_active=True).order_by('name')
+    
+    # Get junkyard counts per city
+    from bot.models import Junkyard
+    for city in cities:
+        city.junkyard_count = Junkyard.objects.filter(city=city, is_active=True).count()
+    
+    context = {
+        'cities': cities,
+    }
+    
+    return render(request, 'dashboard/test_order_workflow.html', context)
+
+@staff_member_required
+def quick_fix_junkyard(request, junkyard_id):
+    """Quick fix for junkyard offer submission issues"""
+    junkyard = get_object_or_404(Junkyard, id=junkyard_id)
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'activate_junkyard':
+            junkyard.is_active = True
+            junkyard.save()
+            messages.success(request, f'تم تفعيل التشليح {junkyard.user.first_name}')
+        
+        elif action == 'fix_user_type':
+            junkyard.user.user_type = 'junkyard'
+            junkyard.user.save()
+            messages.success(request, f'تم تصحيح نوع المستخدم لـ {junkyard.user.first_name}')
+        
+        elif action == 'activate_city':
+            junkyard.city.is_active = True
+            junkyard.city.save()
+            messages.success(request, f'تم تفعيل المدينة {junkyard.city.name}')
+            
+        elif action == 'test_telegram':
+            # Test sending a message
+            try:
+                from bot.telegram_bot import TelegramBot
+                import asyncio
+                from django.utils import timezone
+                
+                if not junkyard.user.telegram_id:
+                    messages.error(request, 'التشليح ليس لديه معرف تليجرام')
+                    return redirect('dashboard:quick_fix_junkyard', junkyard_id=junkyard_id)
+                
+                bot = TelegramBot()
+                app = bot.setup_bot()
+                
+                if not app:
+                    messages.error(request, 'فشل في إعداد البوت')
+                    return redirect('dashboard:quick_fix_junkyard', junkyard_id=junkyard_id)
+                
+                test_message = f"""
+🔧 اختبار سريع للنظام
+
+مرحباً {junkyard.user.first_name}!
+
+هذه رسالة اختبار سريع للتأكد من أن النظام يعمل بشكل صحيح.
+
+✅ إذا وصلتك هذه الرسالة، فالنظام يعمل بشكل طبيعي.
+
+🔄 جرب الآن الضغط على "إضافة عرض" في أي طلب جديد.
+
+الوقت: {timezone.now().strftime('%Y-%m-%d %H:%M:%S')}
+                """
+                
+                async def send_test():
+                    await app.bot.send_message(
+                        chat_id=junkyard.user.telegram_id,
+                        text=test_message.strip()
+                    )
+                
+                asyncio.run(send_test())
+                messages.success(request, f'تم إرسال رسالة اختبار بنجاح للتشليح {junkyard.user.first_name}')
+                
+            except Exception as e:
+                error_msg = str(e)
+                if "Forbidden" in error_msg:
+                    messages.error(request, f'لا يمكن إرسال الرسالة. السبب: التشليح لم يبدأ محادثة مع البوت. يجب على {junkyard.user.first_name} إرسال /start للبوت أولاً.')
+                else:
+                    messages.error(request, f'فشل في إرسال الرسالة: {error_msg}')
+        
+        return redirect('dashboard:quick_fix_junkyard', junkyard_id=junkyard_id)
+    
+    # GET request - analyze issues
+    issues = []
+    fixes = []
+    warnings = []
+    
+    # Check common issues
+    if not junkyard.user.telegram_id:
+        issues.append({
+            'type': 'critical',
+            'message': '❌ لا يوجد معرف تليجرام',
+            'fix': 'يجب إضافة telegram_id للمستخدم'
+        })
+    
+    if junkyard.user.user_type != 'junkyard':
+        issues.append({
+            'type': 'critical', 
+            'message': f'❌ نوع المستخدم خاطئ: {junkyard.user.user_type}',
+            'fix': 'fix_user_type',
+            'fix_label': 'تصحيح نوع المستخدم'
+        })
+    
+    if not junkyard.is_active:
+        issues.append({
+            'type': 'critical',
+            'message': '❌ التشليح غير مُفعل',
+            'fix': 'activate_junkyard',
+            'fix_label': 'تفعيل التشليح'
+        })
+    
+    if not junkyard.city.is_active:
+        issues.append({
+            'type': 'warning',
+            'message': f'⚠️ المدينة {junkyard.city.name} غير مُفعلة',
+            'fix': 'activate_city',
+            'fix_label': 'تفعيل المدينة'
+        })
+    
+    # Check recent activity
+    from django.utils import timezone
+    from datetime import timedelta
+    
+    last_week = timezone.now() - timedelta(days=7)
+    recent_offers = junkyard.offers.filter(created_at__gte=last_week).count()
+    total_offers = junkyard.offers.count()
+    
+    if total_offers == 0:
+        warnings.append('⚠️ لم يقدم أي عروض بعد')
+    
+    # Check if bot can send messages
+    can_test_telegram = junkyard.user.telegram_id is not None
+    
+    context = {
+        'junkyard': junkyard,
+        'issues': issues,
+        'fixes': fixes,
+        'warnings': warnings,
+        'can_test_telegram': can_test_telegram,
+        'recent_offers': recent_offers,
+        'total_offers': total_offers,
+    }
+    
+    return render(request, 'dashboard/quick_fix_junkyard.html', context)
+
+@staff_member_required
+def edit_junkyard(request, junkyard_id):
+    """Edit existing junkyard"""
+    try:
+        junkyard = get_object_or_404(Junkyard, id=junkyard_id)
+        print(f"🔍 EDIT DEBUG: Starting edit for junkyard {junkyard_id} - {junkyard.user.first_name}")
+    except Junkyard.DoesNotExist:
+        messages.error(request, f'التشليح رقم {junkyard_id} غير موجود')
+        return redirect('dashboard:junkyards_list')
+    
+    if request.method == 'POST':
+        # Debug: Print all POST data
+        print(f"🔍 EDIT DEBUG: POST data for junkyard {junkyard_id}: {request.POST}")
+        
+        # Store original values for comparison
+        original_junkyard_id = junkyard.id
+        original_user_id = junkyard.user.id
+        original_telegram_id = junkyard.user.telegram_id
+        print(f"🔍 EDIT DEBUG: Original IDs - Junkyard: {original_junkyard_id}, User: {original_user_id}, Telegram: {original_telegram_id}")
+        
+        # Get form data
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        username = request.POST.get('username', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        city_id = request.POST.get('city')
+        location = request.POST.get('location', '').strip()
+        telegram_id = request.POST.get('telegram_id', '').strip()
+        is_active = request.POST.get('is_active') == 'on'
+        is_verified = request.POST.get('is_verified') == 'on'
+        
+        # Debug: Print extracted values
+        print(f"🔍 EDIT DEBUG: Form data - first_name={first_name}, username={username}, phone={phone}, city_id={city_id}, telegram_id={telegram_id}")
+        
+        # Validate required fields
+        if not all([first_name, username, phone, city_id, location]):
+            print(f"DEBUG: Validation failed - missing required fields")
+            messages.error(request, 'جميع الحقول مطلوبة عدا telegram_id')
+            return redirect('dashboard:edit_junkyard', junkyard_id=junkyard_id)
+        
+        # Validate telegram_id if provided
+        telegram_id_int = None
+        if telegram_id:
+            try:
+                telegram_id_int = int(telegram_id)
+                if telegram_id_int <= 0 or len(telegram_id) < 8:
+                    print(f"🔍 EDIT DEBUG: Invalid telegram_id format: {telegram_id}")
+                    messages.error(request, 'معرف التليجرام يجب أن يكون رقماً صحيحاً مكوناً من 8 أرقام على الأقل')
+                    return redirect('dashboard:edit_junkyard', junkyard_id=original_junkyard_id)
+            except (ValueError, TypeError):
+                print(f"🔍 EDIT DEBUG: telegram_id is not a valid number: {telegram_id}")
+                messages.error(request, 'معرف التليجرام يجب أن يكون رقماً صحيحاً')
+                return redirect('dashboard:edit_junkyard', junkyard_id=original_junkyard_id)
+        
+        print(f"🔍 EDIT DEBUG: Validated telegram_id: {telegram_id_int} (original: {original_telegram_id})")
+        
+        try:
+            # Refresh junkyard from database to ensure we have the latest data
+            junkyard.refresh_from_db()
+            print(f"🔍 EDIT DEBUG: After refresh - Junkyard ID: {junkyard.id}, User ID: {junkyard.user.id}")
+            
+            # Check if username already exists (excluding current user)
+            existing_username = User.objects.filter(username=username).exclude(id=junkyard.user.id).first()
+            if existing_username:
+                print(f"🔍 EDIT DEBUG: Username '{username}' already exists for user ID {existing_username.id}")
+                messages.error(request, f'اسم المستخدم "{username}" مستخدم بالفعل من قبل مستخدم آخر')
+                return redirect('dashboard:edit_junkyard', junkyard_id=original_junkyard_id)
+            
+            # Check if telegram_id already exists (excluding current user)
+            if telegram_id_int:
+                existing_telegram = User.objects.filter(telegram_id=telegram_id_int).exclude(id=junkyard.user.id).first()
+                if existing_telegram:
+                    print(f"🔍 EDIT DEBUG: Telegram ID {telegram_id_int} already exists for user ID {existing_telegram.id} ({existing_telegram.first_name})")
+                    messages.error(request, f'معرف التليجرام {telegram_id_int} مستخدم بالفعل من قبل "{existing_telegram.first_name}"')
+                    return redirect('dashboard:edit_junkyard', junkyard_id=original_junkyard_id)
+            
+            # Get city
+            print(f"DEBUG: Getting city with id {city_id}")
+            city = get_object_or_404(City, id=city_id)
+            print(f"DEBUG: Found city: {city.name}")
+            
+            # Update user
+            print(f"🔍 EDIT DEBUG: Starting user update - User ID: {junkyard.user.id}")
+            print(f"🔍 EDIT DEBUG: Before update - telegram_id: {junkyard.user.telegram_id}")
+            
+            junkyard.user.username = username
+            junkyard.user.first_name = first_name
+            junkyard.user.last_name = last_name
+            junkyard.user.telegram_id = telegram_id_int
+            # Ensure user type is always 'junkyard' for junkyards
+            junkyard.user.user_type = 'junkyard'
+            junkyard.user.save()
+            
+            print(f"🔍 EDIT DEBUG: After user save - User ID: {junkyard.user.id}, telegram_id: {junkyard.user.telegram_id}")
+            
+            # Update junkyard
+            print(f"🔍 EDIT DEBUG: Starting junkyard update - Junkyard ID: {junkyard.id}")
+            junkyard.phone = phone
+            junkyard.city = city
+            junkyard.location = location
+            junkyard.is_active = is_active
+            junkyard.is_verified = is_verified
+            junkyard.save()
+            
+            print(f"🔍 EDIT DEBUG: After junkyard save - Junkyard ID: {junkyard.id}")
+            
+            # Final verification that IDs haven't changed
+            if junkyard.id != original_junkyard_id:
+                print(f"🚨 ALERT: Junkyard ID changed from {original_junkyard_id} to {junkyard.id}!")
+                messages.warning(request, f'تحذير: معرف التشليح تغير من {original_junkyard_id} إلى {junkyard.id}')
+            
+            if junkyard.user.id != original_user_id:
+                print(f"🚨 ALERT: User ID changed from {original_user_id} to {junkyard.user.id}!")
+                messages.warning(request, f'تحذير: معرف المستخدم تغير من {original_user_id} إلى {junkyard.user.id}')
+            
+            messages.success(request, f'تم تحديث بيانات التشليح "{first_name}" بنجاح (ID: {junkyard.id})')
+            print(f"🔍 EDIT DEBUG: Success! Redirecting to junkyard detail {junkyard.id}")
+            return redirect('dashboard:junkyard_detail', junkyard_id=junkyard.id)
+            
+        except Exception as e:
+            print(f"🚨 EDIT ERROR: Exception occurred while updating junkyard {original_junkyard_id}: {str(e)}")
+            print(f"🚨 EDIT ERROR: Exception type: {type(e)}")
+            import traceback
+            print(f"🚨 EDIT ERROR: Traceback: {traceback.format_exc()}")
+            messages.error(request, f'حدث خطأ أثناء تحديث التشليح: {str(e)}')
+            return redirect('dashboard:edit_junkyard', junkyard_id=original_junkyard_id)
+    
+    # GET request - show form with current data
+    cities = City.objects.filter(is_active=True).order_by('name')
+    
+    context = {
+        'junkyard': junkyard,
+        'cities': cities,
+        'is_edit': True,
+    }
+    
+    return render(request, 'dashboard/edit_junkyard.html', context)
+
+@staff_member_required
+def fix_junkyard_user_types(request):
+    """Fix incorrect user types for junkyards"""
+    
+    if request.method == 'POST':
+        # Get all junkyards with wrong user types
+        wrong_type_junkyards = Junkyard.objects.filter(
+            user__user_type__in=['junkyard_owner', 'owner', 'manager', 'admin', 'staff']
+        ).exclude(user__user_type='junkyard')
+        
+        fixed_count = 0
+        errors = []
+        
+        try:
+            for junkyard in wrong_type_junkyards:
+                old_type = junkyard.user.user_type
+                junkyard.user.user_type = 'junkyard'
+                junkyard.user.save()
+                fixed_count += 1
+                print(f"✅ Fixed junkyard {junkyard.id}: {junkyard.user.first_name} - {old_type} → junkyard")
+            
+            if fixed_count > 0:
+                messages.success(request, f'تم إصلاح {fixed_count} تشليح بنجاح! جميع التشاليح الآن لها نوع المستخدم الصحيح.')
+            else:
+                messages.info(request, 'جميع التشاليح لها نوع المستخدم الصحيح بالفعل.')
+                
+        except Exception as e:
+            messages.error(request, f'حدث خطأ أثناء الإصلاح: {str(e)}')
+            print(f"❌ Error fixing user types: {e}")
+        
+        return redirect('dashboard:fix_junkyard_user_types')
+    
+    # GET request - show current status
+    try:
+        # Get all junkyards and their user types
+        all_junkyards = Junkyard.objects.select_related('user', 'city').all()
+        
+        # Categorize by user type
+        correct_junkyards = []
+        wrong_type_junkyards = []
+        
+        for junkyard in all_junkyards:
+            if junkyard.user.user_type == 'junkyard':
+                correct_junkyards.append(junkyard)
+            else:
+                wrong_type_junkyards.append(junkyard)
+        
+        # Get statistics
+        stats = {
+            'total_junkyards': all_junkyards.count(),
+            'correct_type': len(correct_junkyards),
+            'wrong_type': len(wrong_type_junkyards),
+            'needs_fix': len(wrong_type_junkyards) > 0,
+        }
+        
+        context = {
+            'stats': stats,
+            'correct_junkyards': correct_junkyards,
+            'wrong_type_junkyards': wrong_type_junkyards,
+        }
+        
+    except Exception as e:
+        messages.error(request, f'حدث خطأ في تحميل البيانات: {str(e)}')
+        context = {
+            'stats': {'total_junkyards': 0, 'correct_type': 0, 'wrong_type': 0, 'needs_fix': False},
+            'correct_junkyards': [],
+            'wrong_type_junkyards': [],
+        }
+    
+    return render(request, 'dashboard/fix_user_types.html', context)
+
+@staff_member_required
+def debug_junkyard_edit_issue(request):
+    """Debug tool for junkyard edit issues"""
+    
+    context = {
+        'junkyards': [],
+        'debug_info': '',
+        'search_performed': False,
+    }
+    
+    if request.method == 'POST':
+        search_name = request.POST.get('search_name', '').strip()
+        
+        if search_name:
+            # Search for junkyards by name
+            junkyards = Junkyard.objects.filter(
+                user__first_name__icontains=search_name
+            ).select_related('user', 'city').order_by('id')
+            
+            debug_info = []
+            debug_info.append(f"🔍 البحث عن التشاليح باسم: '{search_name}'")
+            debug_info.append(f"📊 عدد النتائج: {junkyards.count()}")
+            debug_info.append("")
+            
+            for idx, junkyard in enumerate(junkyards, 1):
+                debug_info.append(f"--- التشليح رقم {idx} ---")
+                debug_info.append(f"🆔 معرف التشليح: {junkyard.id}")
+                debug_info.append(f"👤 معرف المستخدم: {junkyard.user.id}")
+                debug_info.append(f"📝 الاسم: {junkyard.user.first_name} {junkyard.user.last_name}")
+                debug_info.append(f"🏷️ اسم المستخدم: {junkyard.user.username}")
+                debug_info.append(f"📱 معرف التليجرام: {junkyard.user.telegram_id or 'غير محدد'}")
+                debug_info.append(f"🏙️ المدينة: {junkyard.city.name}")
+                debug_info.append(f"📞 الهاتف: {junkyard.phone}")
+                debug_info.append(f"🔧 نوع المستخدم: {junkyard.user.user_type}")
+                debug_info.append(f"✅ نشط: {'نعم' if junkyard.is_active else 'لا'}")
+                debug_info.append(f"🔐 معتمد: {'نعم' if junkyard.is_verified else 'لا'}")
+                debug_info.append(f"📅 تاريخ الإنشاء: {junkyard.created_at.strftime('%Y-%m-%d %H:%M:%S')}")
+                debug_info.append("")
+            
+            # Check for duplicates
+            user_ids = [j.user.id for j in junkyards]
+            telegram_ids = [j.user.telegram_id for j in junkyards if j.user.telegram_id]
+            usernames = [j.user.username for j in junkyards]
+            
+            duplicate_users = [uid for uid in set(user_ids) if user_ids.count(uid) > 1]
+            duplicate_telegrams = [tid for tid in set(telegram_ids) if telegram_ids.count(tid) > 1]
+            duplicate_usernames = [uname for uname in set(usernames) if usernames.count(uname) > 1]
+            
+            if duplicate_users or duplicate_telegrams or duplicate_usernames:
+                debug_info.append("⚠️ تم العثور على تضارب في البيانات:")
+                if duplicate_users:
+                    debug_info.append(f"   - معرفات مستخدمين مكررة: {duplicate_users}")
+                if duplicate_telegrams:
+                    debug_info.append(f"   - معرفات تليجرام مكررة: {duplicate_telegrams}")
+                if duplicate_usernames:
+                    debug_info.append(f"   - أسماء مستخدمين مكررة: {duplicate_usernames}")
+            else:
+                debug_info.append("✅ لا توجد تضارب في البيانات")
+            
+            context.update({
+                'junkyards': junkyards,
+                'debug_info': '\n'.join(debug_info),
+                'search_performed': True,
+                'search_name': search_name,
+            })
+    
+    return render(request, 'dashboard/debug_junkyard_edit.html', context)
 
 @staff_member_required
 def add_junkyard(request):

@@ -292,12 +292,18 @@
             transition: all 0.3s ease !important;
         }
         
-        /* COMPACT BRANDING */
+        /* UNIFIED HEADER - ALL ELEMENTS TOGETHER */
         #branding {
             background: transparent !important;
-            padding: 15px 30px !important;
-            float: left !important;
+            padding: 0 !important;
+            float: none !important;
             width: auto !important;
+            position: static !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-end !important;
+            z-index: 5 !important;
+            margin-right: 20px !important;
         }
         
         #branding h1 {
@@ -305,8 +311,9 @@
             font-family: 'Cairo', sans-serif !important;
             font-weight: 600 !important;
             font-size: 20px !important;
-            color: white !important;
+            color: #e2e8f0 !important;
             line-height: 1.2 !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
         }
         
         #branding h1 a {
@@ -327,59 +334,186 @@
             color: #14b8a6 !important;
         }
         
-        /* SIMPLE USER TOOLS */
+        /* UNIFIED HEADER CONTAINER - WEBSITE COLORS */
+        #header {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            padding: 15px 30px !important;
+            background: linear-gradient(135deg, #0b1220 0%, #0f172a 100%) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+            position: relative !important;
+            overflow: hidden !important;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2) !important;
+        }
+        
+        #header::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(20, 184, 166, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(13, 148, 136, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(15, 118, 110, 0.06) 0%, transparent 50%);
+            pointer-events: none !important;
+        }
+        
+        /* UNIFIED USER TOOLS - IN SAME HEADER */
         #user-tools {
             background: transparent !important;
-            padding: 15px 30px !important;
+            padding: 0 !important;
             border: none !important;
             color: white !important;
-            float: right !important;
+            float: none !important;
             width: auto !important;
+            position: static !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            z-index: 10 !important;
+            margin-left: 20px !important;
         }
         
         #user-tools a {
-            color: white !important;
-            padding: 8px 16px !important;
-            border-radius: 8px !important;
-            background: rgba(20, 184, 166, 0.15) !important;
-            border: 1px solid rgba(20, 184, 166, 0.3) !important;
+            color: #e2e8f0 !important;
+            padding: 10px 18px !important;
+            border-radius: 12px !important;
+            background: rgba(15, 23, 42, 0.8) !important;
+            border: 1px solid rgba(148, 163, 184, 0.3) !important;
             text-decoration: none !important;
             transition: all 0.3s ease !important;
             font-family: 'Cairo', sans-serif !important;
-            font-weight: 500 !important;
-            font-size: 13px !important;
-            margin-left: 8px !important;
-            display: inline-block !important;
-        }
-        
-        #user-tools a:hover {
-            background: rgba(20, 184, 166, 0.25) !important;
-            border-color: rgba(20, 184, 166, 0.5) !important;
-            transform: translateY(-1px) !important;
-        }
-        
-        /* DASHBOARD LINK IN HEADER */
-        .dashboard-link-header {
-            color: white !important;
-            padding: 8px 16px !important;
-            border-radius: 8px !important;
-            background: rgba(20, 184, 166, 0.2) !important;
-            border: 1px solid rgba(20, 184, 166, 0.4) !important;
-            text-decoration: none !important;
-            transition: all 0.3s ease !important;
-            font-family: 'Cairo', sans-serif !important;
-            font-weight: 500 !important;
-            font-size: 13px !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            margin-right: 12px !important;
             display: inline-flex !important;
             align-items: center !important;
             gap: 6px !important;
+            backdrop-filter: blur(10px) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+        
+        #user-tools a::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: -100% !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.2), 
+                transparent) !important;
+            transition: left 0.6s ease !important;
+        }
+        
+        #user-tools a:hover::before {
+            left: 100% !important;
+        }
+        
+        #user-tools a:hover {
+            background: rgba(20, 184, 166, 0.2) !important;
+            border-color: rgba(20, 184, 166, 0.5) !important;
+            color: #14b8a6 !important;
+            transform: translateY(-2px) scale(1.05) !important;
+            box-shadow: 0 8px 20px rgba(20, 184, 166, 0.3) !important;
+        }
+        
+        /* RESPONSIVE USER TOOLS */
+        @media (max-width: 768px) {
+            #user-tools {
+                position: relative !important;
+                float: none !important;
+                width: 100% !important;
+                padding: 10px 15px !important;
+                justify-content: center !important;
+                margin-bottom: 10px !important;
+            }
+            
+            #user-tools a {
+                padding: 8px 12px !important;
+                font-size: 12px !important;
+                margin-right: 8px !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #header {
+                padding: 15px !important;
+                gap: 12px !important;
+            }
+            
+            #branding h1 {
+                font-size: 16px !important;
+            }
+            
+            .dashboard-link-header {
+                font-size: 11px !important;
+                padding: 6px 12px !important;
+            }
+            
+            #user-tools {
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+            }
+            
+            #user-tools a {
+                padding: 6px 10px !important;
+                font-size: 11px !important;
+                margin-right: 6px !important;
+            }
+        }
+        
+        /* DASHBOARD LINK IN HEADER - WEBSITE COLORS */
+        .dashboard-link-header {
+            color: #e2e8f0 !important;
+            padding: 10px 18px !important;
+            border-radius: 12px !important;
+            background: rgba(15, 23, 42, 0.8) !important;
+            border: 1px solid rgba(148, 163, 184, 0.3) !important;
+            text-decoration: none !important;
+            transition: all 0.3s ease !important;
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            backdrop-filter: blur(10px) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+            position: relative !important;
+            overflow: hidden !important;
         }
         
         .dashboard-link-header:hover {
-            background: rgba(20, 184, 166, 0.3) !important;
-            border-color: rgba(20, 184, 166, 0.6) !important;
-            transform: translateY(-1px) !important;
-            color: white !important;
+            background: rgba(20, 184, 166, 0.2) !important;
+            border-color: rgba(20, 184, 166, 0.5) !important;
+            transform: translateY(-2px) scale(1.05) !important;
+            color: #14b8a6 !important;
+            box-shadow: 0 8px 20px rgba(20, 184, 166, 0.3) !important;
+        }
+        
+        .dashboard-link-header::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: -100% !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.2), 
+                transparent) !important;
+            transition: left 0.6s ease !important;
+        }
+        
+        .dashboard-link-header:hover::before {
+            left: 100% !important;
         }
         
         /* UNIFIED USER TOOLS BUTTONS */
@@ -427,17 +561,24 @@
             clear: both !important;
         }
         
-        /* RESPONSIVE HEADER */
+        /* RESPONSIVE UNIFIED HEADER */
         @media (max-width: 768px) {
+            #header {
+                flex-direction: column !important;
+                gap: 15px !important;
+                padding: 20px !important;
+            }
+            
             #branding {
-                padding: 12px 20px !important;
-                float: none !important;
-                text-align: center !important;
+                order: 1 !important;
+                margin-right: 0 !important;
+                justify-content: center !important;
             }
             
             #branding div {
                 flex-direction: column !important;
                 gap: 12px !important;
+                align-items: center !important;
             }
             
             #branding h1 {
@@ -446,7 +587,13 @@
             
             .dashboard-link-header {
                 font-size: 12px !important;
-                padding: 6px 12px !important;
+                padding: 8px 14px !important;
+            }
+            
+            #user-tools {
+                order: 2 !important;
+                margin-left: 0 !important;
+                justify-content: center !important;
             }
             
             #user-tools {
@@ -653,28 +800,48 @@
         .paginator a:hover { background: var(--primary) !important; color: white !important; }
         .paginator .this-page { background: var(--primary) !important; color: white !important; }
         
-        /* DARK MODE TOGGLE */
-        .theme-toggle {
-            position: fixed !important;
-            top: 20px !important;
-            left: 20px !important;
-            background: var(--bg-glass) !important;
-            backdrop-filter: var(--backdrop-blur) !important;
-            border: 1px solid var(--border-glass) !important;
-            border-radius: 50% !important;
-            width: 50px !important;
-            height: 50px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            cursor: pointer !important;
-            z-index: 1000 !important;
-            color: var(--primary) !important;
-            font-size: 20px !important;
-            transition: all 0.3s ease !important;
-        }
+        /* DARK MODE ONLY - NO TOGGLE BUTTONS */
         
-        .theme-toggle:hover { transform: scale(1.1) !important; }
+        /* Hide Skip to main content and theme toggle elements */
+        .skip-link,
+        .visually-hidden,
+        [class*="skip"],
+        [class*="Skip"],
+        [class*="toggle"],
+        [class*="Toggle"],
+        [class*="theme-toggle"],
+        [class*="theme_toggle"],
+        [id*="skip"],
+        [id*="Skip"],
+        [id*="toggle"],
+        [id*="Toggle"],
+        [id*="theme-toggle"],
+        [id*="theme_toggle"],
+        a[href*="#content"],
+        a[href*="#main"],
+        button[class*="theme"],
+        button[class*="Theme"],
+        .theme-toggle,
+        .theme_toggle,
+        .skip-to-content,
+        .skip-to-main,
+        .skip-link,
+        .visually-hidden {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            position: absolute !important;
+            left: -9999px !important;
+            top: -9999px !important;
+            width: 0 !important;
+            height: 0 !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
         
         /* ADDITIONAL DARK MODE FORCE */
         
@@ -874,5 +1041,86 @@
         // Force dark mode
         document.documentElement.classList.add('dark');
         document.documentElement.style.colorScheme = 'dark';
+        
+        // Remove Skip to main content and theme toggle elements completely
+        document.addEventListener('DOMContentLoaded', function() {
+            // Remove all skip and toggle elements
+            const elementsToRemove = [
+                '.skip-link',
+                '.visually-hidden',
+                '[class*="skip"]',
+                '[class*="Skip"]',
+                '[class*="toggle"]',
+                '[class*="Toggle"]',
+                '[class*="theme-toggle"]',
+                '[class*="theme_toggle"]',
+                '[id*="skip"]',
+                '[id*="Skip"]',
+                '[id*="toggle"]',
+                '[id*="Toggle"]',
+                '[id*="theme-toggle"]',
+                '[id*="theme_toggle"]',
+                'a[href*="#content"]',
+                'a[href*="#main"]',
+                'button[class*="theme"]',
+                'button[class*="Theme"]',
+                '.theme-toggle',
+                '.theme_toggle',
+                '.skip-to-content',
+                '.skip-to-main',
+                '.skip-link',
+                '.visually-hidden',
+                '[aria-label*="skip"]',
+                '[aria-label*="Skip"]',
+                '[aria-label*="toggle"]',
+                '[aria-label*="Toggle"]',
+                '[aria-label*="theme"]',
+                '[aria-label*="Theme"]',
+                '[title*="skip"]',
+                '[title*="Skip"]',
+                '[title*="toggle"]',
+                '[title*="Toggle"]',
+                '[title*="theme"]',
+                '[title*="Theme"]'
+            ];
+            
+            elementsToRemove.forEach(selector => {
+                try {
+                    const elements = document.querySelectorAll(selector);
+                    elements.forEach(element => {
+                        // Check if element contains skip or toggle related text
+                        const text = element.textContent || element.innerText || '';
+                        const ariaLabel = element.getAttribute('aria-label') || '';
+                        const title = element.getAttribute('title') || '';
+                        
+                        if (text.toLowerCase().includes('skip') || 
+                            text.toLowerCase().includes('toggle') ||
+                            text.toLowerCase().includes('theme') ||
+                            ariaLabel.toLowerCase().includes('skip') ||
+                            ariaLabel.toLowerCase().includes('toggle') ||
+                            ariaLabel.toLowerCase().includes('theme') ||
+                            title.toLowerCase().includes('skip') ||
+                            title.toLowerCase().includes('toggle') ||
+                            title.toLowerCase().includes('theme')) {
+                            element.remove();
+                        }
+                    });
+                } catch (e) {
+                    // Ignore errors for invalid selectors
+                }
+            });
+            
+            // Also remove any elements with specific text content
+            const allElements = document.querySelectorAll('*');
+            allElements.forEach(element => {
+                const text = element.textContent || element.innerText || '';
+                if (text.includes('Skip to main content') || 
+                    text.includes('Toggle theme') ||
+                    text.includes('skip to main content') ||
+                    text.includes('toggle theme')) {
+                    element.remove();
+                }
+            });
+        });
     </script>
 {% endblock %} 
