@@ -89,6 +89,9 @@ certificates/
 *.crt
 *.pem
 .git-credentials
+.env
+.env.local
+.env.production
 
 # Temporary files
 tmp/
