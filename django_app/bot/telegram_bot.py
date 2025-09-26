@@ -2,6 +2,7 @@ import os
 import json
 import logging
 import uuid
+import pickle
 from typing import Dict, Any
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, ContextTypes, filters
@@ -17,6 +18,8 @@ class TelegramBot:
         self.application = None
         self.user_states = {}  # تخزين حالات المحادثة والمسودات للمستخدمين
         self.MAX_DRAFTS = 5  # الحد الأقصى لعدد المسودات لكل مستخدم
+        self.states_file = "/tmp/bot_user_states.pickle"  # ملف لحفظ الحالات
+        self.load_user_states()  # تحميل الحالات عند البدء
     
     def setup_bot(self):
         """Initialize the bot application"""
@@ -344,6 +347,10 @@ class TelegramBot:
                 await self.show_offer_details(query, user, data)
             elif data.startswith("add_item_"):
                 await self.handle_add_item(query, user, data)
+            elif data.startswith("add_item_photo_"):
+                await self.handle_add_item_photo(query, user, data)
+            elif data.startswith("skip_item_photo_"):
+                await self.handle_skip_item_photo(query, user, data)
             elif data.startswith("manage_items_"):
                 await self.handle_manage_items(query, user, data)
             elif data.startswith("view_items_"):
@@ -1145,6 +1152,7 @@ class TelegramBot:
         if "items" not in current_draft["request_data"]:
             current_draft["request_data"]["items"] = []
         
+        # Add the item to the list
         current_draft["request_data"]["items"].append({
             "name": parts_text,
             "description": "",
@@ -1154,7 +1162,12 @@ class TelegramBot:
             "media_files": []
         })
         
-        current_draft["step"] = "manage_items"
+        # Store the current item index for photo handling
+        current_draft["current_item_index"] = len(current_draft["request_data"]["items"]) - 1
+        current_draft["step"] = "add_item_photo"
+        
+        # Save the updated state
+        self.save_user_states()
         
         message = f"""
 ✅ تم إضافة القطعة بنجاح!
@@ -1162,13 +1175,13 @@ class TelegramBot:
 📝 **{current_draft['name']}**
 
 ✅ اسم القطعة: {parts_text}
+
+📸 هل تريد إضافة صورة لهذه القطعة؟
         """
         
         keyboard = [
-            [InlineKeyboardButton("➕ إضافة قطعة أخرى", callback_data=f"add_item_{current_draft_id}")],
-            [InlineKeyboardButton("📋 عرض القطع", callback_data=f"view_items_{current_draft_id}")],
-            [InlineKeyboardButton("✅ تأكيد الطلب", callback_data=f"confirm_request_{current_draft_id}")],
-            [InlineKeyboardButton("🔙 رجوع", callback_data=f"manage_items_{current_draft_id}")]
+            [InlineKeyboardButton("📸 إضافة صورة", callback_data=f"add_item_photo_{current_draft_id}")],
+            [InlineKeyboardButton("⏭️ تخطى", callback_data=f"skip_item_photo_{current_draft_id}")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -1235,6 +1248,7 @@ class TelegramBot:
         if "items" not in current_draft["request_data"]:
             current_draft["request_data"]["items"] = []
         
+        # Add the item to the list
         current_draft["request_data"]["items"].append({
             "name": item_name,
             "description": "",
@@ -1244,7 +1258,12 @@ class TelegramBot:
             "media_files": []
         })
         
-        current_draft["step"] = "manage_items"
+        # Store the current item index for photo handling
+        current_draft["current_item_index"] = len(current_draft["request_data"]["items"]) - 1
+        current_draft["step"] = "add_item_photo"
+        
+        # Save the updated state
+        self.save_user_states()
         
         message = f"""
 ✅ تم إضافة القطعة بنجاح!
@@ -1252,13 +1271,13 @@ class TelegramBot:
 📝 **{current_draft['name']}**
 
 ✅ اسم القطعة: {item_name}
+
+📸 هل تريد إضافة صورة لهذه القطعة؟
         """
         
         keyboard = [
-            [InlineKeyboardButton("➕ إضافة قطعة أخرى", callback_data=f"add_item_{current_draft_id}")],
-            [InlineKeyboardButton("📋 عرض القطع", callback_data=f"view_items_{current_draft_id}")],
-            [InlineKeyboardButton("✅ تأكيد الطلب", callback_data=f"confirm_request_{current_draft_id}")],
-            [InlineKeyboardButton("🔙 رجوع", callback_data=f"manage_items_{current_draft_id}")]
+            [InlineKeyboardButton("📸 إضافة صورة", callback_data=f"add_item_photo_{current_draft_id}")],
+            [InlineKeyboardButton("⏭️ تخطى", callback_data=f"skip_item_photo_{current_draft_id}")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -1332,21 +1351,22 @@ class TelegramBot:
             return
         
         current_draft = user_state["drafts"][current_draft_id]
-        if current_draft.get("step") != "add_media":
-            return
+        current_step = current_draft.get("step")
         
-        # Store file ID
-        if "media_files" not in current_draft["request_data"]:
-            current_draft["request_data"]["media_files"] = []
-        
-        if update.message.photo:
-            file_id = update.message.photo[-1].file_id  # Get highest resolution
-            current_draft["request_data"]["media_files"].append({"type": "photo", "file_id": file_id})
-        elif update.message.video:
-            file_id = update.message.video.file_id
-            current_draft["request_data"]["media_files"].append({"type": "video", "file_id": file_id})
-        
-        message = f"""
+        # Handle different media upload scenarios
+        if current_step == "add_media":
+            # General media upload for the request
+            if "media_files" not in current_draft["request_data"]:
+                current_draft["request_data"]["media_files"] = []
+            
+            if update.message.photo:
+                file_id = update.message.photo[-1].file_id  # Get highest resolution
+                current_draft["request_data"]["media_files"].append({"type": "photo", "file_id": file_id})
+            elif update.message.video:
+                file_id = update.message.video.file_id
+                current_draft["request_data"]["media_files"].append({"type": "video", "file_id": file_id})
+            
+            message = f"""
 📝 **{current_draft['name']}**
 
 ✅ تم إضافة الملف ({len(current_draft["request_data"]["media_files"])} ملف)
@@ -1355,15 +1375,73 @@ class TelegramBot:
 • ➕ إضافة قطعة جديدة
 • 📸 إضافة المزيد من الصور/الفيديو
 • 📤 تأكيد الطلب
-        """
-        
-        keyboard = [
-            [InlineKeyboardButton("➕ إضافة قطعة جديدة", callback_data=f"add_item_{current_draft_id}")],
-            [InlineKeyboardButton("📸 إضافة المزيد من الصور/الفيديو", callback_data=f"add_media_{current_draft_id}")],
-            [InlineKeyboardButton("✅ تأكيد الطلب", callback_data=f"confirm_request_{current_draft_id}")],
-            [InlineKeyboardButton("📋 طلباتي", callback_data="my_requests")]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
+            """
+            
+            keyboard = [
+                [InlineKeyboardButton("➕ إضافة قطعة جديدة", callback_data=f"add_item_{current_draft_id}")],
+                [InlineKeyboardButton("📸 إضافة المزيد من الصور/الفيديو", callback_data=f"add_media_{current_draft_id}")],
+                [InlineKeyboardButton("✅ تأكيد الطلب", callback_data=f"confirm_request_{current_draft_id}")],
+                [InlineKeyboardButton("📋 طلباتي", callback_data="my_requests")]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+        elif current_step == "add_item_photo":
+            # Media upload for specific item
+            current_item_index = current_draft.get("current_item_index")
+            
+            # Ensure items list exists
+            if "items" not in current_draft["request_data"]:
+                current_draft["request_data"]["items"] = []
+            
+            # Debug: Log the current state
+            logger.info(f"Photo upload - current_item_index: {current_item_index}, total items: {len(current_draft['request_data']['items'])}")
+            
+            # If current_item_index is not set or invalid, use the last item
+            if current_item_index is None or current_item_index >= len(current_draft["request_data"]["items"]):
+                current_item_index = len(current_draft["request_data"]["items"]) - 1
+                logger.info(f"Adjusted current_item_index to: {current_item_index}")
+            
+            if current_item_index >= 0 and current_item_index < len(current_draft["request_data"]["items"]):
+                current_item = current_draft["request_data"]["items"][current_item_index]
+                
+                # Ensure media_files list exists
+                if "media_files" not in current_item:
+                    current_item["media_files"] = []
+                
+                if update.message.photo:
+                    file_id = update.message.photo[-1].file_id  # Get highest resolution
+                    current_item["media_files"].append({"type": "photo", "file_id": file_id})
+                elif update.message.video:
+                    file_id = update.message.video.file_id
+                    current_item["media_files"].append({"type": "video", "file_id": file_id})
+                
+                message = f"""
+✅ تم إضافة صورة للقطعة بنجاح!
+
+📝 **{current_draft['name']}**
+
+✅ القطعة: {current_item["name"]}
+📸 عدد الصور: {len(current_item["media_files"])}
+
+ما تريد فعله الآن؟
+                """
+                
+                keyboard = [
+                    [InlineKeyboardButton("➕ إضافة قطعة أخرى", callback_data=f"add_item_{current_draft_id}")],
+                    [InlineKeyboardButton("✅ تأكيد الطلب", callback_data=f"confirm_request_{current_draft_id}")]
+                ]
+                reply_markup = InlineKeyboardMarkup(keyboard)
+                
+                # Clear the current item index and change step
+                if "current_item_index" in current_draft:
+                    del current_draft["current_item_index"]
+                current_draft["step"] = "manage_items"
+            else:
+                await update.message.reply_text("❌ خطأ: لم يتم العثور على القطعة.")
+                return
+        else:
+            # Unknown step, ignore media
+            return
         
         await update.message.reply_text(message, reply_markup=reply_markup)
     
@@ -2425,6 +2503,106 @@ class TelegramBot:
         
         await query.edit_message_text(message, reply_markup=reply_markup)
     
+    async def handle_add_item_photo(self, query, user, data):
+        """Handle add item photo button"""
+        try:
+            draft_id = data.split("_")[3]
+            user_state = self.user_states.get(user.telegram_id, {})
+            
+            logger.info(f"Handle add item photo - user: {user.telegram_id}, draft_id: {draft_id}, user_state keys: {list(user_state.keys())}")
+            
+            if not user_state:
+                await query.edit_message_text("❌ خطأ: لم يتم العثور على حالة المستخدم. يرجى بدء طلب جديد.")
+                return
+            
+            if "drafts" not in user_state:
+                user_state["drafts"] = {}
+            
+            if draft_id not in user_state.get("drafts", {}):
+                await query.edit_message_text(f"❌ خطأ: لم يتم العثور على المسودة {draft_id}. المسودات المتاحة: {list(user_state.get('drafts', {}).keys())}")
+                return
+            
+            current_draft = user_state["drafts"][draft_id]
+            
+            # Ensure request_data exists
+            if "request_data" not in current_draft:
+                current_draft["request_data"] = {}
+            
+            # Ensure items list exists
+            if "items" not in current_draft["request_data"]:
+                current_draft["request_data"]["items"] = []
+            
+            # Check if there are items
+            if not current_draft["request_data"]["items"]:
+                await query.edit_message_text("❌ خطأ: لا توجد قطع مضافة بعد. يرجى إضافة قطعة أولاً.")
+                return
+            
+            # Set the current item index to the last added item
+            current_draft["current_item_index"] = len(current_draft["request_data"]["items"]) - 1
+            current_draft["step"] = "add_item_photo"
+            
+            # Save the updated state
+            self.save_user_states()
+            
+            # Debug: Log the current state
+            logger.info(f"Setting up photo upload for item index: {current_draft['current_item_index']}, total items: {len(current_draft['request_data']['items'])}")
+            
+            last_item = current_draft["request_data"]["items"][-1]
+            message = f"""
+📸 إضافة صورة للقطعة
+
+📝 **{current_draft['name']}**
+
+✅ القطعة: {last_item["name"]}
+
+📸 أرسل صورة أو فيديو للقطعة:
+            """
+            
+            keyboard = [
+                [InlineKeyboardButton("⏭️ تخطى", callback_data=f"skip_item_photo_{draft_id}")]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await query.edit_message_text(message, reply_markup=reply_markup)
+            
+        except Exception as e:
+            logger.error(f"Error in handle_add_item_photo: {e}")
+            await query.edit_message_text("❌ حدث خطأ أثناء إعداد إضافة الصورة. يرجى المحاولة مرة أخرى.")
+    
+    async def handle_skip_item_photo(self, query, user, data):
+        """Handle skip item photo button"""
+        draft_id = data.split("_")[3]
+        user_state = self.user_states.get(user.telegram_id, {})
+        
+        if draft_id not in user_state.get("drafts", {}):
+            await query.edit_message_text("❌ خطأ: لم يتم العثور على المسودة.")
+            return
+        
+        current_draft = user_state["drafts"][draft_id]
+        current_draft["step"] = "manage_items"
+        
+        # Clear the current item index
+        if "current_item_index" in current_draft:
+            del current_draft["current_item_index"]
+        
+        message = f"""
+✅ تم إضافة القطعة بنجاح!
+
+📝 **{current_draft['name']}**
+
+✅ القطعة: {current_draft["request_data"]["items"][-1]["name"]}
+
+ما تريد فعله الآن؟
+        """
+        
+        keyboard = [
+            [InlineKeyboardButton("➕ إضافة قطعة أخرى", callback_data=f"add_item_{draft_id}")],
+            [InlineKeyboardButton("✅ تأكيد الطلب", callback_data=f"confirm_request_{draft_id}")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.edit_message_text(message, reply_markup=reply_markup)
+    
     async def handle_manage_items(self, query, user, data):
         """Handle manage items callback"""
         draft_id = data.split("_")[2]
@@ -2798,6 +2976,52 @@ class TelegramBot:
         except Exception as e:
             logger.error(f"Error in handle_view_all_offers: {e}")
             await query.edit_message_text("❌ حدث خطأ في عرض العروض")
+    
+    async def start_polling(self):
+        """Start the bot polling"""
+        if not self.application:
+            logger.error("Bot application not setup")
+            return
+        
+        logger.info("🚀 Starting bot polling...")
+        await self.application.run_polling()
+    
+    def save_user_states(self):
+        """Save user states to file"""
+        try:
+            with open(self.states_file, 'wb') as f:
+                pickle.dump(self.user_states, f)
+            logger.debug(f"Saved user states to {self.states_file}")
+        except Exception as e:
+            logger.error(f"Error saving user states: {e}")
+    
+    def load_user_states(self):
+        """Load user states from file"""
+        try:
+            if os.path.exists(self.states_file):
+                with open(self.states_file, 'rb') as f:
+                    self.user_states = pickle.load(f)
+                logger.info(f"Loaded user states from {self.states_file}")
+            else:
+                logger.info("No existing user states file found, starting fresh")
+        except Exception as e:
+            logger.error(f"Error loading user states: {e}")
+            self.user_states = {}
+    
+    def update_user_state(self, user_id, key, value):
+        """Update user state and save to file"""
+        if user_id not in self.user_states:
+            self.user_states[user_id] = {}
+        self.user_states[user_id][key] = value
+        self.save_user_states()
+    
+    def get_user_state(self, user_id, key=None, default=None):
+        """Get user state"""
+        if user_id not in self.user_states:
+            return default
+        if key is None:
+            return self.user_states[user_id]
+        return self.user_states[user_id].get(key, default)
 
 
 # Initialize bot instance

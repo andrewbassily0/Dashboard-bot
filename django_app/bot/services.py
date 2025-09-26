@@ -93,13 +93,22 @@ class OrderWorkflowService:
             message = await self._prepare_junkyard_notification_message(request)
             keyboard = self._create_junkyard_action_keyboard(request)
             
+            # Get all photos from request items
+            photos_to_send = await self._get_request_photos(request)
+            
             # Send notifications to all junkyards
             success_count = 0
             failed_count = 0
             
             for junkyard in junkyards:
                 try:
+                    # Send message first
                     await self._send_message_to_junkyard(junkyard, message, keyboard)
+                    
+                    # Send photos if any
+                    if photos_to_send:
+                        await self._send_photos_to_junkyard(junkyard, photos_to_send)
+                    
                     success_count += 1
                     logger.info(f"✅ Notified junkyard {junkyard.user.first_name}")
                 except Exception as e:
@@ -242,8 +251,71 @@ class OrderWorkflowService:
         ]
         return InlineKeyboardMarkup(keyboard)
     
+    async def _get_request_photos(self, request: Request) -> list:
+        """Get all photos from request items"""
+        from asgiref.sync import sync_to_async
+        
+        photos = []
+        
+        # Check if request has items
+        has_items = await sync_to_async(lambda: request.items.exists())()
+        
+        if has_items:
+            items = await sync_to_async(list)(request.items.all())
+            for item in items:
+                if item.media_files:
+                    for media in item.media_files:
+                        if media.get("type") == "photo":
+                            photos.append({
+                                "file_id": media.get("file_id"),
+                                "item_name": item.name
+                            })
+        
+        return photos
+    
+    async def _send_photos_to_junkyard(self, junkyard: Junkyard, photos: list):
+        """Send photos to junkyard with captions"""
+        if not self.telegram_bot or not photos:
+            return
+        
+        # Send to main junkyard user
+        telegram_id = junkyard.user.telegram_id
+        if telegram_id:
+            await self._send_photos_to_telegram(telegram_id, photos)
+        
+        # Also send to junkyard staff if any
+        staff_members = await self._get_junkyard_staff(junkyard)
+        for staff in staff_members:
+            if staff.user.telegram_id and staff.is_active:
+                try:
+                    await self._send_photos_to_telegram(staff.user.telegram_id, photos)
+                except Exception as e:
+                    error_msg = str(e).lower()
+                    if "chat not found" in error_msg:
+                        logger.warning(f"Failed to send photos to staff {staff.user.first_name}: Chat not found")
+                    elif "forbidden" in error_msg:
+                        logger.warning(f"Failed to send photos to staff {staff.user.first_name}: User blocked the bot")
+                    else:
+                        logger.warning(f"Failed to send photos to staff {staff.user.first_name}: {e}")
+    
+    async def _send_photos_to_telegram(self, telegram_id: int, photos: list):
+        """Send photos to telegram user"""
+        if not self.telegram_bot:
+            return
+        
+        for photo_data in photos:
+            try:
+                caption = f"📸 صورة قطعة: {photo_data['item_name']}"
+                await self.telegram_bot.application.bot.send_photo(
+                    chat_id=telegram_id,
+                    photo=photo_data['file_id'],
+                    caption=caption
+                )
+            except Exception as e:
+                logger.error(f"Failed to send photo to {telegram_id}: {e}")
+    
     async def _get_request_parts_description(self, request: Request) -> str:
-        """Get parts description with numbers for display"""
+        """Get parts description with numbers and photos for display"""
         from asgiref.sync import sync_to_async
         
         # Check if request has items
@@ -255,7 +327,10 @@ class OrderWorkflowService:
             )
             parts_list = []
             for i, item in enumerate(items, 1):
-                parts_list.append(f"{i}️⃣ {item.name}")
+                # Check if item has photos
+                has_photos = len(item.media_files) > 0
+                photo_indicator = "📸" if has_photos else "📦"
+                parts_list.append(f"{i}️⃣ {photo_indicator} {item.name}")
             return "\n".join(parts_list)
         else:
             return await sync_to_async(lambda: request.parts or "لا توجد قطع محددة")()

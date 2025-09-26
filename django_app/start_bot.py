@@ -29,10 +29,17 @@ def main():
         async def run():
             bot = TelegramBot()
             logger.info("✅ تم إنشاء البوت بنجاح")
+            
+            # Setup bot application
+            app = bot.setup_bot()
+            if not app:
+                logger.error("❌ فشل في إعداد البوت")
+                return
+            
             logger.info("🔄 جاري بدء Polling...")
             
             try:
-                await bot.start_polling()
+                await app.run_polling()
             except Exception as e:
                 logger.error(f"❌ خطأ في Polling: {e}")
                 raise
