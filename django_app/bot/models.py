@@ -126,18 +126,31 @@ class Request(models.Model):
     def generate_order_id(self):
         """Generate unique order ID based on city code and date"""
         from django.utils import timezone
+        import random
         now = timezone.now()
         date_str = now.strftime('%y%m%d')
         city_code = self.city.code
-        
-        # Find the next sequential number for today
-        today_requests = Request.objects.filter(
-            created_at__date=now.date(),
-            city=self.city
-        ).count()
-        
-        sequence = str(today_requests + 1).zfill(3)
-        return f"{city_code}{date_str}{sequence}"
+
+        # Try to find a unique order ID
+        max_attempts = 100
+        for attempt in range(max_attempts):
+            # Find the next sequential number for today
+            today_requests = Request.objects.filter(
+                created_at__date=now.date(),
+                city=self.city
+            ).count()
+
+            # Add some randomness to avoid conflicts
+            sequence = str(today_requests + 1 + attempt).zfill(3)
+            order_id = f"{city_code}{date_str}{sequence}"
+
+            # Check if this order_id already exists
+            if not Request.objects.filter(order_id=order_id).exists():
+                return order_id
+
+        # Fallback: use random number if all attempts failed
+        random_suffix = str(random.randint(1000, 9999))
+        return f"{city_code}{date_str}{random_suffix}"
     
     @property
     def is_expired(self):

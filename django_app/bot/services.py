@@ -39,7 +39,7 @@ class OrderWorkflowService:
         Process a confirmed order by notifying all junkyards in the city
         """
         try:
-            logger.info(f"🔄 Processing confirmed order {request.order_id}")
+            logger.info(f"[PROCESSING] Processing confirmed order {request.order_id}")
             
             # Update request status to active
             await self._update_request_status(request, 'active')
@@ -49,26 +49,29 @@ class OrderWorkflowService:
             try:
                 await self.notify_all_junkyards(request)
                 junkyard_notification_success = True
-                logger.info(f"✅ Successfully notified junkyards for order {request.order_id}")
+                logger.info(f"[SUCCESS] Successfully notified junkyards for order {request.order_id}")
             except Exception as notification_error:
-                logger.error(f"⚠️ Error notifying junkyards for order {request.order_id}: {notification_error}")
+                logger.error(f"[WARNING] Error notifying junkyards for order {request.order_id}: {notification_error}")
                 # Don't fail the entire process if junkyard notifications fail
             
             # Try to send confirmation to customer
             try:
                 await self.send_order_confirmation_to_customer(request)
-                logger.info(f"✅ Successfully sent confirmation to customer for order {request.order_id}")
+                logger.info(f"[SUCCESS] Successfully sent confirmation to customer for order {request.order_id}")
             except Exception as customer_error:
-                logger.error(f"⚠️ Error sending confirmation to customer for order {request.order_id}: {customer_error}")
+                logger.error(f"[WARNING] Error sending confirmation to customer for order {request.order_id}: {customer_error}")
                 # Don't fail the entire process if customer confirmation fails
             
             if junkyard_notification_success:
-                logger.info(f"✅ Successfully processed order {request.order_id}")
+                logger.info(f"[SUCCESS] Successfully processed order {request.order_id}")
             else:
-                logger.warning(f"⚠️ Order {request.order_id} created but junkyard notifications failed")
+                logger.warning(
+                    f"[WARNING] Order {request.order_id} created but "
+                    f"junkyard notifications failed"
+                )
             
         except Exception as e:
-            logger.error(f"❌ Error processing confirmed order {request.order_id}: {e}")
+            logger.error(f"[ERROR] Error processing confirmed order {request.order_id}: {e}")
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
             raise
@@ -78,16 +81,24 @@ class OrderWorkflowService:
         Send notification to all active junkyards in the same city as the request
         """
         try:
-            logger.info(f"📢 Notifying junkyards for order {request.order_id} in {request.city.name}")
+            logger.info(
+                f"[NOTIFY] Notifying junkyards for order {request.order_id} "
+                f"in {request.city.name}"
+            )
             
             # Get all active junkyards in the city
             junkyards = await self._get_active_junkyards_in_city(request.city.id)
             
             if not junkyards:
-                logger.warning(f"⚠️ No active junkyards found in {request.city.name}")
+                logger.warning(
+                    f"[WARNING] No active junkyards found in {request.city.name}"
+                )
                 return
             
-            logger.info(f"📊 Found {len(junkyards)} active junkyards in {request.city.name}")
+            logger.info(
+                f"[INFO] Found {len(junkyards)} active junkyards "
+                f"in {request.city.name}"
+            )
             
             # Prepare the notification message
             message = await self._prepare_junkyard_notification_message(request)
@@ -110,15 +121,15 @@ class OrderWorkflowService:
                         await self._send_photos_to_junkyard(junkyard, photos_to_send)
                     
                     success_count += 1
-                    logger.info(f"✅ Notified junkyard {junkyard.user.first_name}")
+                    logger.info(f"[SUCCESS] Notified junkyard {junkyard.user.first_name}")
                 except Exception as e:
                     failed_count += 1
-                    logger.error(f"❌ Failed to notify junkyard {junkyard.user.first_name}: {e}")
+                    logger.error(f"[ERROR] Failed to notify junkyard {junkyard.user.first_name}: {e}")
             
-            logger.info(f"📈 Notification results: {success_count} successful, {failed_count} failed")
+            logger.info(f"[STATS] Notification results: {success_count} successful, {failed_count} failed")
             
         except Exception as e:
-            logger.error(f"❌ Error notifying junkyards for order {request.order_id}: {e}")
+            logger.error(f"[ERROR] Error notifying junkyards for order {request.order_id}: {e}")
             raise
     
     async def process_junkyard_offer(self, offer: Offer):
@@ -126,7 +137,7 @@ class OrderWorkflowService:
         Process a new offer from junkyard and notify the customer
         """
         try:
-            logger.info(f"💰 Processing new offer from {offer.junkyard.user.first_name} for order {offer.request.order_id}")
+            logger.info(f"[MONEY] Processing new offer from {offer.junkyard.user.first_name} for order {offer.request.order_id}")
             
             # Send offer notification to customer
             await self.notify_customer_about_offer(offer)
@@ -136,10 +147,10 @@ class OrderWorkflowService:
             if offer_count == 1:
                 await self._update_request_status(offer.request, 'active')
             
-            logger.info(f"✅ Successfully processed offer from {offer.junkyard.user.first_name}")
+            logger.info(f"[SUCCESS] Successfully processed offer from {offer.junkyard.user.first_name}")
             
         except Exception as e:
-            logger.error(f"❌ Error processing offer from {offer.junkyard.user.first_name}: {e}")
+            logger.error(f"[ERROR] Error processing offer from {offer.junkyard.user.first_name}: {e}")
             raise
     
     async def notify_customer_about_offer(self, offer: Offer):
@@ -152,10 +163,10 @@ class OrderWorkflowService:
             
             await self._send_message_to_customer(offer.request.user, message, keyboard)
             
-            logger.info(f"📱 Notified customer about offer from {offer.junkyard.user.first_name}")
+            logger.info(f"[MOBILE] Notified customer about offer from {offer.junkyard.user.first_name}")
             
         except Exception as e:
-            logger.error(f"❌ Error notifying customer about offer: {e}")
+            logger.error(f"[ERROR] Error notifying customer about offer: {e}")
             raise
     
     async def process_customer_offer_decision(self, offer: Offer, decision: str, customer_user: User):
@@ -166,7 +177,7 @@ class OrderWorkflowService:
             if decision not in ['accept', 'reject']:
                 raise ValueError(f"Invalid decision: {decision}")
             
-            logger.info(f"🎯 Processing customer decision '{decision}' for offer {offer.id}")
+            logger.info(f"[DIRECT_HIT] Processing customer decision '{decision}' for offer {offer.id}")
             
             # Update offer status
             new_status = 'accepted' if decision == 'accept' else 'rejected'
@@ -180,10 +191,10 @@ class OrderWorkflowService:
             # Send confirmation to customer
             await self._send_decision_confirmation_to_customer(offer, decision)
             
-            logger.info(f"✅ Successfully processed {decision} decision for offer {offer.id}")
+            logger.info(f"[SUCCESS] Successfully processed {decision} decision for offer {offer.id}")
             
         except Exception as e:
-            logger.error(f"❌ Error processing customer decision: {e}")
+            logger.error(f"[ERROR] Error processing customer decision: {e}")
             raise
     
     async def _handle_offer_acceptance(self, offer: Offer):
@@ -246,7 +257,7 @@ class OrderWorkflowService:
     def _create_junkyard_action_keyboard(self, request: Request):
         """Create keyboard for junkyard actions"""
         keyboard = [
-            [InlineKeyboardButton("💰 إضافة عرض سعر", callback_data=f"offer_add_{request.id}")],
+            [InlineKeyboardButton("[MONEY] إضافة عرض سعر", callback_data=f"offer_add_{request.id}")],
             [InlineKeyboardButton("📋 عرض تفاصيل الطلب", callback_data=f"request_details_{request.id}")]
         ]
         return InlineKeyboardMarkup(keyboard)
@@ -363,7 +374,7 @@ class OrderWorkflowService:
         detailed_pricing = await self._get_detailed_pricing(offer)
         
         message = f"""
-💰 عرض جديد لطلبك!
+[MONEY] عرض جديد لطلبك!
 
 🆔 رقم الطلب: {offer.request.order_id}
 🏪 التشليح: {offer.junkyard.user.first_name}
@@ -372,7 +383,7 @@ class OrderWorkflowService:
 
 {detailed_pricing}
 
-💰 **الإجمالي**: {offer.price} ريال
+[MONEY] **الإجمالي**: {offer.price} ريال
 {delivery_info}
 ⭐ التقييم: {offer.junkyard.average_rating:.1f} ⭐ ({offer.junkyard.total_ratings} تقييم)
 📍 الموقع: {offer.junkyard.location}
@@ -387,8 +398,8 @@ class OrderWorkflowService:
         """Create keyboard for customer offer decision"""
         keyboard = [
             [
-                InlineKeyboardButton("✅ قبول العرض", callback_data=f"offer_accept_{offer.id}"),
-                InlineKeyboardButton("❌ رفض العرض", callback_data=f"offer_reject_{offer.id}")
+                InlineKeyboardButton("[SUCCESS] قبول العرض", callback_data=f"offer_accept_{offer.id}"),
+                InlineKeyboardButton("[ERROR] رفض العرض", callback_data=f"offer_reject_{offer.id}")
             ],
             [InlineKeyboardButton("💬 التواصل مع التشليح", callback_data=f"chat_with_junkyard_{offer.junkyard.id}_{offer.request.id}")],
             [InlineKeyboardButton("📋 عرض جميع العروض", callback_data=f"view_all_offers_{offer.request.id}")]
@@ -449,7 +460,7 @@ class OrderWorkflowService:
         parts_description = await self._get_request_parts_description(request)
         
         message = f"""
-✅ تم تأكيد طلبك بنجاح!
+[SUCCESS] تم تأكيد طلبك بنجاح!
 
 🆔 رقم الطلب: {request.order_id}
 🏙️ المدينة: {request.city.name}
@@ -461,7 +472,7 @@ class OrderWorkflowService:
 📤 تم إرسال طلبك إلى جميع التشاليح المسجّلة في منطقتك.
 ⏰ ستبدأ العروض بالوصول خلال دقائق!
 
-📱 سيتم إشعارك فور وصول أي عرض جديد.
+[MOBILE] سيتم إشعارك فور وصول أي عرض جديد.
         """
         
         keyboard = [
@@ -478,14 +489,16 @@ class OrderWorkflowService:
         
         request.status = status
         await sync_to_async(request.save)(update_fields=['status'])
-        logger.info(f"📝 Updated request {request.order_id} status to {status}")
+        logger.info(
+            f"[UPDATE] Updated request {request.order_id} status to {status}"
+        )
     
     async def _update_offer_status(self, offer: Offer, status: str):
         """Update offer status"""
         
         offer.status = status
         await sync_to_async(offer.save)(update_fields=['status'])
-        logger.info(f"📝 Updated offer {offer.id} status to {status}")
+        logger.info(f"[UPDATE] Updated offer {offer.id} status to {status}")
     
     async def _get_offer_count_for_request(self, request: Request) -> int:
         """Get number of offers for a request"""
@@ -549,8 +562,8 @@ class OrderWorkflowService:
 
 {detailed_pricing}
 
-💰 **الإجمالي**: {offer_price} ريال
-📱 رقم العميل: {phone_number if phone_number else 'غير متوفر'}
+[MONEY] **الإجمالي**: {offer_price} ريال
+[MOBILE] رقم العميل: {phone_number if phone_number else 'غير متوفر'}
 
 📞 يرجى التواصل مع العميل لتنسيق التسليم.
 
@@ -594,7 +607,7 @@ class OrderWorkflowService:
 
 {detailed_pricing}
 
-💰 **الإجمالي**: {offer_price} ريال
+[MONEY] **الإجمالي**: {offer_price} ريال
 📝 سبب الرفض: {rejection_reason}
 
 💡 لا تقلق! ستصلك طلبات جديدة قريباً.
@@ -619,7 +632,7 @@ class OrderWorkflowService:
             junkyard_location = await sync_to_async(lambda: offer.junkyard.location)()
             
             message = f"""
-✅ تم قبول العرض بنجاح!
+[SUCCESS] تم قبول العرض بنجاح!
 
 🆔 رقم الطلب: {order_id}
 🏪 التشليح: {junkyard_name}
@@ -628,7 +641,7 @@ class OrderWorkflowService:
 
 {detailed_pricing}
 
-💰 **الإجمالي**: {offer_price} ريال
+[MONEY] **الإجمالي**: {offer_price} ريال
 📍 الموقع: {junkyard_location}
 
 📞 سيتم التواصل معك من قبل التشليح لتنسيق التسليم.
@@ -645,17 +658,17 @@ class OrderWorkflowService:
             offer_price = await sync_to_async(lambda: offer.price)()
             
             message = f"""
-❌ تم رفض العرض
+[ERROR] تم رفض العرض
 
 🆔 رقم الطلب: {order_id}
 🏪 التشليح: {junkyard_name}
 
 {detailed_pricing}
 
-💰 **الإجمالي**: {offer_price} ريال
+[MONEY] **الإجمالي**: {offer_price} ريال
 
 💡 سنستمر في استقبال عروض أخرى لطلبك.
-📱 سيتم إشعارك عند وصول عروض جديدة.
+[MOBILE] سيتم إشعارك عند وصول عروض جديدة.
             """
         
         # Get request ID safely

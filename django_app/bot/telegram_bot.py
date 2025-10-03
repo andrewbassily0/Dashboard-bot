@@ -10,6 +10,8 @@ from django.conf import settings
 from django.utils import timezone
 from asgiref.sync import sync_to_async
 from .models import User, City, Brand, Model, Request, Junkyard, Offer, Conversation, JunkyardRating
+from .database_utils import safe_sync_to_async, ensure_async_db_connection
+from django.db import connection
 
 logger = logging.getLogger(__name__)
 
@@ -18,9 +20,30 @@ class TelegramBot:
         self.application = None
         self.user_states = {}  # تخزين حالات المحادثة والمسودات للمستخدمين
         self.MAX_DRAFTS = 5  # الحد الأقصى لعدد المسودات لكل مستخدم
-        self.states_file = "/tmp/bot_user_states.pickle"  # ملف لحفظ الحالات
+        # Use a more reliable path for state file
+        import tempfile
+        self.states_file = os.path.join(tempfile.gettempdir(), "bot_user_states.pickle")
         self.load_user_states()  # تحميل الحالات عند البدء
-    
+
+    async def safe_edit_message_text(self, query, text, reply_markup=None, parse_mode=None):
+        """
+        Safely edit message text, handling the 'Message is not modified' error gracefully.
+        This prevents crashes when users click the same button multiple times.
+        """
+        try:
+            if parse_mode:
+                await query.edit_message_text(text, reply_markup=reply_markup, parse_mode=parse_mode)
+            else:
+                await query.edit_message_text(text, reply_markup=reply_markup)
+        except Exception as e:
+            if "Message is not modified" in str(e):
+                # Silently ignore this error as the message is already showing the correct content
+                logger.debug(f"Message not modified - content already displayed")
+                pass
+            else:
+                # Re-raise other exceptions
+                raise e
+
     def setup_bot(self):
         """Initialize the bot application"""
         if not settings.TELEGRAM_BOT_TOKEN:
@@ -200,7 +223,7 @@ class TelegramBot:
             user_greeting = f"@{telegram_user.username}"
         else:
             user_greeting = telegram_user.first_name or "عزيزي المستخدم"
-        
+
         # رسالة الترحيب الجديدة
         welcome_message = f"""
 🔧 مرحباً {user_greeting}!
@@ -211,15 +234,15 @@ class TelegramBot:
 
 اختَر إجراءً:
         """
-        
+
         # الأزرار الجديدة
         keyboard = [
             [InlineKeyboardButton("🛒 بدء الطلبات", callback_data="start_ordering")],
             [InlineKeyboardButton("❓ ما هو تشاليح", callback_data="about_tashaleeh")],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        
-        await query.edit_message_text(welcome_message, reply_markup=reply_markup)
+
+        await self.safe_edit_message_text(query, welcome_message, reply_markup=reply_markup)
     
     async def show_about_tashaleeh(self, query, user):
         """Show 'About Tashaleeh' screen"""
@@ -245,7 +268,7 @@ class TelegramBot:
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
-        await query.edit_message_text(about_message, reply_markup=reply_markup, parse_mode='Markdown')
+        await self.safe_edit_message_text(query, about_message, reply_markup=reply_markup, parse_mode='Markdown')
     
     async def show_usage_policy(self, query, user):
         """Show usage instructions and policy screen"""
@@ -274,7 +297,7 @@ class TelegramBot:
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
-        await query.edit_message_text(policy_message, reply_markup=reply_markup, parse_mode='Markdown')
+        await self.safe_edit_message_text(query, policy_message, reply_markup=reply_markup, parse_mode='Markdown')
     
     async def button_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle inline keyboard button callbacks"""
@@ -345,12 +368,12 @@ class TelegramBot:
                 await self.delete_draft(query, user, data)
             elif data.startswith("offer_details_"):
                 await self.show_offer_details(query, user, data)
-            elif data.startswith("add_item_"):
-                await self.handle_add_item(query, user, data)
             elif data.startswith("add_item_photo_"):
                 await self.handle_add_item_photo(query, user, data)
             elif data.startswith("skip_item_photo_"):
                 await self.handle_skip_item_photo(query, user, data)
+            elif data.startswith("add_item_"):
+                await self.handle_add_item(query, user, data)
             elif data.startswith("manage_items_"):
                 await self.handle_manage_items(query, user, data)
             elif data.startswith("view_items_"):
@@ -384,16 +407,43 @@ class TelegramBot:
             logger.error(f"Error in button_callback: {e}")
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
-            
-            try:
-                await query.edit_message_text("""
+
+            # More specific error handling
+            error_str = str(e).lower()
+
+            if "does not exist" in error_str:
+                error_message = """
+❌ البيانات المطلوبة غير متوفرة
+
+🔧 الحل:
+• اضغط /start لإعادة تشغيل البوت
+• جرب مرة أخرى من البداية
+
+إذا استمرت المشكلة، يرجى التواصل مع الدعم الفني.
+                """
+            elif "database" in error_str or "connection" in error_str:
+                error_message = """
+❌ مشكلة مؤقتة في الاتصال
+
+🔧 الحل:
+• انتظر لحظة وجرب مرة أخرى
+• اضغط /start لإعادة تشغيل البوت
+
+نعتذر عن هذا الإزعاج المؤقت.
+                """
+            else:
+                error_message = """
 ❌ حدث خطأ مؤقت في النظام
 
 🔧 يرجى المحاولة مرة أخرى، وإذا استمرت المشكلة:
 • اضغط /start لإعادة تشغيل البوت
 • تواصل مع الدعم الفني
 
-نعتذر عن هذا الإزعاج المؤقت.""")
+نعتذر عن هذا الإزعاج المؤقت.
+                """
+
+            try:
+                await self.safe_edit_message_text(query, error_message.strip())
             except Exception as send_error:
                 logger.error(f"Failed to send error message: {send_error}")
                 # Try to answer the callback at least
@@ -424,7 +474,7 @@ class TelegramBot:
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
             
-            await query.edit_message_text(expired_button_message, reply_markup=reply_markup)
+            await self.safe_edit_message_text(query, expired_button_message, reply_markup=reply_markup)
             
         except Exception as e:
             logger.error(f"Error in handle_unknown_button: {e}")
@@ -500,13 +550,13 @@ class TelegramBot:
             keyboard.append([InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="user_type_client")])
             
             reply_markup = InlineKeyboardMarkup(keyboard)
-            await query.edit_message_text(message, reply_markup=reply_markup)
+            await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
             
         except Request.DoesNotExist:
-            await query.edit_message_text("❌ الطلب غير موجود أو لا تملك الصلاحية للوصول إليه.")
+            await self.safe_edit_message_text(query, "❌ الطلب غير موجود أو لا تملك الصلاحية للوصول إليه.")
         except Exception as e:
             logger.error(f"Error showing request details: {e}")
-            await query.edit_message_text("حدث خطأ أثناء عرض تفاصيل الطلب.")
+            await self.safe_edit_message_text(query, "حدث خطأ أثناء عرض تفاصيل الطلب.")
 
     async def handle_request_action(self, query, user, data):
         """Handle actions on requests (refresh, cancel, etc.)"""
@@ -537,13 +587,13 @@ class TelegramBot:
                     [InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="user_type_client")]
                 ]
                 reply_markup = InlineKeyboardMarkup(keyboard)
-                await query.edit_message_text(message, reply_markup=reply_markup)
+                await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
                 
         except Request.DoesNotExist:
-            await query.edit_message_text("❌ الطلب غير موجود.")
+            await self.safe_edit_message_text(query, "❌ الطلب غير موجود.")
         except Exception as e:
             logger.error(f"Error handling request action: {e}")
-            await query.edit_message_text("حدث خطأ أثناء تنفيذ الإجراء.")
+            await self.safe_edit_message_text(query, "حدث خطأ أثناء تنفيذ الإجراء.")
 
     async def show_brand_selection(self, query, user):
         """Show brand selection again"""
@@ -595,7 +645,7 @@ class TelegramBot:
         keyboard.append([InlineKeyboardButton("🔙 القائمة الرئيسية", callback_data="user_type_client")])
         
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
     
     async def show_all_brands(self, query, user):
         """Show all brands with pagination"""
@@ -625,7 +675,7 @@ class TelegramBot:
         ])
         
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
     
     
     async def show_client_menu(self, query, user):
@@ -649,20 +699,25 @@ class TelegramBot:
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
     
     async def show_user_requests(self, query, user):
         """Show user's drafts and sent requests"""
         try:
-            # Get user states for drafts
-            user_drafts = self.user_states.get(user.telegram_id, {}).get("drafts", {})
-            
-            # Get sent requests from database
-            requests = await sync_to_async(list)(
-                Request.objects.filter(user=user)
-                .select_related('brand', 'model', 'city')
-                .order_by('-created_at')
-            )
+            # Ensure user state exists
+            user_state = self.ensure_user_state(user.telegram_id)
+            user_drafts = user_state.get("drafts", {})
+
+            # Get sent requests from database with better error handling
+            try:
+                requests = await sync_to_async(list)(
+                    Request.objects.filter(user=user)
+                    .select_related('brand', 'model', 'city')
+                    .order_by('-created_at')
+                )
+            except Exception as db_error:
+                logger.error(f"Database error getting requests for user {user.telegram_id}: {db_error}")
+                requests = []
             
             # Build message and keyboard
             message = "📋 طلباتك:\n\n"
@@ -728,11 +783,11 @@ class TelegramBot:
             keyboard.append([InlineKeyboardButton("🔙 القائمة الرئيسية", callback_data="user_type_client")])
             
             reply_markup = InlineKeyboardMarkup(keyboard)
-            await query.edit_message_text(message, reply_markup=reply_markup)
+            await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
             
         except Exception as e:
             logger.error(f"Error showing user requests: {e}")
-            await query.edit_message_text("حدث خطأ أثناء عرض الطلبات. يرجى المحاولة مرة أخرى.")
+            await self.safe_edit_message_text(query, "حدث خطأ أثناء عرض الطلبات. يرجى المحاولة مرة أخرى.")
     
     
     
@@ -743,11 +798,8 @@ class TelegramBot:
     
     async def start_new_request(self, query, user):
         """Start new parts request process - create a new draft"""
-        # Initialize user states if not exists
-        if user.telegram_id not in self.user_states:
-            self.user_states[user.telegram_id] = {"drafts": {}, "current_draft": None}
-        
-        user_state = self.user_states[user.telegram_id]
+        # Ensure user state exists and is properly initialized
+        user_state = self.ensure_user_state(user.telegram_id)
         
         # Check draft limit
         if len(user_state.get("drafts", {})) >= self.MAX_DRAFTS:
@@ -762,7 +814,7 @@ class TelegramBot:
                 [InlineKeyboardButton("🔙 العودة", callback_data="my_requests")]
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
-            await query.edit_message_text(message, reply_markup=reply_markup)
+            await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
             return
         
         # Create new draft
@@ -803,7 +855,7 @@ class TelegramBot:
         ])
         
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
     
     async def handle_city_selection(self, query, user, data):
         """Handle city selection"""
@@ -815,7 +867,7 @@ class TelegramBot:
         current_draft_id = user_state.get("current_draft")
         
         if not current_draft_id or current_draft_id not in user_state.get("drafts", {}):
-            await query.edit_message_text("❌ خطأ: لم يتم العثور على المسودة. يرجى بدء طلب جديد.")
+            await self.safe_edit_message_text(query, "❌ خطأ: لم يتم العثور على المسودة. يرجى بدء طلب جديد.")
             return
         
         current_draft = user_state["drafts"][current_draft_id]
@@ -878,7 +930,7 @@ class TelegramBot:
         ])
         
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
     
     async def handle_brand_selection(self, query, user, data):
         """Handle brand selection"""
@@ -890,7 +942,7 @@ class TelegramBot:
         current_draft_id = user_state.get("current_draft")
         
         if not current_draft_id or current_draft_id not in user_state.get("drafts", {}):
-            await query.edit_message_text("❌ خطأ: لم يتم العثور على المسودة. يرجى بدء طلب جديد.")
+            await self.safe_edit_message_text(query, "❌ خطأ: لم يتم العثور على المسودة. يرجى بدء طلب جديد.")
             return
         
         current_draft = user_state["drafts"][current_draft_id]
@@ -935,7 +987,7 @@ class TelegramBot:
             ])
             
             reply_markup = InlineKeyboardMarkup(keyboard)
-            await query.edit_message_text(message, reply_markup=reply_markup)
+            await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
             return
         
         # Get brand name safely (reuse if already got)
@@ -961,7 +1013,7 @@ class TelegramBot:
         ])
         
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
     
     async def handle_model_selection(self, query, user, data):
         """Handle model selection"""
@@ -973,7 +1025,7 @@ class TelegramBot:
         current_draft_id = user_state.get("current_draft")
         
         if not current_draft_id or current_draft_id not in user_state.get("drafts", {}):
-            await query.edit_message_text("❌ خطأ: لم يتم العثور على المسودة. يرجى بدء طلب جديد.")
+            await self.safe_edit_message_text(query, "❌ خطأ: لم يتم العثور على المسودة. يرجى بدء طلب جديد.")
             return
         
         current_draft = user_state["drafts"][current_draft_id]
@@ -1014,7 +1066,7 @@ class TelegramBot:
         ])
         
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
     
     async def handle_year_range_selection(self, query, user, data):
         """Handle year range selection"""
@@ -1027,7 +1079,7 @@ class TelegramBot:
         current_draft_id = user_state.get("current_draft")
         
         if not current_draft_id or current_draft_id not in user_state.get("drafts", {}):
-            await query.edit_message_text("❌ خطأ: لم يتم العثور على المسودة. يرجى بدء طلب جديد.")
+            await self.safe_edit_message_text(query, "❌ خطأ: لم يتم العثور على المسودة. يرجى بدء طلب جديد.")
             return
         
         current_draft = user_state["drafts"][current_draft_id]
@@ -1059,7 +1111,7 @@ class TelegramBot:
         ])
         
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
     
     async def handle_year_selection(self, query, user, data):
         """Handle year selection"""
@@ -1070,7 +1122,7 @@ class TelegramBot:
         current_draft_id = user_state.get("current_draft")
         
         if not current_draft_id or current_draft_id not in user_state.get("drafts", {}):
-            await query.edit_message_text("❌ خطأ: لم يتم العثور على المسودة. يرجى بدء طلب جديد.")
+            await self.safe_edit_message_text(query, "❌ خطأ: لم يتم العثور على المسودة. يرجى بدء طلب جديد.")
             return
         
         current_draft = user_state["drafts"][current_draft_id]
@@ -1095,7 +1147,7 @@ class TelegramBot:
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
     
     async def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handle text messages"""
@@ -1331,26 +1383,38 @@ class TelegramBot:
     
     
     async def handle_media(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handle photo/video uploads"""
+        """Handle photo/video uploads with improved error handling"""
         # التحقق من حالة المستخدم أولاً
         if not await self.check_user_status(update):
             return  # المستخدم محجوب، تم إرسال رسالة الحجب
-        
+
         user = await self.get_or_create_user(update.effective_user)
-        
-        if user.telegram_id not in self.user_states:
-            await update.message.reply_text("يرجى بدء طلب جديد أولاً")
-            return
-        
-        # Get current draft
-        user_state = self.user_states.get(user.telegram_id, {})
+
+        # Ensure user state exists
+        user_state = self.ensure_user_state(user.telegram_id)
         current_draft_id = user_state.get("current_draft")
-        
-        if not current_draft_id or current_draft_id not in user_state.get("drafts", {}):
-            await update.message.reply_text("❌ خطأ: لم يتم العثور على المسودة. يرجى بدء طلب جديد.")
+
+        # Check if user has a current draft
+        if not current_draft_id:
+            await update.message.reply_text("""
+❌ لا يوجد طلب نشط حالياً.
+
+يرجى بدء طلب جديد أولاً بالضغط على /start
+            """)
             return
-        
-        current_draft = user_state["drafts"][current_draft_id]
+
+        # Get the current draft with better error handling
+        current_draft = self.get_or_create_draft(user.telegram_id, current_draft_id)
+        if not current_draft:
+            await update.message.reply_text("""
+❌ خطأ: لم يتم العثور على المسودة الحالية.
+
+يرجى بدء طلب جديد بالضغط على /start
+            """)
+            # Clear the invalid current_draft
+            user_state["current_draft"] = None
+            self.save_user_states()
+            return
         current_step = current_draft.get("step")
         
         # Handle different media upload scenarios
@@ -1442,7 +1506,10 @@ class TelegramBot:
         else:
             # Unknown step, ignore media
             return
-        
+
+        # Save the updated state
+        self.save_user_states()
+
         await update.message.reply_text(message, reply_markup=reply_markup)
     
     async def confirm_request(self, query, user, data):
@@ -1453,7 +1520,7 @@ class TelegramBot:
         user_state = self.user_states.get(user.telegram_id, {})
         
         if not draft_id or draft_id not in user_state.get("drafts", {}):
-            await query.edit_message_text("❌ خطأ: لم يتم العثور على المسودة.")
+            await self.safe_edit_message_text(query, "❌ خطأ: لم يتم العثور على المسودة.")
             return
         
         current_draft = user_state["drafts"][draft_id]
@@ -1463,13 +1530,13 @@ class TelegramBot:
         required_fields = ["city_id", "brand_id", "model_id", "year"]
         for field in required_fields:
             if field not in request_data:
-                await query.edit_message_text(f"❌ خطأ: حقل {field} مفقود. يرجى إكمال جميع البيانات المطلوبة.")
+                await self.safe_edit_message_text(query, f"❌ خطأ: حقل {field} مفقود. يرجى إكمال جميع البيانات المطلوبة.")
                 return
         
         # Validate that there are items
         items = request_data.get("items", [])
         if not items:
-            await query.edit_message_text("❌ خطأ: يجب إضافة قطعة واحدة على الأقل.")
+            await self.safe_edit_message_text(query, "❌ خطأ: يجب إضافة قطعة واحدة على الأقل.")
             return
         
         # Create the request
@@ -1478,7 +1545,7 @@ class TelegramBot:
             try:
                 city = await sync_to_async(City.objects.get)(id=request_data["city_id"])
             except City.DoesNotExist:
-                await query.edit_message_text("""
+                await self.safe_edit_message_text(query, """
 ❌ خطأ في بيانات المدينة
 
 المدينة المحددة غير موجودة في النظام.
@@ -1489,7 +1556,7 @@ class TelegramBot:
             try:
                 brand = await sync_to_async(Brand.objects.get)(id=request_data["brand_id"])
             except Brand.DoesNotExist:
-                await query.edit_message_text("""
+                await self.safe_edit_message_text(query, """
 ❌ خطأ في بيانات الوكالة
 
 الوكالة المحددة غير موجودة في النظام.
@@ -1500,7 +1567,7 @@ class TelegramBot:
             try:
                 model = await sync_to_async(Model.objects.get)(id=request_data["model_id"])
             except Model.DoesNotExist:
-                await query.edit_message_text("""
+                await self.safe_edit_message_text(query, """
 ❌ خطأ في بيانات اسم السيارة
 
 اسم السيارة المحدد غير موجود في النظام.
@@ -1565,7 +1632,7 @@ class TelegramBot:
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
             
-            await query.edit_message_text(message, reply_markup=reply_markup)
+            await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
             
             # Use workflow service to process confirmed order
             try:
@@ -1603,35 +1670,35 @@ class TelegramBot:
             error_msg = str(e).lower()
             
             if "city" in error_msg and "does not exist" in error_msg:
-                await query.edit_message_text("""
+                await self.safe_edit_message_text(query, """
 ❌ خطأ في بيانات المدينة
 
 المدينة المحددة غير موجودة في النظام.
 يرجى بدء طلب جديد واختيار مدينة صحيحة.
                 """)
             elif "brand" in error_msg and "does not exist" in error_msg:
-                await query.edit_message_text("""
+                await self.safe_edit_message_text(query, """
 ❌ خطأ في بيانات الوكالة
 
 الوكالة المحددة غير موجودة في النظام.
 يرجى بدء طلب جديد واختيار وكالة صحيحة.
                 """)
             elif "model" in error_msg and "does not exist" in error_msg:
-                await query.edit_message_text("""
+                await self.safe_edit_message_text(query, """
 ❌ خطأ في بيانات الاسم السيارة
 
 الاسم السيارة المحدد غير موجود في النظام.
 يرجى بدء طلب جديد واختيار اسم السيارة صحيح.
                 """)
             elif "database" in error_msg or "connection" in error_msg:
-                await query.edit_message_text("""
+                await self.safe_edit_message_text(query, """
 ❌ مشكلة في قاعدة البيانات
 
 يرجى المحاولة مرة أخرى بعد دقائق قليلة.
 إذا استمرت المشكلة، يرجى التواصل مع الدعم الفني.
                 """)
             else:
-                await query.edit_message_text(f"""
+                await self.safe_edit_message_text(query, f"""
 ❌ حدث خطأ أثناء إنشاء الطلب
 
 تفاصيل الخطأ: خطأ في النظام
@@ -1767,7 +1834,7 @@ class TelegramBot:
         if action == "manage":
             await self.show_draft_management(query, user)
         else:
-            await query.edit_message_text("❌ إجراء غير صحيح.")
+            await self.safe_edit_message_text(query, "❌ إجراء غير صحيح.")
     
     async def show_draft_management(self, query, user):
         """Show draft management interface"""
@@ -1793,7 +1860,7 @@ class TelegramBot:
             keyboard.append([InlineKeyboardButton("🔙 العودة", callback_data="my_requests")])
         
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
     
     async def switch_to_draft(self, query, user, data):
         """Switch to a specific draft"""
@@ -1801,7 +1868,7 @@ class TelegramBot:
         user_state = self.user_states.get(user.telegram_id, {})
         
         if draft_id not in user_state.get("drafts", {}):
-            await query.edit_message_text("❌ المسودة غير موجودة.")
+            await self.safe_edit_message_text(query, "❌ المسودة غير موجودة.")
             return
         
         # Set as current draft
@@ -1827,9 +1894,9 @@ class TelegramBot:
                 [InlineKeyboardButton("🔙 القائمة الرئيسية", callback_data="user_type_client")]
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
-            await query.edit_message_text(message, reply_markup=reply_markup)
+            await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
         else:
-            await query.edit_message_text(f"📝 تم التبديل إلى مسودة: {current_draft['name']}")
+            await self.safe_edit_message_text(query, f"📝 تم التبديل إلى مسودة: {current_draft['name']}")
     
     async def delete_draft(self, query, user, data):
         """Delete a specific draft"""
@@ -1837,7 +1904,7 @@ class TelegramBot:
         user_state = self.user_states.get(user.telegram_id, {})
         
         if draft_id not in user_state.get("drafts", {}):
-            await query.edit_message_text("❌ المسودة غير موجودة.")
+            await self.safe_edit_message_text(query, "❌ المسودة غير موجودة.")
             return
         
         draft_name = user_state["drafts"][draft_id].get("name", "مسودة")
@@ -1853,7 +1920,7 @@ class TelegramBot:
             [InlineKeyboardButton("🗑️ إدارة المسودات", callback_data="draft_manage")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
     
     async def handle_rating_selection(self, query, user, data):
         """Handle rating selection for junkyard"""
@@ -1883,11 +1950,11 @@ class TelegramBot:
             keyboard = [[InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="user_type_client")]]
             reply_markup = InlineKeyboardMarkup(keyboard)
             
-            await query.edit_message_text(message, reply_markup=reply_markup)
+            await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
             
         except Exception as e:
             logger.error(f"Error handling rating: {e}")
-            await query.edit_message_text("حدث خطأ أثناء التقييم. يرجى المحاولة مرة أخرى.")
+            await self.safe_edit_message_text(query, "حدث خطأ أثناء التقييم. يرجى المحاولة مرة أخرى.")
     
     async def accept_offer(self, query, user, offer_id):
         """Accept an offer from junkyard with locking mechanism"""
@@ -1913,7 +1980,7 @@ class TelegramBot:
                     [InlineKeyboardButton("🔙 القائمة الرئيسية", callback_data="user_type_client")]
                 ]
                 reply_markup = InlineKeyboardMarkup(keyboard)
-                await query.edit_message_text(message, reply_markup=reply_markup)
+                await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
                 return
             
             # Validate offer has mandatory fields
@@ -1928,7 +1995,7 @@ class TelegramBot:
                     [InlineKeyboardButton("🔙 القائمة الرئيسية", callback_data="user_type_client")]
                 ]
                 reply_markup = InlineKeyboardMarkup(keyboard)
-                await query.edit_message_text(message, reply_markup=reply_markup)
+                await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
                 return
             
             # Use workflow service to process the decision
@@ -1956,11 +2023,11 @@ class TelegramBot:
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
             
-            await query.edit_message_text(message, reply_markup=reply_markup)
+            await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
             
         except Exception as e:
             logger.error(f"Error accepting offer: {e}")
-            await query.edit_message_text("حدث خطأ أثناء قبول العرض. يرجى المحاولة مرة أخرى.")
+            await self.safe_edit_message_text(query, "حدث خطأ أثناء قبول العرض. يرجى المحاولة مرة أخرى.")
     
     async def reject_offer(self, query, user, offer_id):
         """Reject an offer from junkyard"""
@@ -1973,11 +2040,11 @@ class TelegramBot:
             await workflow_service.process_customer_offer_decision(offer, 'reject', user)
             
             # Edit the message to show rejection confirmation
-            await query.edit_message_text("❌ تم رفض العرض. سيتم إشعار التشليح.")
+            await self.safe_edit_message_text(query, "❌ تم رفض العرض. سيتم إشعار التشليح.")
             
         except Exception as e:
             logger.error(f"Error rejecting offer: {e}")
-            await query.edit_message_text("حدث خطأ أثناء رفض العرض. يرجى المحاولة مرة أخرى.")
+            await self.safe_edit_message_text(query, "حدث خطأ أثناء رفض العرض. يرجى المحاولة مرة أخرى.")
     
     async def handle_offer_action(self, query, user, data):
         """Handle offer-related actions"""
@@ -2004,7 +2071,7 @@ class TelegramBot:
                 )(id=request_id)
             except Request.DoesNotExist:
                 logger.error(f"Request {request_id} not found for user {user.telegram_id}")
-                await query.edit_message_text("❌ الطلب غير موجود أو انتهت صلاحيته.")
+                await self.safe_edit_message_text(query, "❌ الطلب غير موجود أو انتهت صلاحيته.")
                 return
             
             # Check if user is a junkyard
@@ -2012,7 +2079,7 @@ class TelegramBot:
                 junkyard = await sync_to_async(Junkyard.objects.get)(user=user)
             except Junkyard.DoesNotExist:
                 logger.error(f"User {user.telegram_id} ({user.first_name}) is not a junkyard but trying to add offer")
-                await query.edit_message_text("""
+                await self.safe_edit_message_text(query, """
 ❌ عذراً، لا يمكنك تقديم عروض.
 
 هذا الحساب غير مُسجل كتشليح في النظام.
@@ -2024,7 +2091,7 @@ class TelegramBot:
             # Check if junkyard is active
             if not junkyard.is_active:
                 logger.warning(f"Inactive junkyard {junkyard.id} trying to add offer")
-                await query.edit_message_text("""
+                await self.safe_edit_message_text(query, """
 ❌ حسابك غير مُفعل حالياً.
 
 يرجى التواصل مع الإدارة لتفعيل حسابك.
@@ -2038,7 +2105,7 @@ class TelegramBot:
 
 لا يمكن إضافة عروض جديدة للطلبات المقبولة.
                 """
-                await query.edit_message_text(message)
+                await self.safe_edit_message_text(query, message)
                 return
             
             # Check if junkyard already has an offer for this request
@@ -2047,7 +2114,7 @@ class TelegramBot:
             )()
             
             if existing_offer:
-                await query.edit_message_text("""
+                await self.safe_edit_message_text(query, """
 ❌ لديك عرض مُسبق لهذا الطلب.
 
 لا يمكن إضافة أكثر من عرض واحد للطلب الواحد.
@@ -2076,7 +2143,7 @@ class TelegramBot:
 مثال: 150
             """
             
-            await query.edit_message_text(message)
+            await self.safe_edit_message_text(query, message)
             logger.info(f"✅ Started offer process for junkyard {junkyard.id} on request {request_id}")
             
         except Exception as e:
@@ -2128,7 +2195,7 @@ class TelegramBot:
             
             # Only edit message if it's different from current content
             try:
-                await query.edit_message_text(error_message.strip())
+                await self.safe_edit_message_text(query, error_message.strip())
             except Exception as edit_error:
                 if "Message is not modified" in str(edit_error):
                     # Message is already the same, just answer the callback
@@ -2325,11 +2392,11 @@ class TelegramBot:
             ])
             
             reply_markup = InlineKeyboardMarkup(keyboard)
-            await query.edit_message_text(message, reply_markup=reply_markup)
+            await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
             
         except Exception as e:
             logger.error(f"Error showing offer details: {e}")
-            await query.edit_message_text("حدث خطأ أثناء عرض تفاصيل العرض.")
+            await self.safe_edit_message_text(query, "حدث خطأ أثناء عرض تفاصيل العرض.")
 
     async def handle_junkyard_name(self, update, user, name_text):
         """Handle junkyard name input"""
@@ -2405,7 +2472,7 @@ class TelegramBot:
 • إحداثيات GPS
         """
         
-        await query.edit_message_text(message)
+        await self.safe_edit_message_text(query, message)
 
     async def handle_junkyard_location(self, update, user, location_text):
         """Handle junkyard location input and complete registration"""
@@ -2481,7 +2548,7 @@ class TelegramBot:
         user_state = self.user_states.get(user.telegram_id, {})
         
         if draft_id not in user_state.get("drafts", {}):
-            await query.edit_message_text("❌ خطأ: لم يتم العثور على المسودة.")
+            await self.safe_edit_message_text(query, "❌ خطأ: لم يتم العثور على المسودة.")
             return
         
         current_draft = user_state["drafts"][draft_id]
@@ -2501,40 +2568,58 @@ class TelegramBot:
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
     
     async def handle_add_item_photo(self, query, user, data):
-        """Handle add item photo button"""
+        """Handle add item photo button with improved error handling"""
         try:
-            draft_id = data.split("_")[3]
-            user_state = self.user_states.get(user.telegram_id, {})
-            
-            logger.info(f"Handle add item photo - user: {user.telegram_id}, draft_id: {draft_id}, user_state keys: {list(user_state.keys())}")
-            
-            if not user_state:
-                await query.edit_message_text("❌ خطأ: لم يتم العثور على حالة المستخدم. يرجى بدء طلب جديد.")
+            # Parse draft_id from callback data
+            parts = data.split("_")
+            if len(parts) < 4:
+                logger.error(f"Invalid callback data format: {data}")
+                await self.safe_edit_message_text(query, "❌ خطأ في البيانات. يرجى المحاولة مرة أخرى.")
                 return
-            
-            if "drafts" not in user_state:
-                user_state["drafts"] = {}
-            
-            if draft_id not in user_state.get("drafts", {}):
-                await query.edit_message_text(f"❌ خطأ: لم يتم العثور على المسودة {draft_id}. المسودات المتاحة: {list(user_state.get('drafts', {}).keys())}")
+
+            draft_id = parts[3]
+            logger.info(f"Handle add item photo - user: {user.telegram_id}, draft_id: {draft_id}, data: {data}")
+
+            # Ensure user state exists
+            user_state = self.ensure_user_state(user.telegram_id)
+
+            # Get the draft with better error handling
+            current_draft = self.get_or_create_draft(user.telegram_id, draft_id)
+            if not current_draft:
+                # Try to find any available draft for this user
+                available_drafts = user_state.get("drafts", {})
+                if available_drafts:
+                    # Use the first available draft
+                    draft_id = list(available_drafts.keys())[0]
+                    current_draft = available_drafts[draft_id]
+                    user_state["current_draft"] = draft_id
+                    logger.info(f"Using available draft: {draft_id}")
+                else:
+                    await self.safe_edit_message_text(query, """
+❌ خطأ: لم يتم العثور على المسودة المطلوبة.
+
+يرجى بدء طلب جديد بالضغط على /start
+                    """)
                 return
-            
-            current_draft = user_state["drafts"][draft_id]
-            
+
             # Ensure request_data exists
             if "request_data" not in current_draft:
                 current_draft["request_data"] = {}
-            
+
             # Ensure items list exists
             if "items" not in current_draft["request_data"]:
                 current_draft["request_data"]["items"] = []
-            
+
             # Check if there are items
             if not current_draft["request_data"]["items"]:
-                await query.edit_message_text("❌ خطأ: لا توجد قطع مضافة بعد. يرجى إضافة قطعة أولاً.")
+                await self.safe_edit_message_text(query, """
+❌ خطأ: لا توجد قطع مضافة بعد.
+
+يرجى إضافة قطعة أولاً قبل إضافة الصور.
+                """)
                 return
             
             # Set the current item index to the last added item
@@ -2563,11 +2648,11 @@ class TelegramBot:
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
             
-            await query.edit_message_text(message, reply_markup=reply_markup)
+            await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
             
         except Exception as e:
             logger.error(f"Error in handle_add_item_photo: {e}")
-            await query.edit_message_text("❌ حدث خطأ أثناء إعداد إضافة الصورة. يرجى المحاولة مرة أخرى.")
+            await self.safe_edit_message_text(query, "❌ حدث خطأ أثناء إعداد إضافة الصورة. يرجى المحاولة مرة أخرى.")
     
     async def handle_skip_item_photo(self, query, user, data):
         """Handle skip item photo button"""
@@ -2575,7 +2660,7 @@ class TelegramBot:
         user_state = self.user_states.get(user.telegram_id, {})
         
         if draft_id not in user_state.get("drafts", {}):
-            await query.edit_message_text("❌ خطأ: لم يتم العثور على المسودة.")
+            await self.safe_edit_message_text(query, "❌ خطأ: لم يتم العثور على المسودة.")
             return
         
         current_draft = user_state["drafts"][draft_id]
@@ -2601,7 +2686,7 @@ class TelegramBot:
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
     
     async def handle_manage_items(self, query, user, data):
         """Handle manage items callback"""
@@ -2614,7 +2699,7 @@ class TelegramBot:
         user_state = self.user_states.get(user.telegram_id, {})
         
         if draft_id not in user_state.get("drafts", {}):
-            await query.edit_message_text("❌ خطأ: لم يتم العثور على المسودة.")
+            await self.safe_edit_message_text(query, "❌ خطأ: لم يتم العثور على المسودة.")
             return
         
         draft = user_state["drafts"][draft_id]
@@ -2653,7 +2738,7 @@ class TelegramBot:
             ]
         
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
     
     async def handle_skip_description(self, query, user, data):
         """Handle skip description callback"""
@@ -2662,14 +2747,14 @@ class TelegramBot:
         
         # Check if drafts exist
         if "drafts" not in user_state or draft_id not in user_state["drafts"]:
-            await query.edit_message_text("❌ خطأ: انتهت الجلسة. يرجى بدء طلب جديد بالضغط على /start")
+            await self.safe_edit_message_text(query, "❌ خطأ: انتهت الجلسة. يرجى بدء طلب جديد بالضغط على /start")
             return
         
         current_draft = user_state["drafts"][draft_id]
         
         # Check if temp_item exists
         if "temp_item" not in current_draft:
-            await query.edit_message_text("❌ خطأ: بيانات القطعة مفقودة. يرجى بدء إضافة قطعة جديدة.")
+            await self.safe_edit_message_text(query, "❌ خطأ: بيانات القطعة مفقودة. يرجى بدء إضافة قطعة جديدة.")
             return
         
         current_draft["temp_item"]["description"] = ""
@@ -2691,7 +2776,7 @@ class TelegramBot:
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
     
     async def handle_set_quantity(self, query, user, data):
         """Handle quantity button callbacks"""
@@ -2703,14 +2788,14 @@ class TelegramBot:
         
         # Check if drafts exist
         if "drafts" not in user_state or draft_id not in user_state["drafts"]:
-            await query.edit_message_text("❌ خطأ: انتهت الجلسة. يرجى بدء طلب جديد بالضغط على /start")
+            await self.safe_edit_message_text(query, "❌ خطأ: انتهت الجلسة. يرجى بدء طلب جديد بالضغط على /start")
             return
         
         current_draft = user_state["drafts"][draft_id]
         
         # Check if temp_item exists
         if "temp_item" not in current_draft:
-            await query.edit_message_text("❌ خطأ: بيانات القطعة مفقودة. يرجى بدء إضافة قطعة جديدة.")
+            await self.safe_edit_message_text(query, "❌ خطأ: بيانات القطعة مفقودة. يرجى بدء إضافة قطعة جديدة.")
             return
         
         # Add the item to the list
@@ -2754,7 +2839,7 @@ class TelegramBot:
         keyboard.append([InlineKeyboardButton("🔙 رجوع", callback_data=f"manage_items_{draft_id}")])
         reply_markup = InlineKeyboardMarkup(keyboard)
         
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
     
     async def handle_delete_item_menu(self, query, user, data):
         """Show delete item menu"""
@@ -2779,7 +2864,7 @@ class TelegramBot:
         keyboard.append([InlineKeyboardButton("🔙 رجوع", callback_data=f"manage_items_{draft_id}")])
         reply_markup = InlineKeyboardMarkup(keyboard)
         
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
     
     async def handle_edit_item(self, query, user, data):
         """Handle edit specific item"""
@@ -2816,7 +2901,7 @@ class TelegramBot:
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
     
     async def handle_delete_item(self, query, user, data):
         """Handle delete specific item"""
@@ -2868,7 +2953,7 @@ class TelegramBot:
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
-        await query.edit_message_text(message, reply_markup=reply_markup)
+        await self.safe_edit_message_text(query, message, reply_markup=reply_markup)
 
     async def handle_chat_with_customer(self, query, user, data):
         """Handle chat with customer button for junkyards"""
@@ -2914,11 +2999,11 @@ class TelegramBot:
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
             
-            await query.edit_message_text(message, reply_markup=reply_markup, parse_mode='Markdown')
+            await self.safe_edit_message_text(query, message, reply_markup=reply_markup, parse_mode='Markdown')
             
         except Exception as e:
             logger.error(f"Error in handle_chat_with_customer: {e}")
-            await query.edit_message_text("❌ حدث خطأ في عرض معلومات العميل")
+            await self.safe_edit_message_text(query, "❌ حدث خطأ في عرض معلومات العميل")
 
     async def handle_view_all_offers(self, query, user, data):
         """Handle view all offers button for customers"""
@@ -2971,11 +3056,11 @@ class TelegramBot:
                 ]
             
             reply_markup = InlineKeyboardMarkup(keyboard)
-            await query.edit_message_text(message, reply_markup=reply_markup, parse_mode='Markdown')
+            await self.safe_edit_message_text(query, message, reply_markup=reply_markup, parse_mode='Markdown')
             
         except Exception as e:
             logger.error(f"Error in handle_view_all_offers: {e}")
-            await query.edit_message_text("❌ حدث خطأ في عرض العروض")
+            await self.safe_edit_message_text(query, "❌ حدث خطأ في عرض العروض")
     
     async def start_polling(self):
         """Start the bot polling"""
@@ -2987,25 +3072,51 @@ class TelegramBot:
         await self.application.run_polling()
     
     def save_user_states(self):
-        """Save user states to file"""
+        """Save user states to file with better error handling"""
         try:
-            with open(self.states_file, 'wb') as f:
+            # Create directory if it doesn't exist
+            os.makedirs(os.path.dirname(self.states_file), exist_ok=True)
+
+            # Use atomic write to prevent corruption
+            temp_file = self.states_file + '.tmp'
+            with open(temp_file, 'wb') as f:
                 pickle.dump(self.user_states, f)
+
+            # Atomic move
+            if os.path.exists(self.states_file):
+                os.remove(self.states_file)
+            os.rename(temp_file, self.states_file)
+
             logger.debug(f"Saved user states to {self.states_file}")
         except Exception as e:
             logger.error(f"Error saving user states: {e}")
+            # Clean up temp file if it exists
+            temp_file = self.states_file + '.tmp'
+            if os.path.exists(temp_file):
+                try:
+                    os.remove(temp_file)
+                except:
+                    pass
     
     def load_user_states(self):
-        """Load user states from file"""
+        """Load user states from file with better error handling"""
         try:
             if os.path.exists(self.states_file):
                 with open(self.states_file, 'rb') as f:
-                    self.user_states = pickle.load(f)
-                logger.info(f"Loaded user states from {self.states_file}")
+                    loaded_states = pickle.load(f)
+                    # Validate the loaded data
+                    if isinstance(loaded_states, dict):
+                        self.user_states = loaded_states
+                        logger.info(f"Loaded user states from {self.states_file} - {len(self.user_states)} users")
+                    else:
+                        logger.warning("Invalid user states format, starting fresh")
+                        self.user_states = {}
             else:
                 logger.info("No existing user states file found, starting fresh")
+                self.user_states = {}
         except Exception as e:
             logger.error(f"Error loading user states: {e}")
+            logger.info("Starting with empty user states")
             self.user_states = {}
     
     def update_user_state(self, user_id, key, value):
@@ -3022,6 +3133,43 @@ class TelegramBot:
         if key is None:
             return self.user_states[user_id]
         return self.user_states[user_id].get(key, default)
+
+    def ensure_user_state(self, user_id):
+        """Ensure user state exists and is properly initialized"""
+        if user_id not in self.user_states:
+            self.user_states[user_id] = {
+                "drafts": {},
+                "current_draft": None
+            }
+            logger.info(f"Initialized new user state for {user_id}")
+
+        # Ensure required keys exist
+        user_state = self.user_states[user_id]
+        if "drafts" not in user_state:
+            user_state["drafts"] = {}
+        if "current_draft" not in user_state:
+            user_state["current_draft"] = None
+
+        return user_state
+
+    def get_or_create_draft(self, user_id, draft_id):
+        """Get draft or return None if not found, with better error handling"""
+        user_state = self.ensure_user_state(user_id)
+
+        if draft_id not in user_state.get("drafts", {}):
+            available_drafts = list(user_state.get('drafts', {}).keys())
+            logger.warning(f"Draft {draft_id} not found for user {user_id}. Available: {available_drafts}")
+            return None
+
+        return user_state["drafts"][draft_id]
+
+    async def ensure_db_connection(self):
+        """Ensure database connection is working"""
+        try:
+            return await ensure_async_db_connection()
+        except Exception as e:
+            logger.error(f"Database connection check failed: {e}")
+            return False
 
 
 # Initialize bot instance
